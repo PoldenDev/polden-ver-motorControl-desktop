@@ -3,6 +3,7 @@
 #include <QtDebug>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QScrollBar>
+#include <QList>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -197,12 +198,47 @@ void MainWindow::readPendingDatagrams()
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
-        QString  contrStr =  dataStr.mid(4,12);
+        QStringList list1 = dataStr.split("\r\n");
+        QString  contrStr =  dataStr.left(12);
+
+        //qDebug("%s", dataStr.toLatin1().constData());
+        QList<QSlider*> slList;
+        slList.append(ui->verticalMotorPos10);
+        slList.append(ui->verticalMotorPos9);
+        slList.append(ui->verticalMotorPos8);
+        slList.append(ui->verticalMotorPos7);
+        slList.append(ui->verticalMotorPos6);
+        slList.append(ui->verticalMotorPos5);
+        slList.append(ui->verticalMotorPos4);
+        slList.append(ui->verticalMotorPos3);
+        slList.append(ui->verticalMotorPos2);
+        slList.append(ui->verticalMotorPos1);
+
+        foreach (QString mem, list1) {
+            int mn = QString(mem[1]).toInt();
+            if((mn>=0)&&(mn<10)){
+                //qDebug("%s", mem.toLatin1().constData());
+                int pos = mem.mid(8, 4).toInt();
+                slList[mn]->setValue(pos);
+                if(mn == 1)
+                    qDebug("mn %d pos %d", mn, pos);
+            }
+        }
+
+
+
+        for(int i=0; i<10; i++){
+            QString posData = dataStr.mid(8*(i+1),4);
+            int pos = posData.toInt();
+            slList[i]->setValue(pos);
+        }
 
         //qDebug("%s", contrStr.toLatin1().constData());
         contrStr+= "\r\n";
         //qDebug() << datagram.data();
-        serial.write(contrStr.toLatin1());
+        if(serial.isOpen()){
+            serial.write(contrStr.toLatin1());
+        }
         ui->plainTextUDP->moveCursor (QTextCursor::End);
         ui->plainTextUDP->insertPlainText(contrStr);
         ui->plainTextUDP->moveCursor (QTextCursor::End);
