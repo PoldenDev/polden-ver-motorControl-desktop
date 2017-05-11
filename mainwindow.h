@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include <QUdpSocket>
+#include <QNetworkDatagram>
 
 namespace Ui {
 class MainWindow;
@@ -21,7 +23,7 @@ private slots:
 
     void on_pushButtonComOpen_clicked();
 
-    void on_pushButtonClose_clicked();
+    //void on_pushButtonClose_clicked();
 
     void on_pushButton_clicked();
 
@@ -41,9 +43,23 @@ private slots:
 
     void on_pushButtonSetCont_2_clicked();
 
+    void on_verticalSlider_sliderReleased();
+
+    void on_verticalSlider_sliderMoved(int position);
+
+    void on_verticalSlider_2_sliderReleased();
+    void readPendingDatagrams();
+    void handleReadyRead();
+
 private:
+    void setPos(int pos);
     Ui::MainWindow *ui;
     QSerialPort serial;
+
+    int speed;
+
+    void initUdpSocket();
+    QUdpSocket *udpSocket;
 };
 
 #endif // MAINWINDOW_H

@@ -13,11 +13,14 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -29,7 +32,6 @@ class Ui_MainWindow
 public:
     QWidget *centralWidget;
     QPushButton *butPos;
-    QLineEdit *lineEdit;
     QPushButton *pushButtonComOpen;
     QLineEdit *lineEditPos;
     QPushButton *pushButton;
@@ -39,7 +41,6 @@ public:
     QLineEdit *lineEditDir;
     QLineEdit *lineEditRange3;
     QPushButton *pushButtonSetCont;
-    QPushButton *pushButtonClose;
     QPushButton *pushButtonSetCont_2;
     QPushButton *pushButtonSetRange_2;
     QLineEdit *lineEditVel_2;
@@ -49,6 +50,11 @@ public:
     QPushButton *pushButtonDir_2;
     QLineEdit *lineEditDir_2;
     QPushButton *butPos_2;
+    QSlider *verticalSlider;
+    QSlider *verticalSlider_2;
+    QComboBox *comComboBox;
+    QPlainTextEdit *plainTextEdit;
+    QPlainTextEdit *plainTextUDP;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -57,18 +63,15 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(400, 300);
+        MainWindow->resize(523, 563);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         butPos = new QPushButton(centralWidget);
         butPos->setObjectName(QStringLiteral("butPos"));
         butPos->setGeometry(QRect(10, 60, 75, 23));
-        lineEdit = new QLineEdit(centralWidget);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
-        lineEdit->setGeometry(QRect(10, 10, 113, 20));
         pushButtonComOpen = new QPushButton(centralWidget);
         pushButtonComOpen->setObjectName(QStringLiteral("pushButtonComOpen"));
-        pushButtonComOpen->setGeometry(QRect(140, 10, 75, 23));
+        pushButtonComOpen->setGeometry(QRect(110, 10, 75, 31));
         lineEditPos = new QLineEdit(centralWidget);
         lineEditPos->setObjectName(QStringLiteral("lineEditPos"));
         lineEditPos->setGeometry(QRect(100, 60, 81, 20));
@@ -93,40 +96,56 @@ public:
         pushButtonSetCont = new QPushButton(centralWidget);
         pushButtonSetCont->setObjectName(QStringLiteral("pushButtonSetCont"));
         pushButtonSetCont->setGeometry(QRect(10, 180, 75, 23));
-        pushButtonClose = new QPushButton(centralWidget);
-        pushButtonClose->setObjectName(QStringLiteral("pushButtonClose"));
-        pushButtonClose->setGeometry(QRect(220, 10, 75, 23));
         pushButtonSetCont_2 = new QPushButton(centralWidget);
         pushButtonSetCont_2->setObjectName(QStringLiteral("pushButtonSetCont_2"));
-        pushButtonSetCont_2->setGeometry(QRect(210, 180, 75, 23));
+        pushButtonSetCont_2->setGeometry(QRect(270, 180, 75, 23));
         pushButtonSetRange_2 = new QPushButton(centralWidget);
         pushButtonSetRange_2->setObjectName(QStringLiteral("pushButtonSetRange_2"));
-        pushButtonSetRange_2->setGeometry(QRect(210, 150, 75, 23));
+        pushButtonSetRange_2->setGeometry(QRect(270, 150, 75, 23));
         lineEditVel_2 = new QLineEdit(centralWidget);
         lineEditVel_2->setObjectName(QStringLiteral("lineEditVel_2"));
-        lineEditVel_2->setGeometry(QRect(300, 90, 81, 20));
+        lineEditVel_2->setGeometry(QRect(360, 90, 81, 20));
         lineEditRange3_2 = new QLineEdit(centralWidget);
         lineEditRange3_2->setObjectName(QStringLiteral("lineEditRange3_2"));
-        lineEditRange3_2->setGeometry(QRect(300, 150, 81, 20));
+        lineEditRange3_2->setGeometry(QRect(360, 150, 81, 20));
         pushButton_2 = new QPushButton(centralWidget);
         pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
-        pushButton_2->setGeometry(QRect(210, 90, 75, 23));
+        pushButton_2->setGeometry(QRect(270, 90, 75, 23));
         lineEditPos_2 = new QLineEdit(centralWidget);
         lineEditPos_2->setObjectName(QStringLiteral("lineEditPos_2"));
-        lineEditPos_2->setGeometry(QRect(300, 60, 81, 20));
+        lineEditPos_2->setGeometry(QRect(360, 60, 81, 20));
         pushButtonDir_2 = new QPushButton(centralWidget);
         pushButtonDir_2->setObjectName(QStringLiteral("pushButtonDir_2"));
-        pushButtonDir_2->setGeometry(QRect(210, 120, 75, 23));
+        pushButtonDir_2->setGeometry(QRect(270, 120, 75, 23));
         lineEditDir_2 = new QLineEdit(centralWidget);
         lineEditDir_2->setObjectName(QStringLiteral("lineEditDir_2"));
-        lineEditDir_2->setGeometry(QRect(300, 120, 81, 20));
+        lineEditDir_2->setGeometry(QRect(360, 120, 81, 20));
         butPos_2 = new QPushButton(centralWidget);
         butPos_2->setObjectName(QStringLiteral("butPos_2"));
-        butPos_2->setGeometry(QRect(210, 60, 75, 23));
+        butPos_2->setGeometry(QRect(270, 60, 75, 23));
+        verticalSlider = new QSlider(centralWidget);
+        verticalSlider->setObjectName(QStringLiteral("verticalSlider"));
+        verticalSlider->setGeometry(QRect(450, 20, 22, 271));
+        verticalSlider->setOrientation(Qt::Vertical);
+        verticalSlider_2 = new QSlider(centralWidget);
+        verticalSlider_2->setObjectName(QStringLiteral("verticalSlider_2"));
+        verticalSlider_2->setGeometry(QRect(490, 20, 22, 271));
+        verticalSlider_2->setOrientation(Qt::Vertical);
+        comComboBox = new QComboBox(centralWidget);
+        comComboBox->setObjectName(QStringLiteral("comComboBox"));
+        comComboBox->setGeometry(QRect(10, 10, 91, 22));
+        plainTextEdit = new QPlainTextEdit(centralWidget);
+        plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
+        plainTextEdit->setGeometry(QRect(10, 230, 391, 121));
+        plainTextEdit->setReadOnly(true);
+        plainTextUDP = new QPlainTextEdit(centralWidget);
+        plainTextUDP->setObjectName(QStringLiteral("plainTextUDP"));
+        plainTextUDP->setGeometry(QRect(10, 380, 391, 111));
+        plainTextUDP->setReadOnly(true);
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 21));
+        menuBar->setGeometry(QRect(0, 0, 523, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -149,7 +168,6 @@ public:
         pushButtonSetRange->setText(QApplication::translate("MainWindow", "setRange", Q_NULLPTR));
         pushButtonDir->setText(QApplication::translate("MainWindow", "setDir", Q_NULLPTR));
         pushButtonSetCont->setText(QApplication::translate("MainWindow", "setCont", Q_NULLPTR));
-        pushButtonClose->setText(QApplication::translate("MainWindow", "close", Q_NULLPTR));
         pushButtonSetCont_2->setText(QApplication::translate("MainWindow", "setCont", Q_NULLPTR));
         pushButtonSetRange_2->setText(QApplication::translate("MainWindow", "setRange", Q_NULLPTR));
         pushButton_2->setText(QApplication::translate("MainWindow", "setVel", Q_NULLPTR));

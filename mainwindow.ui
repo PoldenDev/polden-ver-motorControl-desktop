@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>523</width>
+    <height>563</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,23 +27,13 @@
      <string>setPos</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>113</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButtonComOpen">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>110</x>
       <y>10</y>
       <width>75</width>
-      <height>23</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -142,23 +132,10 @@
      <string>setCont</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButtonClose">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>close</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButtonSetCont_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>270</x>
       <y>180</y>
       <width>75</width>
       <height>23</height>
@@ -171,7 +148,7 @@
    <widget class="QPushButton" name="pushButtonSetRange_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>270</x>
       <y>150</y>
       <width>75</width>
       <height>23</height>
@@ -184,7 +161,7 @@
    <widget class="QLineEdit" name="lineEditVel_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>360</x>
       <y>90</y>
       <width>81</width>
       <height>20</height>
@@ -194,7 +171,7 @@
    <widget class="QLineEdit" name="lineEditRange3_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>360</x>
       <y>150</y>
       <width>81</width>
       <height>20</height>
@@ -204,7 +181,7 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>270</x>
       <y>90</y>
       <width>75</width>
       <height>23</height>
@@ -217,7 +194,7 @@
    <widget class="QLineEdit" name="lineEditPos_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>360</x>
       <y>60</y>
       <width>81</width>
       <height>20</height>
@@ -227,7 +204,7 @@
    <widget class="QPushButton" name="pushButtonDir_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>270</x>
       <y>120</y>
       <width>75</width>
       <height>23</height>
@@ -240,7 +217,7 @@
    <widget class="QLineEdit" name="lineEditDir_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>360</x>
       <y>120</y>
       <width>81</width>
       <height>20</height>
@@ -250,7 +227,7 @@
    <widget class="QPushButton" name="butPos_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>270</x>
       <y>60</y>
       <width>75</width>
       <height>23</height>
@@ -260,13 +237,75 @@
      <string>setPos</string>
     </property>
    </widget>
+   <widget class="QSlider" name="verticalSlider">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>20</y>
+      <width>22</width>
+      <height>271</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QSlider" name="verticalSlider_2">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>20</y>
+      <width>22</width>
+      <height>271</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comComboBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>230</y>
+      <width>391</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextUDP">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>380</y>
+      <width>391</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>523</width>
      <height>21</height>
     </rect>
    </property>
