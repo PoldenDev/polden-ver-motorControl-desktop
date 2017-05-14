@@ -164,6 +164,9 @@ void MainWindow::on_verticalSlider_sliderMoved(int position)
 void MainWindow::setPos(int pos)
 {
 
+    pos = pos*10;
+    if(pos>1000)
+        pos = 1000;
     QString str = QString("S0p%1v%2\r\n").arg(pos).arg(speed) ;
     quint32 ret = serial.write(str.toLatin1());
 
@@ -177,7 +180,7 @@ void MainWindow::setPos(int pos)
 
 void MainWindow::on_verticalSlider_2_sliderReleased()
 {
-    speed = (ui->verticalSlider_2->value()/100.00)*1000;
+    speed = (ui->verticalSlider_2->value()/100.00)*4000;
 
 }
 
