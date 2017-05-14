@@ -65,6 +65,7 @@ public:
     QSlider *verticalMotorPos8;
     QSlider *verticalMotorPos9;
     QSlider *verticalMotorPos10;
+    QPushButton *pushButton_refreshCom;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -136,10 +137,14 @@ public:
         verticalSlider = new QSlider(centralWidget);
         verticalSlider->setObjectName(QStringLiteral("verticalSlider"));
         verticalSlider->setGeometry(QRect(450, 20, 22, 271));
+        verticalSlider->setMaximum(1000);
+        verticalSlider->setValue(0);
         verticalSlider->setOrientation(Qt::Vertical);
         verticalSlider_2 = new QSlider(centralWidget);
         verticalSlider_2->setObjectName(QStringLiteral("verticalSlider_2"));
         verticalSlider_2->setGeometry(QRect(490, 20, 22, 271));
+        verticalSlider_2->setMaximum(3999);
+        verticalSlider_2->setValue(1000);
         verticalSlider_2->setOrientation(Qt::Vertical);
         comComboBox = new QComboBox(centralWidget);
         comComboBox->setObjectName(QStringLiteral("comComboBox"));
@@ -202,6 +207,9 @@ public:
         verticalMotorPos10->setGeometry(QRect(690, 330, 22, 160));
         verticalMotorPos10->setMaximum(1000);
         verticalMotorPos10->setOrientation(Qt::Vertical);
+        pushButton_refreshCom = new QPushButton(centralWidget);
+        pushButton_refreshCom->setObjectName(QStringLiteral("pushButton_refreshCom"));
+        pushButton_refreshCom->setGeometry(QRect(190, 10, 75, 31));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -233,6 +241,7 @@ public:
         pushButton_2->setText(QApplication::translate("MainWindow", "setVel", Q_NULLPTR));
         pushButtonDir_2->setText(QApplication::translate("MainWindow", "setDir", Q_NULLPTR));
         butPos_2->setText(QApplication::translate("MainWindow", "setPos", Q_NULLPTR));
+        pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
     } // retranslateUi
 
 };

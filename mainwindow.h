@@ -51,6 +51,8 @@ private slots:
     void readPendingDatagrams();
     void handleReadyRead();
 
+    void on_pushButton_refreshCom_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;

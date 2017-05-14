@@ -13,27 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    const auto serialPortInfos = QSerialPortInfo::availablePorts();
-    const QString blankString = QObject::tr("N/A");
-      QString description;
-      QString manufacturer;
-      QString serialNumber;
-    for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
-           description = serialPortInfo.description();
-           manufacturer = serialPortInfo.manufacturer();
-           serialNumber = serialPortInfo.serialNumber();
-           qDebug() << endl
-               << QObject::tr("Port: ") << serialPortInfo.portName() << endl
-               << QObject::tr("Location: ") << serialPortInfo.systemLocation() << endl
-               << QObject::tr("Description: ") << (!description.isEmpty() ? description : blankString) << endl
-               << QObject::tr("Manufacturer: ") << (!manufacturer.isEmpty() ? manufacturer : blankString) << endl
-               << QObject::tr("Serial number: ") << (!serialNumber.isEmpty() ? serialNumber : blankString) << endl
-               << QObject::tr("Vendor Identifier: ") << (serialPortInfo.hasVendorIdentifier() ? QByteArray::number(serialPortInfo.vendorIdentifier(), 16) : blankString) << endl
-               << QObject::tr("Product Identifier: ") << (serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString) << endl
-               << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
-           ui->comComboBox->addItem(serialPortInfo.portName());
-    }
 
+
+    on_pushButton_refreshCom_clicked();
 
     initUdpSocket();
 
@@ -265,3 +247,29 @@ void MainWindow::handleReadyRead()
     ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
 }
 
+
+void MainWindow::on_pushButton_refreshCom_clicked()
+{
+    ui->comComboBox->clear();
+    const auto serialPortInfos = QSerialPortInfo::availablePorts();
+    const QString blankString = QObject::tr("N/A");
+      QString description;
+      QString manufacturer;
+      QString serialNumber;
+    for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
+           description = serialPortInfo.description();
+           manufacturer = serialPortInfo.manufacturer();
+           serialNumber = serialPortInfo.serialNumber();
+           qDebug() << endl
+               << QObject::tr("Port: ") << serialPortInfo.portName() << endl
+               << QObject::tr("Location: ") << serialPortInfo.systemLocation() << endl
+               << QObject::tr("Description: ") << (!description.isEmpty() ? description : blankString) << endl
+               << QObject::tr("Manufacturer: ") << (!manufacturer.isEmpty() ? manufacturer : blankString) << endl
+               << QObject::tr("Serial number: ") << (!serialNumber.isEmpty() ? serialNumber : blankString) << endl
+               << QObject::tr("Vendor Identifier: ") << (serialPortInfo.hasVendorIdentifier() ? QByteArray::number(serialPortInfo.vendorIdentifier(), 16) : blankString) << endl
+               << QObject::tr("Product Identifier: ") << (serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString) << endl
+               << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
+           ui->comComboBox->addItem(serialPortInfo.portName());
+    }
+
+}
