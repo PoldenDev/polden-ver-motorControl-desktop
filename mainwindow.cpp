@@ -9,7 +9,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     speed(100),
-    udpSocket(NULL)
+    udpSocket(NULL),
+    noDataSending(true),
+    cmdNum(0)
 {
     ui->setupUi(this);
 
@@ -29,8 +31,13 @@ MainWindow::~MainWindow()
 void MainWindow::on_butPos_clicked()
 {
     QString str;
-    str = QString("p00=%1\r\n").arg(ui->lineEditPos->text());
+    //for(int i=0; i<64; i++){
+        //str = QString("S0p%1t1000\r\n").arg(int((i/64.)*100));
+    //}
+
+    str = QString("S0p%1t1000\r\n").arg(ui->lineEditPos->text());
     serial.write(str.toLatin1());
+
 
 }
 
@@ -49,6 +56,8 @@ void MainWindow::on_pushButtonComOpen_clicked()
                 qDebug("%s port opened", qUtf8Printable(comName));
                 connect(&serial, SIGNAL(readyRead()),
                         this, SLOT(handleReadyRead()));
+                connect(&serial, SIGNAL(bytesWritten(qint64)),
+                        this, SLOT(handleSerialDataWritten(qint64)));
                 ui->pushButtonComOpen->setText("close");
             }
         }
@@ -57,6 +66,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
         serial.close();
         qDebug("com port closed");
         ui->pushButtonComOpen->setText("open");
+        contrStringQueue.clear();
     }
 
 }
@@ -169,6 +179,7 @@ void MainWindow::on_verticalSlider_2_sliderReleased()
 void MainWindow::initUdpSocket()
 {
     udpSocket = new QUdpSocket(this);
+    //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
     if(udpSocket->bind(QHostAddress::LocalHost, 8051) == true){
         qDebug("UDP bind OK");
     }
@@ -184,7 +195,7 @@ void MainWindow::readPendingDatagrams()
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
         QStringList list1 = dataStr.split("\r\n");
-        QString  contrStr =  dataStr.left(12);
+        QString  contrStr =  dataStr.left(13);
 
         //qDebug("%s", dataStr.toLatin1().constData());
         QList<QSlider*> slList;
@@ -219,10 +230,25 @@ void MainWindow::readPendingDatagrams()
         }
 
         //qDebug("%s", contrStr.toLatin1().constData());
-        contrStr+= "\r\n";
+        //contrStr+= "\r\n";
         //qDebug() << datagram.data();
-        if(serial.isOpen()){
-            serial.write(contrStr.toLatin1());
+        if(serial.isOpen()){            
+            if(noDataSending){
+                serial.write(contrStr.toLatin1());
+                noDataSending = false;
+            }
+            else{
+                contrStringQueue.enqueue(contrStr);
+
+            }
+
+            //if(serial.waitForBytesWritten(10000)){
+
+            //}
+            //else{
+                //qDebug("serial port write byte error!");
+            //}
+
         }
         ui->plainTextUDP->moveCursor (QTextCursor::End);
         ui->plainTextUDP->insertPlainText(contrStr);
@@ -247,6 +273,24 @@ void MainWindow::handleReadyRead()
     ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
 }
 
+void MainWindow::handleSerialDataWritten(qint64 bytes)
+{
+    qDebug("handleSerialDataWritten %d", bytes);
+    if(serial.isOpen()){
+        if(contrStringQueue.isEmpty()){
+            noDataSending = true;
+        }
+        else{
+            QString wrStr = contrStringQueue.dequeue();
+            qDebug("%s", qPrintable(wrStr));
+            serial.write(wrStr.toLatin1());
+
+        }
+
+    }
+
+
+}
 
 void MainWindow::on_pushButton_refreshCom_clicked()
 {
@@ -271,5 +315,12 @@ void MainWindow::on_pushButton_refreshCom_clicked()
                << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
            ui->comComboBox->addItem(serialPortInfo.portName());
     }
+
+}
+
+void MainWindow::on_pushButtonClear_clicked()
+{
+    ui->plainTextEdit->clear();
+    ui->plainTextUDP->clear();
 
 }

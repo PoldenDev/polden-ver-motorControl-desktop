@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>784</width>
-    <height>544</height>
+    <height>742</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -135,7 +135,7 @@
    <widget class="QPushButton" name="pushButtonSetCont_2">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>200</x>
       <y>180</y>
       <width>75</width>
       <height>23</height>
@@ -148,7 +148,7 @@
    <widget class="QPushButton" name="pushButtonSetRange_2">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>200</x>
       <y>150</y>
       <width>75</width>
       <height>23</height>
@@ -161,7 +161,7 @@
    <widget class="QLineEdit" name="lineEditVel_2">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>290</x>
       <y>90</y>
       <width>81</width>
       <height>20</height>
@@ -171,7 +171,7 @@
    <widget class="QLineEdit" name="lineEditRange3_2">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>290</x>
       <y>150</y>
       <width>81</width>
       <height>20</height>
@@ -181,7 +181,7 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>200</x>
       <y>90</y>
       <width>75</width>
       <height>23</height>
@@ -194,7 +194,7 @@
    <widget class="QLineEdit" name="lineEditPos_2">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>290</x>
       <y>60</y>
       <width>81</width>
       <height>20</height>
@@ -204,7 +204,7 @@
    <widget class="QPushButton" name="pushButtonDir_2">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>200</x>
       <y>120</y>
       <width>75</width>
       <height>23</height>
@@ -217,7 +217,7 @@
    <widget class="QLineEdit" name="lineEditDir_2">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>290</x>
       <y>120</y>
       <width>81</width>
       <height>20</height>
@@ -227,7 +227,7 @@
    <widget class="QPushButton" name="butPos_2">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>200</x>
       <y>60</y>
       <width>75</width>
       <height>23</height>
@@ -240,10 +240,10 @@
    <widget class="QSlider" name="verticalSlider">
     <property name="geometry">
      <rect>
-      <x>450</x>
+      <x>390</x>
       <y>20</y>
       <width>22</width>
-      <height>271</height>
+      <height>181</height>
      </rect>
     </property>
     <property name="maximum">
@@ -259,10 +259,10 @@
    <widget class="QSlider" name="verticalSlider_2">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>20</y>
+      <x>420</x>
+      <y>10</y>
       <width>22</width>
-      <height>271</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="maximum">
@@ -290,8 +290,8 @@
      <rect>
       <x>10</x>
       <y>230</y>
-      <width>391</width>
-      <height>121</height>
+      <width>371</width>
+      <height>461</height>
      </rect>
     </property>
     <property name="readOnly">
@@ -301,10 +301,10 @@
    <widget class="QPlainTextEdit" name="plainTextUDP">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>380</y>
-      <width>391</width>
-      <height>111</height>
+      <x>400</x>
+      <y>230</y>
+      <width>371</width>
+      <height>461</height>
      </rect>
     </property>
     <property name="readOnly">
@@ -314,8 +314,8 @@
    <widget class="QSlider" name="verticalMotorPos1">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>330</y>
+      <x>460</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -330,8 +330,8 @@
    <widget class="QSlider" name="verticalMotorPos2">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>330</y>
+      <x>490</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -346,8 +346,8 @@
    <widget class="QSlider" name="verticalMotorPos3">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>330</y>
+      <x>520</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -362,8 +362,8 @@
    <widget class="QSlider" name="verticalMotorPos4">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>330</y>
+      <x>550</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -378,8 +378,8 @@
    <widget class="QSlider" name="verticalMotorPos5">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>330</y>
+      <x>580</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -394,8 +394,8 @@
    <widget class="QSlider" name="verticalMotorPos6">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>330</y>
+      <x>610</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -410,8 +410,8 @@
    <widget class="QSlider" name="verticalMotorPos7">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>330</y>
+      <x>640</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -426,8 +426,8 @@
    <widget class="QSlider" name="verticalMotorPos8">
     <property name="geometry">
      <rect>
-      <x>630</x>
-      <y>330</y>
+      <x>670</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -442,8 +442,8 @@
    <widget class="QSlider" name="verticalMotorPos9">
     <property name="geometry">
      <rect>
-      <x>660</x>
-      <y>330</y>
+      <x>700</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -458,8 +458,8 @@
    <widget class="QSlider" name="verticalMotorPos10">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>330</y>
+      <x>730</x>
+      <y>40</y>
       <width>22</width>
       <height>160</height>
      </rect>
@@ -482,6 +482,19 @@
     </property>
     <property name="text">
      <string>refresh</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonClear">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>10</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>clear</string>
     </property>
    </widget>
   </widget>

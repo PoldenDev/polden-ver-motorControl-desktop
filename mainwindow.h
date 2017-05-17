@@ -5,6 +5,7 @@
 #include <QSerialPort>
 #include <QUdpSocket>
 #include <QNetworkDatagram>
+#include <QQueue>
 
 namespace Ui {
 class MainWindow;
@@ -50,8 +51,11 @@ private slots:
     void on_verticalSlider_2_sliderReleased();
     void readPendingDatagrams();
     void handleReadyRead();
+    void handleSerialDataWritten(qint64 bytes);
 
     void on_pushButton_refreshCom_clicked();
+
+    void on_pushButtonClear_clicked();
 
 private:
     void setPos(int pos);
@@ -62,6 +66,10 @@ private:
 
     void initUdpSocket();
     QUdpSocket *udpSocket;
+    QQueue<QString> contrStringQueue;
+
+    bool noDataSending;
+    quint32 cmdNum;
 };
 
 #endif // MAINWINDOW_H
