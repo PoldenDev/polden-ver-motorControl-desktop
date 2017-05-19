@@ -4,6 +4,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QScrollBar>
 #include <QList>
+#include <QNetworkDatagram>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -210,23 +211,32 @@ void MainWindow::readPendingDatagrams()
         slList.append(ui->verticalMotorPos2);
         slList.append(ui->verticalMotorPos1);
 
-        foreach (QString mem, list1) {
-            int mn = QString(mem[1]).toInt();
-            if((mn>=0)&&(mn<10)){
-                //qDebug("%s", mem.toLatin1().constData());
-                int pos = mem.mid(8, 4).toInt();
-                slList[mn]->setValue(pos);
-                if(mn == 1)
-                    qDebug("mn %d pos %d", mn, pos);
-            }
-        }
+//        foreach (QString mem, list1) {
+//            int mn = QString(mem[1]).toInt();
+//            if((mn>=0)&&(mn<10)){
+//                //qDebug("%s", mem.toLatin1().constData());
+//                int pos = mem.mid(8, 4).toInt();
+//                slList[mn]->setValue(pos);
+//                if(mn == 1)
+//                    qDebug("mn %d pos %d", mn, pos);
+//            }
+//        }
 
 
 
-        for(int i=0; i<10; i++){
-            QString posData = dataStr.mid(8*(i+1),4);
-            int pos = posData.toInt();
-            slList[i]->setValue(pos);
+//        for(int i=0; i<10; i++){
+//            QString posData = dataStr.mid(8*(i+1),4);
+//            int pos = posData.toInt();
+//            slList[i]->setValue(pos);
+//        }
+
+        int mn = QString(contrStr[1]).toInt();
+        if((mn>=0)&&(mn<10)){
+            //qDebug("%s", mem.toLatin1().constData());
+            int pos = contrStr.mid(8, 4).toInt();
+            slList[mn]->setValue(pos);
+            if(mn == 1)
+                qDebug("mn %d pos %d", mn, pos);
         }
 
         //qDebug("%s", contrStr.toLatin1().constData());
@@ -250,12 +260,21 @@ void MainWindow::readPendingDatagrams()
             //}
 
         }
-        ui->plainTextUDP->moveCursor (QTextCursor::End);
-        ui->plainTextUDP->insertPlainText(contrStr);
-        ui->plainTextUDP->moveCursor (QTextCursor::End);
+        QByteArray cmdOkba = QString("cmdOK\r\n").toLatin1();
+        QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
+        QNetworkDatagram drply = datagram.makeReply(cmdOkba);
+        if(mn == 2)
+            drply = datagram.makeReply(cmdFailba);
+
+        udpSocket->writeDatagram(drply);
+
+        //udpSocket->writeDatagram()                ;
+//        ui->plainTextUDP->moveCursor (QTextCursor::End);
+//        ui->plainTextUDP->insertPlainText(contrStr);
+//        ui->plainTextUDP->moveCursor (QTextCursor::End);
         //ui->plainTextEdit->appendPlainText(str);
 
-        ui->plainTextUDP->verticalScrollBar()->setValue(ui->plainTextUDP->verticalScrollBar()->maximum());
+        //ui->plainTextUDP->verticalScrollBar()->setValue(ui->plainTextUDP->verticalScrollBar()->maximum());
 
     }
 }
