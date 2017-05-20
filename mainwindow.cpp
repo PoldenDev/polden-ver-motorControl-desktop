@@ -26,6 +26,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
+    slList.append(ui->verticalMotorPos10);
+    slList.append(ui->verticalMotorPos9);
+    slList.append(ui->verticalMotorPos8);
+    slList.append(ui->verticalMotorPos7);
+    slList.append(ui->verticalMotorPos6);
+    slList.append(ui->verticalMotorPos5);
+    slList.append(ui->verticalMotorPos4);
+    slList.append(ui->verticalMotorPos3);
+    slList.append(ui->verticalMotorPos2);
+    slList.append(ui->verticalMotorPos1);
+
 }
 
 MainWindow::~MainWindow()
@@ -199,103 +210,112 @@ void MainWindow::readPendingDatagrams()
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
+
         QStringList list1 = dataStr.split("\r\n");
         QString  contrStr =  dataStr.left(13);
 
         //qDebug("%s", dataStr.toLatin1().constData());
-        QList<QSlider*> slList;
-        slList.append(ui->verticalMotorPos10);
-        slList.append(ui->verticalMotorPos9);
-        slList.append(ui->verticalMotorPos8);
-        slList.append(ui->verticalMotorPos7);
-        slList.append(ui->verticalMotorPos6);
-        slList.append(ui->verticalMotorPos5);
-        slList.append(ui->verticalMotorPos4);
-        slList.append(ui->verticalMotorPos3);
-        slList.append(ui->verticalMotorPos2);
-        slList.append(ui->verticalMotorPos1);
-
-//        foreach (QString mem, list1) {
-//            int mn = QString(mem[1]).toInt();
-//            if((mn>=0)&&(mn<10)){
-//                //qDebug("%s", mem.toLatin1().constData());
-//                int pos = mem.mid(8, 4).toInt();
-//                slList[mn]->setValue(pos);
-//                if(mn == 1)
-//                    qDebug("mn %d pos %d", mn, pos);
-//            }
-//        }
 
 
+        if(dataStr[0] == 'P'){
+            int mn = QString(contrStr[1]).toInt();
 
-//        for(int i=0; i<10; i++){
-//            QString posData = dataStr.mid(8*(i+1),4);
-//            int pos = posData.toInt();
-//            slList[i]->setValue(pos);
-//        }
-
-        int mn = QString(contrStr[1]).toInt();
-
-        if((mn>=0)&&(mn<10)){
-            //qDebug("%s", mem.toLatin1().constData());
-            int pos = contrStr.mid(8, 4).toInt();
-            slList[mn]->setValue(pos);
-//            if(mn == 1)
-//                qDebug("mn %d pos %d", mn, pos);
-        }
-
-        //qDebug("%s", contrStr.toLatin1().constData());
-        //contrStr+= "\r\n";
-        //qDebug() << datagram.data();
-        QByteArray cmdOkba = QString("cmdOK\r\n").toLatin1();
-        QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
-        QNetworkDatagram drply = datagram.makeReply(cmdOkba);
-        udpSocket->writeDatagram(drply);
-        if(mn > 0)
+            if((mn>=0)&&(mn<10)){
+                //qDebug("%s", mem.toLatin1().constData());
+                int pos = contrStr.mid(8, 4).toInt();
+                slList[mn]->setValue(pos);
+    //            if(mn == 1)
+    //                qDebug("mn %d pos %d", mn, pos);
+            }
+            QByteArray motorOkba = QString("M%1Ok").arg(mn).toLatin1();
+            QNetworkDatagram drply = datagram.makeReply(motorOkba);
+            udpSocket->writeDatagram(drply);
             return;
 
-        if(serial.isOpen() /*&& (bCmdOk == true)*/){
-            serial.write(contrStr.toLatin1());
-            //drply = datagram.makeReply(cmdOkba);
-            //bCmdOk = false;
+        }
+        else if(dataStr[0] == 'S'){
+            int mn = QString(contrStr[1]).toInt();
+            if((mn>=0)&&(mn<10)){
+                //qDebug("%s", mem.toLatin1().constData());
+                int pos = contrStr.mid(8, 4).toInt();
+                slList[mn]->setValue(pos);
+    //            if(mn == 1)
+    //                qDebug("mn %d pos %d", mn, pos);
+            }
+    //        foreach (QString mem, list1) {
+    //            int mn = QString(mem[1]).toInt();
+    //            if((mn>=0)&&(mn<10)){
+    //                //qDebug("%s", mem.toLatin1().constData());
+    //                int pos = mem.mid(8, 4).toInt();
+    //                slList[mn]->setValue(pos);
+    //                if(mn == 1)
+    //                    qDebug("mn %d pos %d", mn, pos);
+    //            }
+    //        }
 
-//            if(noDataSending){
-//                serial.write(contrStr.toLatin1());
-//                noDataSending = false;
-//            }
-//            else{
-//                contrStringQueue.enqueue(contrStr);
 
-//            }
 
-            //if(serial.waitForBytesWritten(10000)){
+    //        for(int i=0; i<10; i++){
+    //            QString posData = dataStr.mid(8*(i+1),4);
+    //            int pos = posData.toInt();
+    //            slList[i]->setValue(pos);
+    //        }
 
-            //}
-            //else{
-                //qDebug("serial port write byte error!");
-            //}
+
+            //qDebug("%s", contrStr.toLatin1().constData());
+            //contrStr+= "\r\n";
+            //qDebug() << datagram.data();
+            QByteArray cmdOkba = QString("cmdOK\r\n").toLatin1();
+            QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
+            QNetworkDatagram drply = datagram.makeReply(cmdOkba);
+            udpSocket->writeDatagram(drply);
+            if(mn > 3)
+                return;
+
+            if(serial.isOpen() /*&& (bCmdOk == true)*/){
+                serial.write(contrStr.toLatin1());
+                //drply = datagram.makeReply(cmdOkba);
+                //bCmdOk = false;
+
+    //            if(noDataSending){
+    //                serial.write(contrStr.toLatin1());
+    //                noDataSending = false;
+    //            }
+    //            else{
+    //                contrStringQueue.enqueue(contrStr);
+
+    //            }
+
+                //if(serial.waitForBytesWritten(10000)){
+
+                //}
+                //else{
+                    //qDebug("serial port write byte error!");
+                //}
+
+            }
+    //        else{
+    //            drply = datagram.makeReply(cmdFailba);
+
+    //        }
+    //        if(serial.isOpen() /*&& (bCmdOk == true)*/){
+    //            //serial.write(contrStr.toLatin1());
+    //            contrStringQueue.enqueue(contrStr);
+    //        }
+
+
+
+            //udpSocket->writeDatagram()                ;
+            ui->plainTextUDP->moveCursor (QTextCursor::End);
+            ui->plainTextUDP->insertPlainText(contrStr);
+            ui->plainTextUDP->moveCursor (QTextCursor::End);
+            //ui->plainTextEdit->appendPlainText(str);
+
+            //ui->plainTextUDP->verticalScrollBar()->setValue(ui->plainTextUDP->verticalScrollBar()->maximum());
+
+       // }
 
         }
-//        else{
-//            drply = datagram.makeReply(cmdFailba);
-
-//        }
-//        if(serial.isOpen() /*&& (bCmdOk == true)*/){
-//            //serial.write(contrStr.toLatin1());
-//            contrStringQueue.enqueue(contrStr);
-//        }
-
-
-
-        //udpSocket->writeDatagram()                ;
-//        ui->plainTextUDP->moveCursor (QTextCursor::End);
-//        ui->plainTextUDP->insertPlainText(contrStr);
-//        ui->plainTextUDP->moveCursor (QTextCursor::End);
-        //ui->plainTextEdit->appendPlainText(str);
-
-        //ui->plainTextUDP->verticalScrollBar()->setValue(ui->plainTextUDP->verticalScrollBar()->maximum());
-
-   // }
 }
 
 void MainWindow::handleReadyRead()

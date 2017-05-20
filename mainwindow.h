@@ -7,7 +7,7 @@
 #include <QNetworkDatagram>
 #include <QQueue>
 #include <QTimer>
-
+#include <QSlider>
 namespace Ui {
 class MainWindow;
 }
@@ -76,6 +76,7 @@ private:
     //bool bFifoFull;
     bool bCmdOk;
     QTimer timer;
+    QList<QSlider*> slList;
 };
 
 #endif // MAINWINDOW_H
