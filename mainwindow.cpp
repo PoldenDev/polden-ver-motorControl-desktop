@@ -5,14 +5,15 @@
 #include <QScrollBar>
 #include <QList>
 #include <QNetworkDatagram>
-
+#include <QThread>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     speed(100),
     udpSocket(NULL),
     noDataSending(true),
-    cmdNum(0)
+    cmdNum(0),
+    bCmdOk(true)
 {
     ui->setupUi(this);
 
@@ -21,6 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     initUdpSocket();
+    timer.setInterval(50);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
+    timer.start();
 
 }
 
@@ -181,7 +185,7 @@ void MainWindow::initUdpSocket()
 {
     udpSocket = new QUdpSocket(this);
     //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
-    if(udpSocket->bind(QHostAddress::LocalHost, 8051) == true){
+    if(udpSocket->bind(QHostAddress::Any, 8051) == true){
         qDebug("UDP bind OK");
     }
 
@@ -191,7 +195,7 @@ void MainWindow::initUdpSocket()
 
 void MainWindow::readPendingDatagrams()
 {
-    while (udpSocket->hasPendingDatagrams()) {
+    //while (udpSocket->hasPendingDatagrams()) {
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
@@ -231,26 +235,38 @@ void MainWindow::readPendingDatagrams()
 //        }
 
         int mn = QString(contrStr[1]).toInt();
+
         if((mn>=0)&&(mn<10)){
             //qDebug("%s", mem.toLatin1().constData());
             int pos = contrStr.mid(8, 4).toInt();
             slList[mn]->setValue(pos);
-            if(mn == 1)
-                qDebug("mn %d pos %d", mn, pos);
+//            if(mn == 1)
+//                qDebug("mn %d pos %d", mn, pos);
         }
 
         //qDebug("%s", contrStr.toLatin1().constData());
         //contrStr+= "\r\n";
         //qDebug() << datagram.data();
-        if(serial.isOpen()){            
-            if(noDataSending){
-                serial.write(contrStr.toLatin1());
-                noDataSending = false;
-            }
-            else{
-                contrStringQueue.enqueue(contrStr);
+        QByteArray cmdOkba = QString("cmdOK\r\n").toLatin1();
+        QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
+        QNetworkDatagram drply = datagram.makeReply(cmdOkba);
+        udpSocket->writeDatagram(drply);
+        if(mn > 0)
+            return;
 
-            }
+        if(serial.isOpen() /*&& (bCmdOk == true)*/){
+            serial.write(contrStr.toLatin1());
+            //drply = datagram.makeReply(cmdOkba);
+            //bCmdOk = false;
+
+//            if(noDataSending){
+//                serial.write(contrStr.toLatin1());
+//                noDataSending = false;
+//            }
+//            else{
+//                contrStringQueue.enqueue(contrStr);
+
+//            }
 
             //if(serial.waitForBytesWritten(10000)){
 
@@ -260,13 +276,16 @@ void MainWindow::readPendingDatagrams()
             //}
 
         }
-        QByteArray cmdOkba = QString("cmdOK\r\n").toLatin1();
-        QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
-        QNetworkDatagram drply = datagram.makeReply(cmdOkba);
-        if(mn == 2)
-            drply = datagram.makeReply(cmdFailba);
+//        else{
+//            drply = datagram.makeReply(cmdFailba);
 
-        udpSocket->writeDatagram(drply);
+//        }
+//        if(serial.isOpen() /*&& (bCmdOk == true)*/){
+//            //serial.write(contrStr.toLatin1());
+//            contrStringQueue.enqueue(contrStr);
+//        }
+
+
 
         //udpSocket->writeDatagram()                ;
 //        ui->plainTextUDP->moveCursor (QTextCursor::End);
@@ -276,14 +295,56 @@ void MainWindow::readPendingDatagrams()
 
         //ui->plainTextUDP->verticalScrollBar()->setValue(ui->plainTextUDP->verticalScrollBar()->maximum());
 
-    }
+   // }
 }
 
 void MainWindow::handleReadyRead()
 {
     QByteArray str = serial.readAll();
 
-    qDebug() << str;
+//    uartBuff += str;
+//    uartBuff.split("\r\n");
+//    int lfInd = uartBuff.indexOf("\r\n");
+//    QString cmd = uartBuff.left(lfInd+2);
+//    uartBuff.remove(0, lfInd+2);
+//    if(cmd.compare("Fifo full!\r\n") == 0){
+//        bCmdOk = false;
+//        qDebug() << "Fifo full!!!";
+//        if(contrStringQueue.isEmpty() != true){
+//            QThread::msleep(1000);
+//            QString wrStr = contrStringQueue.head();
+//            //qDebug("%s", qPrintable(wrStr));
+//            serial.write(wrStr.toLatin1());
+
+//        }
+//        else{
+//            noDataSending = true;
+//        }
+//    }
+//    if(cmd.compare("cmdOk\r\n") == 0){
+//        bCmdOk = true;
+//        qDebug() << "OK!!!";
+
+//        if(contrStringQueue.isEmpty() == false){
+//            contrStringQueue.dequeue();
+//            if(contrStringQueue.isEmpty() == false){
+//                QString wrStr = contrStringQueue.head();
+//                qDebug("%s", qPrintable(wrStr));
+//                QThread::msleep(20);
+//                serial.write(wrStr.toLatin1());
+//            }
+//            else{
+//                noDataSending = true;
+//            }
+//        }
+//        else{
+//            noDataSending = true;
+//        }
+
+//    }
+
+
+    //qDebug() << str;
     ui->plainTextEdit->moveCursor (QTextCursor::End);
     ui->plainTextEdit->insertPlainText(str);
     ui->plainTextEdit->moveCursor (QTextCursor::End);
@@ -294,19 +355,33 @@ void MainWindow::handleReadyRead()
 
 void MainWindow::handleSerialDataWritten(qint64 bytes)
 {
-    qDebug("handleSerialDataWritten %d", bytes);
-    if(serial.isOpen()){
-        if(contrStringQueue.isEmpty()){
-            noDataSending = true;
-        }
-        else{
-            QString wrStr = contrStringQueue.dequeue();
-            qDebug("%s", qPrintable(wrStr));
-            serial.write(wrStr.toLatin1());
+//    //qDebug("handleSerialDataWritten %d", bytes);
+//    if(serial.isOpen()){
+//        if(contrStringQueue.isEmpty()){
+//            noDataSending = true;
+//        }
+//        else{
+//            if(bCmdOk){
+//                qDebug() << "last send OK, send next";
+//                contrStringQueue.dequeue();
+//                bCmdOk = false;
+//            }
+//            else{
+//                qDebug() << "last send Fail, repeat ";
+//            }
 
-        }
+//            if(contrStringQueue.isEmpty()){
+//                noDataSending = true;
+//            }
+//            else{
+//                QString wrStr = contrStringQueue.head();
+//                //qDebug("%s", qPrintable(wrStr));
+//                serial.write(wrStr.toLatin1());
+//            }
 
-    }
+//        }
+
+//    }
 
 
 }
@@ -341,5 +416,14 @@ void MainWindow::on_pushButtonClear_clicked()
 {
     ui->plainTextEdit->clear();
     ui->plainTextUDP->clear();
+
+}
+
+void MainWindow::sendOnTimer()
+{
+//    if(serial.isOpen() && !contrStringQueue.isEmpty()){
+//        QString wrStr = contrStringQueue.dequeue();
+//        serial.write(wrStr.toLatin1());
+//    }
 
 }

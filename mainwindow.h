@@ -6,6 +6,7 @@
 #include <QUdpSocket>
 #include <QNetworkDatagram>
 #include <QQueue>
+#include <QTimer>
 
 namespace Ui {
 class MainWindow;
@@ -56,6 +57,7 @@ private slots:
     void on_pushButton_refreshCom_clicked();
 
     void on_pushButtonClear_clicked();
+    void sendOnTimer();
 
 private:
     void setPos(int pos);
@@ -70,6 +72,10 @@ private:
 
     bool noDataSending;
     quint32 cmdNum;
+    QString uartBuff;
+    //bool bFifoFull;
+    bool bCmdOk;
+    QTimer timer;
 };
 
 #endif // MAINWINDOW_H
