@@ -75,7 +75,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(784, 742);
+        MainWindow->resize(1233, 767);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         butPos = new QPushButton(centralWidget);
@@ -152,11 +152,11 @@ public:
         comComboBox->setGeometry(QRect(10, 10, 91, 22));
         plainTextEdit = new QPlainTextEdit(centralWidget);
         plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
-        plainTextEdit->setGeometry(QRect(10, 230, 371, 461));
+        plainTextEdit->setGeometry(QRect(10, 230, 891, 461));
         plainTextEdit->setReadOnly(true);
         plainTextUDP = new QPlainTextEdit(centralWidget);
         plainTextUDP->setObjectName(QStringLiteral("plainTextUDP"));
-        plainTextUDP->setGeometry(QRect(400, 230, 371, 461));
+        plainTextUDP->setGeometry(QRect(940, 220, 191, 461));
         plainTextUDP->setReadOnly(true);
         verticalMotorPos1 = new QSlider(centralWidget);
         verticalMotorPos1->setObjectName(QStringLiteral("verticalMotorPos1"));
@@ -217,7 +217,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 784, 21));
+        menuBar->setGeometry(QRect(0, 0, 1233, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
