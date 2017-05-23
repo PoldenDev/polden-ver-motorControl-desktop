@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1233</width>
-    <height>767</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -291,7 +291,7 @@
       <x>10</x>
       <y>230</y>
       <width>891</width>
-      <height>461</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="readOnly">
@@ -301,10 +301,10 @@
    <widget class="QPlainTextEdit" name="plainTextUDP">
     <property name="geometry">
      <rect>
-      <x>940</x>
-      <y>220</y>
-      <width>191</width>
-      <height>461</height>
+      <x>910</x>
+      <y>230</y>
+      <width>201</width>
+      <height>321</height>
      </rect>
     </property>
     <property name="readOnly">

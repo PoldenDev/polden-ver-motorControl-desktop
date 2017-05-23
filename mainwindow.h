@@ -77,6 +77,8 @@ private:
     bool bCmdOk;
     QTimer timer;
     QList<QSlider*> slList;
+
+    quint32 udpCnt;
 };
 
 #endif // MAINWINDOW_H

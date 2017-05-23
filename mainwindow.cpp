@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     udpSocket(NULL),
     noDataSending(true),
     cmdNum(0),
-    bCmdOk(true)
+    bCmdOk(true),
+    udpCnt(0)
 {
     ui->setupUi(this);
 
@@ -206,6 +207,7 @@ void MainWindow::initUdpSocket()
 
 void MainWindow::readPendingDatagrams()
 {
+
     //while (udpSocket->hasPendingDatagrams()) {
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
         //processTheDatagram(datagram);
@@ -213,6 +215,8 @@ void MainWindow::readPendingDatagrams()
 
         QStringList list1 = dataStr.split("\r\n");
         QString  contrStr =  dataStr.left(13);
+        if(list1.size() > 2)
+            return;
 
         //qDebug("%s", dataStr.toLatin1().constData());
 
@@ -227,7 +231,7 @@ void MainWindow::readPendingDatagrams()
     //            if(mn == 1)
     //                qDebug("mn %d pos %d", mn, pos);
             }
-            QByteArray motorOkba = QString("M%1Ok").arg(mn).toLatin1();
+            QByteArray motorOkba = QString("M%1Ok\r\n").arg(mn).toLatin1();
             QNetworkDatagram drply = datagram.makeReply(motorOkba);
             udpSocket->writeDatagram(drply);
             return;
@@ -269,8 +273,15 @@ void MainWindow::readPendingDatagrams()
             QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
             QNetworkDatagram drply = datagram.makeReply(cmdOkba);
             udpSocket->writeDatagram(drply);
-            if(mn > 3)
-                return;
+            //if(mn > 1)
+            //    return;
+
+        QString udpTextField = QString("%1:%2").arg(udpCnt++).arg(contrStr);
+        //udpSocket->writeDatagram()                ;
+        ui->plainTextUDP->moveCursor (QTextCursor::End);
+        ui->plainTextUDP->insertPlainText(udpTextField);
+        ui->plainTextUDP->moveCursor (QTextCursor::End);
+        //ui->plainTextEdit->appendPlainText(str);
 
             if(serial.isOpen() /*&& (bCmdOk == true)*/){
                 serial.write(contrStr.toLatin1());
@@ -305,15 +316,7 @@ void MainWindow::readPendingDatagrams()
 
 
 
-            //udpSocket->writeDatagram()                ;
-            ui->plainTextUDP->moveCursor (QTextCursor::End);
-            ui->plainTextUDP->insertPlainText(contrStr);
-            ui->plainTextUDP->moveCursor (QTextCursor::End);
-            //ui->plainTextEdit->appendPlainText(str);
 
-            //ui->plainTextUDP->verticalScrollBar()->setValue(ui->plainTextUDP->verticalScrollBar()->maximum());
-
-       // }
 
         }
 }
@@ -436,6 +439,7 @@ void MainWindow::on_pushButtonClear_clicked()
 {
     ui->plainTextEdit->clear();
     ui->plainTextUDP->clear();
+    udpCnt = 0;
 
 }
 
