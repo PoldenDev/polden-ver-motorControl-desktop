@@ -33,6 +33,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     UartThread \
     UartThread \
-    uartthread.h
+    uartthread.h \
+    stand.h
 
 FORMS    += mainwindow.ui

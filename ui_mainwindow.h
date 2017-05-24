@@ -56,6 +56,11 @@ public:
     QSlider *verticalMotorPos8;
     QSlider *verticalMotorPos9;
     QSlider *verticalMotorPos10;
+    QWidget *widget_6;
+    QHBoxLayout *horizontalLayout_4;
+    QPushButton *pushMoveDownState;
+    QPushButton *pushButtonGotoPEriodState;
+    QPushButton *pushBUttonToIdle;
     QWidget *widget;
     QHBoxLayout *horizontalLayout;
     QPlainTextEdit *plainTextEdit;
@@ -219,6 +224,30 @@ public:
 
         verticalLayout_2->addWidget(widget_2);
 
+        widget_6 = new QWidget(centralWidget);
+        widget_6->setObjectName(QStringLiteral("widget_6"));
+        horizontalLayout_4 = new QHBoxLayout(widget_6);
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        pushMoveDownState = new QPushButton(widget_6);
+        pushMoveDownState->setObjectName(QStringLiteral("pushMoveDownState"));
+
+        horizontalLayout_4->addWidget(pushMoveDownState);
+
+        pushButtonGotoPEriodState = new QPushButton(widget_6);
+        pushButtonGotoPEriodState->setObjectName(QStringLiteral("pushButtonGotoPEriodState"));
+
+        horizontalLayout_4->addWidget(pushButtonGotoPEriodState);
+
+        pushBUttonToIdle = new QPushButton(widget_6);
+        pushBUttonToIdle->setObjectName(QStringLiteral("pushBUttonToIdle"));
+
+        horizontalLayout_4->addWidget(pushBUttonToIdle);
+
+
+        verticalLayout_2->addWidget(widget_6);
+
         widget = new QWidget(centralWidget);
         widget->setObjectName(QStringLiteral("widget"));
         horizontalLayout = new QHBoxLayout(widget);
@@ -265,6 +294,9 @@ public:
         pushButtonComOpen->setText(QApplication::translate("MainWindow", "open", Q_NULLPTR));
         pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
         pushButtonClear->setText(QApplication::translate("MainWindow", "clear", Q_NULLPTR));
+        pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
+        pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
+        pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
     } // retranslateUi
 
 };

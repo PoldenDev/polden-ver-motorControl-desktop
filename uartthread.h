@@ -7,17 +7,8 @@
 #include <QWaitCondition>
 #include <QSerialPort>
 #include <QQueue>
+#include "stand.h"
 
-
-typedef enum {idle, waitForAck, waitForFifoFree} TSendState;
-
-#define MOTOR_CNT 10
-typedef struct{
-    QQueue<QString> contrStringQueue;
-    bool bCmdOk;
-    TSendState sendState;
-
-} TMotorStr;
 
 class UartThread : public QThread
 {
@@ -51,7 +42,7 @@ private:
 
     void processUartRecvExchange(QString msg);
 
-        TMotorStr mtstr[MOTOR_CNT];
+    TMotorStr mtstr[MOTOR_CNT];
 
 
 };

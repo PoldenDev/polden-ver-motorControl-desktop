@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     speed(100),
     udpSocket(NULL),    
     cmdNum(0),
-    udpCnt(0)
+    udpCnt(0),
+  curMotorSendIdx(0)
 {
     ui->setupUi(this);
 
@@ -24,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     initUdpSocket();
-    timer.setInterval(50);
+    timer.setInterval(4);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
@@ -47,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&waitForFifoFreeTimer, SIGNAL(timeout()), this, SLOT(waitForFifoFreeFifo()));
 
-    connect(&UartThread, SIGNAL(response(QString)), this, SLOT(response(QString)));
+    //connect(&UartThread, SIGNAL(response(QString)), this, SLOT(response(QString)));
 
 }
 
@@ -347,11 +348,11 @@ void MainWindow::readPendingDatagrams()
         }
         else if(dataStr[0] == 'S'){
             int mn = QString(contrStr[1]).toInt();
-            int pos = contrStr.mid(8, 4).toInt();
+            int pos = contrStr.mid(3, 4).toInt();
             if((mn>=0)&&(mn<10)){
                 //qDebug("%s", mem.toLatin1().constData());
                 //pos = contrStr.mid(8, 4).toInt();
-                slList[mn]->setValue(pos);
+                //slList[mn]->setValue(pos);
 
     //            if(mn == 1)
     //                qDebug("mn %d pos %d", mn, pos);
@@ -383,14 +384,15 @@ void MainWindow::readPendingDatagrams()
             QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
             QNetworkDatagram drply = datagram.makeReply(cmdOkba);
             udpSocket->writeDatagram(drply);
-            //if(mn > 1)
-            //    return;
+            //if(mn != 2)
+             //  return;
+            mtstr[mn].contrStringQueue.enqueue(contrStr);
 
 
             if((pos>=0) && (pos<1000)){
              //   UartThread.transaction(mn, contrStr);
-                if(serial.isOpen() /*&& (bCmdOk == true)*/){
-                        serial.write(contrStr.toLatin1());
+                //if(serial.isOpen() /*&& (bCmdOk == true)*/){
+                 //       serial.write(contrStr.toLatin1());
                         //drply = datagram.makeReply(cmdOkba);
                         //bCmdOk = false;
 
@@ -410,18 +412,21 @@ void MainWindow::readPendingDatagrams()
                             //qDebug("serial port write byte error!");
                         //}
 
-                    }
+                   // }
             }
             else{
                 qDebug("pos diap error %d", pos);
             }
 
-            QString udpTextField = QString("%1:%2").arg(udpCnt++).arg(contrStr);
-            //udpSocket->writeDatagram()                ;
-            ui->plainTextUDP->moveCursor (QTextCursor::End);
-            ui->plainTextUDP->insertPlainText(udpTextField);
-            ui->plainTextUDP->moveCursor (QTextCursor::End);
-            //ui->plainTextEdit->appendPlainText(str);
+            if(mn==0){
+               // QString udpTextField = QString("%1:%2").arg(udpCnt++).arg(contrStr);
+                 QString udpTextField = QString("%1\r\n").arg(pos);
+                 //udpSocket->writeDatagram()                ;
+                ui->plainTextUDP->moveCursor (QTextCursor::End);
+                ui->plainTextUDP->insertPlainText(udpTextField);
+                ui->plainTextUDP->moveCursor (QTextCursor::End);
+             //ui->plainTextEdit->appendPlainText(str);
+            }
 
 
 
@@ -529,11 +534,19 @@ void MainWindow::on_pushButtonClear_clicked()
 
 void MainWindow::sendOnTimer()
 {
-//    if(serial.isOpen() && !contrStringQueue.isEmpty()){
-//        QString wrStr = contrStringQueue.dequeue();
-//        serial.write(wrStr.toLatin1());
-//    }
+    if(mtstr[curMotorSendIdx].contrStringQueue.isEmpty() == false){
+       // qDebug() << QTime::currentTime().msecsSinceStartOfDay() << "send "
+       //          << curMotorSendIdx << " " << mtstr[curMotorSendIdx].contrStringQueue.size();
+        if(serial.isOpen()){
+            QString wrStr = mtstr[curMotorSendIdx].contrStringQueue.dequeue();
+            serial.write(wrStr.toLatin1());
+        }
 
+    }
+    curMotorSendIdx++;
+    if(curMotorSendIdx >= MOTOR_CNT){
+        curMotorSendIdx = 0;
+    }
 }
 
 void MainWindow::waitForFifoFreeFifo()
@@ -628,4 +641,30 @@ void MainWindow::response(QString str)
     //ui->plainTextEdit->appendPlainText(str);
 
     ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
+}
+
+void MainWindow::on_pushMoveDownState_clicked()
+{
+    if(serial.isOpen()){
+        QString str("Sd\r\n");
+     serial.write(str.toLatin1());
+    }
+}
+
+void MainWindow::on_pushBUttonToIdle_clicked()
+{
+    if(serial.isOpen()){
+        QString str("Si\r\n");
+     serial.write(str.toLatin1());
+    }
+
+}
+
+void MainWindow::on_pushButtonGotoPEriodState_clicked()
+{
+    if(serial.isOpen()){
+        QString str("Sp\r\n");
+     serial.write(str.toLatin1());
+    }
+
 }

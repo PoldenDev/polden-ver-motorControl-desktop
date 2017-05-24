@@ -9,7 +9,8 @@
 #include <QTimer>
 #include <QSlider>
 
-#include <uartthread.h>
+//#include <uartthread.h>
+#include "stand.h"
 namespace Ui {
 class MainWindow;
 }
@@ -56,6 +57,12 @@ private slots:
     void response(QString str);
 
 
+    void on_pushMoveDownState_clicked();
+
+    void on_pushBUttonToIdle_clicked();
+
+    void on_pushButtonGotoPEriodState_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
@@ -83,7 +90,11 @@ private:
     //void processUartSendExchange();
     //void processUartRecvExchange(QString str);
     QTimer waitForFifoFreeTimer;
-    UartThread UartThread;
+    //UartThread UartThread;
+
+
+    TMotorStr mtstr[MOTOR_CNT];
+    quint8 curMotorSendIdx;
 
 };
 
