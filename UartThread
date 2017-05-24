@@ -1,0 +1,6 @@
+#include "UartThread"
+
+UartThread::UartThread()
+{
+
+}

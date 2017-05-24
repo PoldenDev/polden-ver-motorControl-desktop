@@ -6,504 +6,274 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1233</width>
-    <height>608</height>
+    <width>840</width>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="butPos">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setPos</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonComOpen">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>10</y>
-      <width>75</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>open</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditPos">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>60</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setVel</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditVel">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>90</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonSetRange">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>150</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setRange</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonDir">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>120</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setDir</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditDir">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>120</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditRange3">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>150</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonSetCont">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>180</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setCont</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonSetCont_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>180</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setCont</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonSetRange_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>150</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setRange</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditVel_2">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>90</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditRange3_2">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>150</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>90</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setVel</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditPos_2">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>60</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonDir_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>120</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setDir</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditDir_2">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>120</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="butPos_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>60</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setPos</string>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalSlider">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>20</y>
-      <width>22</width>
-      <height>181</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalSlider_2">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>10</y>
-      <width>22</width>
-      <height>191</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>3999</number>
-    </property>
-    <property name="value">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comComboBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>91</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPlainTextEdit" name="plainTextEdit">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>230</y>
-      <width>891</width>
-      <height>331</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPlainTextEdit" name="plainTextUDP">
-    <property name="geometry">
-     <rect>
-      <x>910</x>
-      <y>230</y>
-      <width>201</width>
-      <height>321</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos1">
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos2">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos3">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos4">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos5">
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos6">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos7">
-    <property name="geometry">
-     <rect>
-      <x>640</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos8">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos9">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSlider" name="verticalMotorPos10">
-    <property name="geometry">
-     <rect>
-      <x>730</x>
-      <y>40</y>
-      <width>22</width>
-      <height>160</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_refreshCom">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>10</y>
-      <width>75</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>refresh</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonClear">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>10</y>
-      <width>75</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>clear</string>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QWidget" name="widget_2" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>820</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>800</width>
+        <height>200</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QWidget" name="widget_4" native="true">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_5" native="true"/>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comComboBox"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonComOpen">
+            <property name="text">
+             <string>open</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_refreshCom">
+            <property name="text">
+             <string>refresh</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonClear">
+            <property name="text">
+             <string>clear</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_3" native="true">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QSlider" name="verticalSlider">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalSlider_2">
+            <property name="maximum">
+             <number>3999</number>
+            </property>
+            <property name="value">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos1">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos2">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos3">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos4">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos5">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos6">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos7">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos8">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos9">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="verticalMotorPos10">
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPlainTextEdit" name="plainTextEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="plainTextUDP">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1233</width>
+     <width>840</width>
      <height>21</height>
     </rect>
    </property>
