@@ -255,6 +255,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonPosReset">
+         <property name="text">
+          <string>pos reset</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>

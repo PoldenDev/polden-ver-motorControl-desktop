@@ -63,6 +63,8 @@ private slots:
 
     void on_pushButtonGotoPEriodState_clicked();
 
+    void on_pushButtonPosReset_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;

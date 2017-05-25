@@ -61,6 +61,7 @@ public:
     QPushButton *pushMoveDownState;
     QPushButton *pushButtonGotoPEriodState;
     QPushButton *pushBUttonToIdle;
+    QPushButton *pushButtonPosReset;
     QWidget *widget;
     QHBoxLayout *horizontalLayout;
     QPlainTextEdit *plainTextEdit;
@@ -245,6 +246,11 @@ public:
 
         horizontalLayout_4->addWidget(pushBUttonToIdle);
 
+        pushButtonPosReset = new QPushButton(widget_6);
+        pushButtonPosReset->setObjectName(QStringLiteral("pushButtonPosReset"));
+
+        horizontalLayout_4->addWidget(pushButtonPosReset);
+
 
         verticalLayout_2->addWidget(widget_6);
 
@@ -297,6 +303,7 @@ public:
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
+        pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
     } // retranslateUi
 
 };

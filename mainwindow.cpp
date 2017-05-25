@@ -668,3 +668,11 @@ void MainWindow::on_pushButtonGotoPEriodState_clicked()
     }
 
 }
+
+void MainWindow::on_pushButtonPosReset_clicked()
+{
+    if(serial.isOpen()){
+        QString str("Sr\r\n");
+     serial.write(str.toLatin1());
+    }
+}
