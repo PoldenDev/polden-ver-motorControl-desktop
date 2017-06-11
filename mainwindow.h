@@ -8,8 +8,13 @@
 #include <QQueue>
 #include <QTimer>
 #include <QSlider>
+#include <QMap>
 
 //#include <uartthread.h>
+
+
+#include <qwt_plot_curve.h>
+
 #include "stand.h"
 namespace Ui {
 class MainWindow;
@@ -26,23 +31,23 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_butPos_clicked();
+    //void on_butPos_clicked();
 
     void on_pushButtonComOpen_clicked();
 
     //void on_pushButtonClose_clicked();
-    void on_pushButton_clicked();
-    void on_pushButtonDir_clicked();
-    void on_pushButtonSetRange_clicked();
-    void on_pushButtonSetCont_clicked();
-    void on_butPos_2_clicked();
-    void on_pushButton_2_clicked();
-    void on_pushButtonDir_2_clicked();
-    void on_pushButtonSetRange_2_clicked();
-    void on_pushButtonSetCont_2_clicked();
-    void on_verticalSlider_sliderReleased();
-    void on_verticalSlider_sliderMoved(int position);
-    void on_verticalSlider_2_sliderReleased();
+    //void on_pushButton_clicked();
+    //void on_pushButtonDir_clicked();
+    //void on_pushButtonSetRange_clicked();
+    //void on_pushButtonSetCont_clicked();
+    //void on_butPos_2_clicked();
+    //void on_pushButton_2_clicked();
+    //void on_pushButtonDir_2_clicked();
+    //void on_pushButtonSetRange_2_clicked();
+    //void on_pushButtonSetCont_2_clicked();
+    //void on_verticalSlider_sliderReleased();
+    //void on_verticalSlider_sliderMoved(int position);
+    //void on_verticalSlider_2_sliderReleased();
     void readPendingDatagrams();
     void handleReadyRead();
     void handleSerialDataWritten(qint64 bytes);
@@ -97,6 +102,22 @@ private:
 
     TMotorStr mtstr[MOTOR_CNT];
     quint8 curMotorSendIdx;
+
+    QList<QwtPlot*> plotList;
+    QList<QwtPlotCurve*> curveList;
+    QList<QPolygonF> polylist;
+    //QwtPlot *d_plot;
+    //QwtPlotCurve *curve;
+    //QPolygonF points;
+    int x;
+    void createPlot(QString name);
+
+    void parseCmdMotorStr(QString);
+    void parseCmdMultiMotorStr(QString);
+
+    QMap<int, int> xMap;
+    QMap<int, QString> lastCmdMap;
+    QQueue<QString> motorPosCmdStrings;
 
 };
 

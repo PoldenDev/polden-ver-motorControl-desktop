@@ -20,7 +20,6 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
@@ -33,8 +32,6 @@ class Ui_MainWindow
 public:
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
-    QWidget *widget_2;
-    QVBoxLayout *verticalLayout;
     QWidget *widget_4;
     QHBoxLayout *horizontalLayout_3;
     QWidget *widget_5;
@@ -42,20 +39,12 @@ public:
     QPushButton *pushButtonComOpen;
     QPushButton *pushButton_refreshCom;
     QPushButton *pushButtonClear;
-    QWidget *widget_3;
+    QWidget *qwtWdgH1;
     QHBoxLayout *horizontalLayout_2;
-    QSlider *verticalSlider;
-    QSlider *verticalSlider_2;
-    QSlider *verticalMotorPos1;
-    QSlider *verticalMotorPos2;
-    QSlider *verticalMotorPos3;
-    QSlider *verticalMotorPos4;
-    QSlider *verticalMotorPos5;
-    QSlider *verticalMotorPos6;
-    QSlider *verticalMotorPos7;
-    QSlider *verticalMotorPos8;
-    QSlider *verticalMotorPos9;
-    QSlider *verticalMotorPos10;
+    QWidget *widget_7;
+    QWidget *qwtWdgH2;
+    QHBoxLayout *horizontalLayout_5;
+    QWidget *widget_8;
     QWidget *widget_6;
     QHBoxLayout *horizontalLayout_4;
     QPushButton *pushMoveDownState;
@@ -81,16 +70,7 @@ public:
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        widget_2 = new QWidget(centralWidget);
-        widget_2->setObjectName(QStringLiteral("widget_2"));
-        widget_2->setMinimumSize(QSize(820, 0));
-        widget_2->setMaximumSize(QSize(800, 200));
-        verticalLayout = new QVBoxLayout(widget_2);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
-        widget_4 = new QWidget(widget_2);
+        widget_4 = new QWidget(centralWidget);
         widget_4->setObjectName(QStringLiteral("widget_4"));
         widget_4->setMaximumSize(QSize(300, 16777215));
         horizontalLayout_3 = new QHBoxLayout(widget_4);
@@ -124,106 +104,35 @@ public:
         horizontalLayout_3->addWidget(pushButtonClear);
 
 
-        verticalLayout->addWidget(widget_4);
+        verticalLayout_2->addWidget(widget_4);
 
-        widget_3 = new QWidget(widget_2);
-        widget_3->setObjectName(QStringLiteral("widget_3"));
-        widget_3->setMaximumSize(QSize(300, 16777215));
-        horizontalLayout_2 = new QHBoxLayout(widget_3);
+        qwtWdgH1 = new QWidget(centralWidget);
+        qwtWdgH1->setObjectName(QStringLiteral("qwtWdgH1"));
+        horizontalLayout_2 = new QHBoxLayout(qwtWdgH1);
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        verticalSlider = new QSlider(widget_3);
-        verticalSlider->setObjectName(QStringLiteral("verticalSlider"));
-        verticalSlider->setMaximum(1000);
-        verticalSlider->setValue(0);
-        verticalSlider->setOrientation(Qt::Vertical);
+        widget_7 = new QWidget(qwtWdgH1);
+        widget_7->setObjectName(QStringLiteral("widget_7"));
 
-        horizontalLayout_2->addWidget(verticalSlider);
-
-        verticalSlider_2 = new QSlider(widget_3);
-        verticalSlider_2->setObjectName(QStringLiteral("verticalSlider_2"));
-        verticalSlider_2->setMaximum(3999);
-        verticalSlider_2->setValue(1000);
-        verticalSlider_2->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalSlider_2);
-
-        verticalMotorPos1 = new QSlider(widget_3);
-        verticalMotorPos1->setObjectName(QStringLiteral("verticalMotorPos1"));
-        verticalMotorPos1->setMaximum(1000);
-        verticalMotorPos1->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos1);
-
-        verticalMotorPos2 = new QSlider(widget_3);
-        verticalMotorPos2->setObjectName(QStringLiteral("verticalMotorPos2"));
-        verticalMotorPos2->setMaximum(1000);
-        verticalMotorPos2->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos2);
-
-        verticalMotorPos3 = new QSlider(widget_3);
-        verticalMotorPos3->setObjectName(QStringLiteral("verticalMotorPos3"));
-        verticalMotorPos3->setMaximum(1000);
-        verticalMotorPos3->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos3);
-
-        verticalMotorPos4 = new QSlider(widget_3);
-        verticalMotorPos4->setObjectName(QStringLiteral("verticalMotorPos4"));
-        verticalMotorPos4->setMaximum(1000);
-        verticalMotorPos4->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos4);
-
-        verticalMotorPos5 = new QSlider(widget_3);
-        verticalMotorPos5->setObjectName(QStringLiteral("verticalMotorPos5"));
-        verticalMotorPos5->setMaximum(1000);
-        verticalMotorPos5->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos5);
-
-        verticalMotorPos6 = new QSlider(widget_3);
-        verticalMotorPos6->setObjectName(QStringLiteral("verticalMotorPos6"));
-        verticalMotorPos6->setMaximum(1000);
-        verticalMotorPos6->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos6);
-
-        verticalMotorPos7 = new QSlider(widget_3);
-        verticalMotorPos7->setObjectName(QStringLiteral("verticalMotorPos7"));
-        verticalMotorPos7->setMaximum(1000);
-        verticalMotorPos7->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos7);
-
-        verticalMotorPos8 = new QSlider(widget_3);
-        verticalMotorPos8->setObjectName(QStringLiteral("verticalMotorPos8"));
-        verticalMotorPos8->setMaximum(1000);
-        verticalMotorPos8->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos8);
-
-        verticalMotorPos9 = new QSlider(widget_3);
-        verticalMotorPos9->setObjectName(QStringLiteral("verticalMotorPos9"));
-        verticalMotorPos9->setMaximum(1000);
-        verticalMotorPos9->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos9);
-
-        verticalMotorPos10 = new QSlider(widget_3);
-        verticalMotorPos10->setObjectName(QStringLiteral("verticalMotorPos10"));
-        verticalMotorPos10->setMaximum(1000);
-        verticalMotorPos10->setOrientation(Qt::Vertical);
-
-        horizontalLayout_2->addWidget(verticalMotorPos10);
+        horizontalLayout_2->addWidget(widget_7);
 
 
-        verticalLayout->addWidget(widget_3);
+        verticalLayout_2->addWidget(qwtWdgH1);
+
+        qwtWdgH2 = new QWidget(centralWidget);
+        qwtWdgH2->setObjectName(QStringLiteral("qwtWdgH2"));
+        horizontalLayout_5 = new QHBoxLayout(qwtWdgH2);
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        widget_8 = new QWidget(qwtWdgH2);
+        widget_8->setObjectName(QStringLiteral("widget_8"));
+
+        horizontalLayout_5->addWidget(widget_8);
 
 
-        verticalLayout_2->addWidget(widget_2);
+        verticalLayout_2->addWidget(qwtWdgH2);
 
         widget_6 = new QWidget(centralWidget);
         widget_6->setObjectName(QStringLiteral("widget_6"));

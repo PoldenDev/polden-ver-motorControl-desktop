@@ -9,6 +9,9 @@ QT       += core gui
 QT += serialport
 QT += network
 
+CONFIG += qwt
+
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = motor-control
@@ -37,3 +40,7 @@ HEADERS  += mainwindow.h \
     stand.h
 
 FORMS    += mainwindow.ui
+
+include ( C:\Qwt-6.1.3\features\qwt.prf )
+
+
