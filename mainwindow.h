@@ -70,6 +70,10 @@ private slots:
 
     void on_pushButtonPosReset_clicked();
 
+    void on_pushTestData_clicked();
+
+    void on_pushClearMap_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
@@ -114,10 +118,18 @@ private:
 
     void parseCmdMotorStr(QString);
     void parseCmdMultiMotorStr(QString);
+    void parseCmdMultiMotorStrList(QStringList);
+
+
+
 
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;
     QQueue<QString> motorPosCmdStrings;
+
+    //void convertPosModeToVelMode(QString);
+    //QMap<int, int> lastPosMap;
+    //QQueue<QString> motorVelCmdStrings;
 
 };
 

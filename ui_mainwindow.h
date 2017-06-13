@@ -39,6 +39,7 @@ public:
     QPushButton *pushButtonComOpen;
     QPushButton *pushButton_refreshCom;
     QPushButton *pushButtonClear;
+    QPushButton *pushClearMap;
     QWidget *qwtWdgH1;
     QHBoxLayout *horizontalLayout_2;
     QWidget *widget_7;
@@ -51,6 +52,7 @@ public:
     QPushButton *pushButtonGotoPEriodState;
     QPushButton *pushBUttonToIdle;
     QPushButton *pushButtonPosReset;
+    QPushButton *pushTestData;
     QWidget *widget;
     QHBoxLayout *horizontalLayout;
     QPlainTextEdit *plainTextEdit;
@@ -102,6 +104,11 @@ public:
         pushButtonClear->setObjectName(QStringLiteral("pushButtonClear"));
 
         horizontalLayout_3->addWidget(pushButtonClear);
+
+        pushClearMap = new QPushButton(widget_4);
+        pushClearMap->setObjectName(QStringLiteral("pushClearMap"));
+
+        horizontalLayout_3->addWidget(pushClearMap);
 
 
         verticalLayout_2->addWidget(widget_4);
@@ -160,11 +167,17 @@ public:
 
         horizontalLayout_4->addWidget(pushButtonPosReset);
 
+        pushTestData = new QPushButton(widget_6);
+        pushTestData->setObjectName(QStringLiteral("pushTestData"));
+
+        horizontalLayout_4->addWidget(pushTestData);
+
 
         verticalLayout_2->addWidget(widget_6);
 
         widget = new QWidget(centralWidget);
         widget->setObjectName(QStringLiteral("widget"));
+        widget->setMinimumSize(QSize(0, 300));
         horizontalLayout = new QHBoxLayout(widget);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
@@ -172,6 +185,7 @@ public:
         horizontalLayout->setContentsMargins(0, -1, 0, 0);
         plainTextEdit = new QPlainTextEdit(widget);
         plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
+        plainTextEdit->setMinimumSize(QSize(0, 0));
         plainTextEdit->setReadOnly(true);
 
         horizontalLayout->addWidget(plainTextEdit);
@@ -209,10 +223,12 @@ public:
         pushButtonComOpen->setText(QApplication::translate("MainWindow", "open", Q_NULLPTR));
         pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
         pushButtonClear->setText(QApplication::translate("MainWindow", "clear", Q_NULLPTR));
+        pushClearMap->setText(QApplication::translate("MainWindow", "clearMap", Q_NULLPTR));
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
+        pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));
     } // retranslateUi
 
 };

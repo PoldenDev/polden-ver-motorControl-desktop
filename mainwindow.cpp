@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     initUdpSocket();
-    timer.setInterval(4);
+    timer.setInterval(10);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
@@ -394,20 +394,33 @@ void MainWindow::handleSerialDataWritten(qint64 bytes)
 
 }
 
+void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
+{
+    motorPosCmdStrings << cmdMultiMotorStrList;
+
+    foreach (QString cmdStr, cmdMultiMotorStrList) {
+        //convertPosModeToVelMode(cmdStr);
+        parseCmdMultiMotorStr(cmdStr);
+        //qDebug() << "--- "<< cmdStr;
+    }
+}
+
 void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
 {
-    QStringList motorStrList =  cmdMultiMotorStr.split("S", QString::SkipEmptyParts);
+    QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
     foreach (QString motorStr, motorStrList) {
-        parseCmdMotorStr("S"+motorStr);
+        parseCmdMotorStr(motorStr);
     }
 }
 
 void MainWindow::parseCmdMotorStr(QString cmdStr)
 {
-    if(cmdStr[0] == 'S'){
+    //if(cmdStr[0] == 'S'){
+    if(true){
         int mn = QString(cmdStr[1]).toInt();
         //QString midstr = cmdStr.mid(3, 3);
-        int pos = cmdStr.mid(3, 3).toInt();
+        //int pos = cmdStr.mid(3, 3).toInt();
+        int pos = cmdStr.toInt();
         //int pos = cmdStr.right(3).toInt();
         if((mn>=0)&&(mn<10)){
             //qDebug("%s", mem.toLatin1().constData());
@@ -465,6 +478,9 @@ void MainWindow::parseCmdMotorStr(QString cmdStr)
             }
             curveList[mn]->setSamples(polylist[mn]);
             plotList[mn]->replot();
+
+
+
 
             //   UartThread.transaction(mn, contrStr);
             //if(serial.isOpen() /*&& (bCmdOk == true)*/){
@@ -567,6 +583,26 @@ void MainWindow::parseCmdMotorStr(QString cmdStr)
     }
 }
 
+//void MainWindow::convertPosModeToVelMode(QString cmdStr)
+//{
+//    QStringList motorStrList =  cmdStr.split("p", QString::SkipEmptyParts);
+
+
+//    for(int i=0; i<10; i++){
+//        int pos = motorStrList[i].left(3).toInt();
+//        if(lastPosMap.contains(i)==false){
+//            lastPosMap[i]=pos;
+//        }
+//        else{
+//            //int vel =
+//            //motorVelCmdStrings
+
+//        }
+
+//    }
+
+//}
+
 void MainWindow::readPendingDatagrams()
 {
     //while (udpSocket->hasPendingDatagrams()) {
@@ -609,12 +645,9 @@ void MainWindow::readPendingDatagrams()
             outString += "\r\n";
             outStrings << outString;
         }
-        motorPosCmdStrings << outStrings;
 
-        foreach (QString cmdStr, outStrings) {
-            parseCmdMultiMotorStr(cmdStr);
-            //qDebug() << "--- "<< cmdStr;
-        }
+        parseCmdMultiMotorStrList(outStrings);
+
 
 //        foreach (QString cmdStr, list1) {
 //            parseCmdStr(cmdStr);
@@ -677,19 +710,26 @@ void MainWindow::on_pushButtonClear_clicked()
 
 void MainWindow::sendOnTimer()
 {
-    if(mtstr[curMotorSendIdx].contrStringQueue.isEmpty() == false){
-       // qDebug() << QTime::currentTime().msecsSinceStartOfDay() << "send "
-       //          << curMotorSendIdx << " " << mtstr[curMotorSendIdx].contrStringQueue.size();
-        if(serial.isOpen()){
-            QString wrStr = mtstr[curMotorSendIdx].contrStringQueue.dequeue();
-            serial.write(wrStr.toLatin1());
-        }
+    if(serial.isOpen() && !motorPosCmdStrings.isEmpty()){
+        QString wrStr = motorPosCmdStrings.dequeue();
+        serial.write(wrStr.toLatin1());
+    }
 
-    }
-    curMotorSendIdx++;
-    if(curMotorSendIdx >= MOTOR_CNT){
-        curMotorSendIdx = 0;
-    }
+//    if(mtstr[curMotorSendIdx].contrStringQueue.isEmpty() == false){
+//       // qDebug() << QTime::currentTime().msecsSinceStartOfDay() << "send "
+//       //          << curMotorSendIdx << " " << mtstr[curMotorSendIdx].contrStringQueue.size();
+//        if(serial.isOpen()){
+//            QString wrStr = mtstr[curMotorSendIdx].contrStringQueue.dequeue();
+//            serial.write(wrStr.toLatin1());
+//        }
+
+//    }
+//    curMotorSendIdx++;
+//    if(curMotorSendIdx >= MOTOR_CNT){
+//        curMotorSendIdx = 0;
+//    }
+
+
 }
 
 
@@ -816,13 +856,38 @@ void MainWindow::on_pushButtonGotoPEriodState_clicked()
 
 void MainWindow::on_pushButtonPosReset_clicked()
 {
-    for(int i=0; i< plotList.size(); i++){
-        polylist[i]<<  QPointF(polylist[i].length(), rand() % 100 );
-        curveList[i]->setSamples(polylist[i]);
-        plotList[i]->replot();
-    }
+//    for(int i=0; i< plotList.size(); i++){
+//        polylist[i]<<  QPointF(polylist[i].length(), rand() % 100 );
+//        curveList[i]->setSamples(polylist[i]);
+//        plotList[i]->replot();
+//    }
     if(serial.isOpen()){
         QString str("Sr\r\n");
      serial.write(str.toLatin1());
     }
+}
+
+void MainWindow::on_pushTestData_clicked()
+{
+
+    QStringList strList;
+    strList << "p000p000p000p000p000p000p000p000p000p000\r\n";
+
+    for(int i=0; i<13; i++)
+        strList << "p000p000p000p000p000p000p000p000p000p050\r\n";
+
+    for(int i=0; i<13; i++)
+        strList << "p000p000p000p000p000p000p000p000p000p100\r\n";
+
+    for(int i=0; i<13; i++)
+        strList << "p000p000p000p000p000p000p000p000p000p150\r\n";
+
+    parseCmdMultiMotorStrList(strList);
+
+}
+
+void MainWindow::on_pushClearMap_clicked()
+{
+    lastCmdMap.clear();
+
 }
