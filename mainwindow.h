@@ -108,15 +108,15 @@ private:
     quint8 curMotorSendIdx;
 
     QList<QwtPlot*> plotList;
-    QList<QwtPlotCurve*> curveList;
-    QList<QPolygonF> polylist;
+    QList<QwtPlotCurve*> posCurveList, velCurveList;
+    QList<QPolygonF> polyPoslist, polyVellist;
     //QwtPlot *d_plot;
     //QwtPlotCurve *curve;
     //QPolygonF points;
     int x;
     void createPlot(QString name);
 
-    void parseCmdMotorStr(QString);
+    void parseCmdMotorStr(int, QString);
     void parseCmdMultiMotorStr(QString);
     void parseCmdMultiMotorStrList(QStringList);
 
@@ -128,7 +128,7 @@ private:
     QQueue<QString> motorPosCmdStrings;
 
     //void convertPosModeToVelMode(QString);
-    //QMap<int, int> lastPosMap;
+    QMap<int, int> lastPosMap;
     //QQueue<QString> motorVelCmdStrings;
 
 };

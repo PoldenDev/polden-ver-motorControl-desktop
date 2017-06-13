@@ -19,7 +19,7 @@
      <widget class="QWidget" name="widget_4" native="true">
       <property name="maximumSize">
        <size>
-        <width>300</width>
+        <width>600</width>
         <height>16777215</height>
        </size>
       </property>
@@ -33,9 +33,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="QWidget" name="widget_5" native="true"/>
-       </item>
        <item>
         <widget class="QComboBox" name="comComboBox"/>
        </item>
@@ -64,6 +61,46 @@
         <widget class="QPushButton" name="pushClearMap">
          <property name="text">
           <string>clearMap</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>min:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditMinVal">
+         <property name="inputMask">
+          <string>999</string>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>max</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditMaxVal">
+         <property name="inputMask">
+          <string>999</string>
+         </property>
+         <property name="text">
+          <string>999</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>

@@ -16,6 +16,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPlainTextEdit>
@@ -34,12 +36,15 @@ public:
     QVBoxLayout *verticalLayout_2;
     QWidget *widget_4;
     QHBoxLayout *horizontalLayout_3;
-    QWidget *widget_5;
     QComboBox *comComboBox;
     QPushButton *pushButtonComOpen;
     QPushButton *pushButton_refreshCom;
     QPushButton *pushButtonClear;
     QPushButton *pushClearMap;
+    QLabel *label;
+    QLineEdit *lineEditMinVal;
+    QLabel *label_2;
+    QLineEdit *lineEditMaxVal;
     QWidget *qwtWdgH1;
     QHBoxLayout *horizontalLayout_2;
     QWidget *widget_7;
@@ -74,17 +79,12 @@ public:
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         widget_4 = new QWidget(centralWidget);
         widget_4->setObjectName(QStringLiteral("widget_4"));
-        widget_4->setMaximumSize(QSize(300, 16777215));
+        widget_4->setMaximumSize(QSize(600, 16777215));
         horizontalLayout_3 = new QHBoxLayout(widget_4);
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, -1, 0);
-        widget_5 = new QWidget(widget_4);
-        widget_5->setObjectName(QStringLiteral("widget_5"));
-
-        horizontalLayout_3->addWidget(widget_5);
-
         comComboBox = new QComboBox(widget_4);
         comComboBox->setObjectName(QStringLiteral("comComboBox"));
 
@@ -109,6 +109,28 @@ public:
         pushClearMap->setObjectName(QStringLiteral("pushClearMap"));
 
         horizontalLayout_3->addWidget(pushClearMap);
+
+        label = new QLabel(widget_4);
+        label->setObjectName(QStringLiteral("label"));
+
+        horizontalLayout_3->addWidget(label);
+
+        lineEditMinVal = new QLineEdit(widget_4);
+        lineEditMinVal->setObjectName(QStringLiteral("lineEditMinVal"));
+        lineEditMinVal->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_3->addWidget(lineEditMinVal);
+
+        label_2 = new QLabel(widget_4);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        horizontalLayout_3->addWidget(label_2);
+
+        lineEditMaxVal = new QLineEdit(widget_4);
+        lineEditMaxVal->setObjectName(QStringLiteral("lineEditMaxVal"));
+        lineEditMaxVal->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_3->addWidget(lineEditMaxVal);
 
 
         verticalLayout_2->addWidget(widget_4);
@@ -224,6 +246,12 @@ public:
         pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
         pushButtonClear->setText(QApplication::translate("MainWindow", "clear", Q_NULLPTR));
         pushClearMap->setText(QApplication::translate("MainWindow", "clearMap", Q_NULLPTR));
+        label->setText(QApplication::translate("MainWindow", "min:", Q_NULLPTR));
+        lineEditMinVal->setInputMask(QApplication::translate("MainWindow", "999", Q_NULLPTR));
+        lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
+        label_2->setText(QApplication::translate("MainWindow", "max", Q_NULLPTR));
+        lineEditMaxVal->setInputMask(QApplication::translate("MainWindow", "999", Q_NULLPTR));
+        lineEditMaxVal->setText(QApplication::translate("MainWindow", "999", Q_NULLPTR));
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));

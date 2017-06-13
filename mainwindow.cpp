@@ -108,7 +108,7 @@ void MainWindow::createPlot(QString name)
 
 
     QwtPlotCurve *curve = new QwtPlotCurve();
-    curveList << curve;
+    posCurveList << curve;
     //curve->setTitle( name );
     curve->setPen( Qt::blue, 2 ); // цвет и толщина кривой
 //        curve->setRenderHint
@@ -127,7 +127,14 @@ void MainWindow::createPlot(QString name)
 
   curve->attach( d_plot ); // отобразить кривую на графике
 
-  polylist << QPolygonF();
+    curve = new QwtPlotCurve();
+    velCurveList << curve;
+    curve->setPen( Qt::red, 2 ); // цвет и толщина кривой
+    curve->attach(d_plot ); // отобразить кривую на графике
+
+
+  polyPoslist << QPolygonF();
+  polyVellist << QPolygonF();
   x=0;
 }
 
@@ -408,16 +415,17 @@ void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
 void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
 {
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
-    foreach (QString motorStr, motorStrList) {
-        parseCmdMotorStr(motorStr);
+    //foreach (QString motorStr, motorStrList) {
+    for(int i=0; i<10; i++){
+        parseCmdMotorStr(i, motorStrList[i]);
     }
 }
 
-void MainWindow::parseCmdMotorStr(QString cmdStr)
+void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
 {
     //if(cmdStr[0] == 'S'){
     if(true){
-        int mn = QString(cmdStr[1]).toInt();
+        //int mn = QString(cmdStr[1]).toInt();
         //QString midstr = cmdStr.mid(3, 3);
         //int pos = cmdStr.mid(3, 3).toInt();
         int pos = cmdStr.toInt();
@@ -464,22 +472,34 @@ void MainWindow::parseCmdMotorStr(QString cmdStr)
 
         if((pos>=0) && (pos<1000)){
 
-            int x = xMap[mn];
-            if(x == NULL){
-                xMap[mn] = 0;
-                x = 0;
+            int x=0;
+            if(xMap.contains(mn) == true){
+                x = xMap[mn];
             }
 
-            polylist[mn].append(QPointF(x, pos/10.));
+            polyPoslist[mn].append(QPointF(x, pos/10.));
             xMap[mn] = x+1;
 
-            if(polylist[mn].length() > 500){
-                polylist[mn].removeFirst();
+            if(polyPoslist[mn].length() > 500){
+                polyPoslist[mn].removeFirst();
             }
-            curveList[mn]->setSamples(polylist[mn]);
+            posCurveList[mn]->setSamples(polyPoslist[mn]);
+
+
+            int lasPos = 0;
+            if(lastPosMap.contains(mn) == true){
+                lasPos = lastPosMap[mn];
+            }
+            int vel = pos - lasPos;
+            //qDebug("%d v %d", mn,  vel);
+            lastPosMap[mn] = pos;
+
+            polyVellist[mn].append(QPointF(x, vel));
+            if(polyVellist[mn].length() > 500){
+                polyVellist[mn].removeFirst();
+            }
+            velCurveList[mn]->setSamples(polyVellist[mn]);
             plotList[mn]->replot();
-
-
 
 
             //   UartThread.transaction(mn, contrStr);
@@ -605,7 +625,7 @@ void MainWindow::parseCmdMotorStr(QString cmdStr)
 
 void MainWindow::readPendingDatagrams()
 {
-    //while (udpSocket->hasPendingDatagrams()) {
+    while (udpSocket->hasPendingDatagrams()) {
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
@@ -616,7 +636,7 @@ void MainWindow::readPendingDatagrams()
         foreach (QString posStr, list1) {
             debStr.append(posStr + " ");
         }
-        //qDebug("%s", debStr.toLatin1().constData());
+        qDebug("%s", debStr.toLatin1().constData());
 
         //if(list1.size() > 2)
         //    return;
@@ -670,7 +690,7 @@ void MainWindow::readPendingDatagrams()
 //            return;
 
 //        }
-    //}
+    }
 }
 
 
