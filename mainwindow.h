@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QSlider>
 #include <QMap>
+#include <QSettings>
 
 //#include <uartthread.h>
 
@@ -74,6 +75,7 @@ private slots:
 
     void on_pushClearMap_clicked();
 
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
@@ -104,7 +106,7 @@ private:
     //UartThread UartThread;
 
 
-    TMotorStr mtstr[MOTOR_CNT];
+    //TMotorStr mtstr[MOTOR_CNT];
     quint8 curMotorSendIdx;
 
     QList<QwtPlot*> plotList;
@@ -130,6 +132,9 @@ private:
     //void convertPosModeToVelMode(QString);
     QMap<int, int> lastPosMap;
     //QQueue<QString> motorVelCmdStrings;
+
+    void graphReset();
+    QSettings settings;
 
 };
 

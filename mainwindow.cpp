@@ -32,11 +32,13 @@ MainWindow::MainWindow(QWidget *parent) :
     udpSocket(NULL),    
     cmdNum(0),
     udpCnt(0),
-  curMotorSendIdx(0)
+    curMotorSendIdx(0),
+    settings("murinets", "vertolet")
 {
     ui->setupUi(this);
 
-
+    ui->lineEditMaxVal->setText(QString::number(settings.value("maxPosValue").toInt()));
+    ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue").toInt()));
 
     on_pushButton_refreshCom_clicked();
 
@@ -140,6 +142,8 @@ void MainWindow::createPlot(QString name)
 
 MainWindow::~MainWindow()
 {
+    settings.setValue("maxPosValue", ui->lineEditMaxVal->text().toInt());
+    settings.setValue("minPosValue", ui->lineEditMinVal->text().toInt());
     delete ui;
 }
 
@@ -402,11 +406,9 @@ void MainWindow::handleSerialDataWritten(qint64 bytes)
 }
 
 void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
-{
-    motorPosCmdStrings << cmdMultiMotorStrList;
-
-    foreach (QString cmdStr, cmdMultiMotorStrList) {
-        //convertPosModeToVelMode(cmdStr);
+{        
+    foreach (QString cmdStr, cmdMultiMotorStrList) {        
+        //convertPosModeToVelMode(cmdStr);        
         parseCmdMultiMotorStr(cmdStr);
         //qDebug() << "--- "<< cmdStr;
     }
@@ -414,11 +416,22 @@ void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
 
 void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
 {
+    QString convertedString;
+    int maxVal = ui->lineEditMaxVal->text().toInt();
+
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
     //foreach (QString motorStr, motorStrList) {
     for(int i=0; i<10; i++){
-        parseCmdMotorStr(i, motorStrList[i]);
+        QString vs = motorStrList[i];
+        parseCmdMotorStr(i, vs);
+        float ip = vs.toInt()/1000.;
+        int convVal = ip*maxVal;
+        convertedString += QString("p%1").arg(convVal, 3, 'g', -1, '0');
+
     }
+    convertedString += "\r\n";
+
+    motorPosCmdStrings << convertedString;
 }
 
 void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
@@ -467,7 +480,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         //udpSocket->writeDatagram(drply);
         //if(mn != 2)
         //  return;
-        mtstr[mn].contrStringQueue.enqueue(cmdStr);
+        //mtstr[mn].contrStringQueue.enqueue(cmdStr);
 
 
         if((pos>=0) && (pos<1000)){
@@ -622,6 +635,29 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
 //    }
 
 //}
+void MainWindow::graphReset()
+{
+    xMap.clear();
+
+    foreach (QPolygonF plg, polyPoslist) {
+        plg.clear();
+    }
+    foreach (QPolygonF plg, polyVellist) {
+        plg.clear();
+    }
+
+    foreach (QwtPlotCurve* crv, posCurveList) {
+        crv->setSamples(QPolygonF());
+    }
+    foreach (QwtPlotCurve* crv, velCurveList) {
+        crv->setSamples(QPolygonF());
+    }
+
+    foreach (QwtPlot* plt, plotList) {
+        plt->replot();
+    }
+
+}
 
 void MainWindow::readPendingDatagrams()
 {
@@ -630,43 +666,56 @@ void MainWindow::readPendingDatagrams()
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
 
-        QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
-        QString  contrStr =  dataStr.left(13);
-        QString debStr;
-        foreach (QString posStr, list1) {
-            debStr.append(posStr + " ");
-        }
-        qDebug("%s", debStr.toLatin1().constData());
-
-        //if(list1.size() > 2)
-        //    return;
-
         QStringList outStrings;
-        if(list1.size() == 20){
-            foreach (QString cmdStr, list1) {
-                int mn = QString(cmdStr[1]).toInt();
-                lastCmdMap[mn] = cmdStr.mid(2, 4);
+        if(dataStr.compare("start\r\n") == 0){
+            lastCmdMap.clear();
+            lastPosMap.clear();
+            graphReset();
+            motorPosCmdStrings.clear();
+        }
+        else{
+            QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
+            //QString  contrStr =  dataStr.left(13);
+//            QString debStr;
+//            foreach (QString posStr, list1) {
+//                debStr.append(posStr + " ");
+//            }
+//            qDebug("%s", debStr.toLatin1().constData());
+
+
+//            if(list1.size() == 20){
+//                foreach (QString cmdStr, list1) {
+//                    int mn = QString(cmdStr[1]).toInt();
+//                    lastCmdMap[mn] = cmdStr.mid(2, 4);
+//                    QString outString;
+//                    for(int i=0; i<10; i++){
+//                        if(lastCmdMap[i] == NULL){
+//                            lastCmdMap[i] = QString("p000");
+//                        }
+//                        outString += lastCmdMap[i];
+//                    }
+//                    outString += "\r\n";
+//                    outStrings << outString;
+//                }
+//            }
+//            else{
+
+            foreach (QString multiMotorStr, list1) {
+                QStringList motorList = multiMotorStr.split("S", QString::SkipEmptyParts);
                 QString outString;
-                for(int i=0; i<10; i++){
-                    if(lastCmdMap[i] == NULL){
-                        lastCmdMap[i] = QString("p000");
-                    }
-                    outString += lastCmdMap[i];
+                foreach (QString cmdStr, motorList) {
+                    outString += cmdStr.mid(1, 4);
                 }
                 outString += "\r\n";
                 outStrings << outString;
+
             }
-        }
-        else{
-            QString outString;
-            foreach (QString cmdStr, list1) {
-                outString += cmdStr.mid(2, 4);
-            }
-            outString += "\r\n";
-            outStrings << outString;
+//            }
+            parseCmdMultiMotorStrList(outStrings);
         }
 
-        parseCmdMultiMotorStrList(outStrings);
+
+
 
 
 //        foreach (QString cmdStr, list1) {
@@ -943,6 +992,6 @@ void MainWindow::on_pushTestData_clicked()
 
 void MainWindow::on_pushClearMap_clicked()
 {
-    lastCmdMap.clear();
+
 
 }
