@@ -10,6 +10,7 @@
 #include <QSlider>
 #include <QMap>
 #include <QSettings>
+#include <qwt_plot_marker.h>
 
 //#include <uartthread.h>
 
@@ -55,8 +56,8 @@ private slots:
     void on_pushButton_refreshCom_clicked();
     void on_pushButtonClear_clicked();
     void sendOnTimer();
-
     void sendTimeOut();
+    void dataProcess100msTimeOut();
    // void processUartExchange();
     void waitForFifoFreeFifo();
 
@@ -75,6 +76,8 @@ private slots:
 
     void on_pushClearMap_clicked();
 
+
+    void on_tabWidget_tabBarClicked(int index);
 
 private:
     void setPos(int pos);
@@ -104,6 +107,7 @@ private:
     //void processUartRecvExchange(QString str);
     QTimer waitForFifoFreeTimer;
     //UartThread UartThread;
+    QTimer dataProcess100msTimer;
 
 
     //TMotorStr mtstr[MOTOR_CNT];
@@ -112,10 +116,12 @@ private:
     QList<QwtPlot*> plotList;
     QList<QwtPlotCurve*> posCurveList, velCurveList;
     QList<QPolygonF> polyPoslist, polyVellist;
+    QList<QwtPlotMarker*> markrlist;
+    int markerXPos;
     //QwtPlot *d_plot;
     //QwtPlotCurve *curve;
     //QPolygonF points;
-    int x;
+    int x, xUdpRecv;
     void createPlot(QString name);
 
     void parseCmdMotorStr(int, QString);
@@ -135,6 +141,9 @@ private:
 
     void graphReset();
     QSettings settings;
+
+
+
 
 };
 

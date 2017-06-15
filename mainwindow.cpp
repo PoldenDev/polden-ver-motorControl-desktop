@@ -24,6 +24,7 @@
 
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
+#include <qwt_plot_marker.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,7 +34,9 @@ MainWindow::MainWindow(QWidget *parent) :
     cmdNum(0),
     udpCnt(0),
     curMotorSendIdx(0),
-    settings("murinets", "vertolet")
+    settings("murinets", "vertolet"),
+    xUdpRecv(0),
+    markerXPos(0)
 {
     ui->setupUi(this);
 
@@ -43,9 +46,12 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     initUdpSocket();
-    timer.setInterval(10);
+    timer.setInterval(50);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
+
+    dataProcess100msTimer.setInterval(100);
+    connect(&dataProcess100msTimer, SIGNAL(timeout()), this, SLOT(dataProcess100msTimeOut()));
 
 //    slList.append(ui->verticalMotorPos10);
 //    slList.append(ui->verticalMotorPos9);
@@ -68,8 +74,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect(&UartThread, SIGNAL(response(QString)), this, SLOT(response(QString)));
 
+    QWidget *tabWdg;
     for(int i=0; i<10; i++){
         createPlot(QString::number(i));
+        tabWdg = new QWidget();
+        tabWdg->setLayout(new QVBoxLayout());
+        ui->tabWidget->addTab(tabWdg, QString::number(i));
     }
 
 
@@ -81,10 +91,12 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->qwtWdgH2->layout()->addWidget(plotList[5+i]);
     }
 
+
+
 }
 void MainWindow::createPlot(QString name)
 {
-    QwtPlot *d_plot = new QwtPlot(this);
+    QwtPlot *d_plot = new QwtPlot(this);    
     plotList << d_plot;
     //d_plot->setTitle( "Qwt demonstration" ); // заголовок
     //d_plot->setCanvasBackground( Qt::white ); // цвет фона
@@ -97,6 +109,7 @@ void MainWindow::createPlot(QString name)
     //d_plot->setAxisScale(QwtPlot::xBottom, 0, 100);
 
     //d_plot->insertLegend( new QwtLegend() );
+    d_plot->enableAxis(QwtPlot::yRight);
 
 
 
@@ -132,12 +145,23 @@ void MainWindow::createPlot(QString name)
     curve = new QwtPlotCurve();
     velCurveList << curve;
     curve->setPen( Qt::red, 2 ); // цвет и толщина кривой
+    curve->setYAxis(QwtPlot::yRight);
+
     curve->attach(d_plot ); // отобразить кривую на графике
+
 
 
   polyPoslist << QPolygonF();
   polyVellist << QPolygonF();
   x=0;
+
+
+   QwtSymbol *markerSymbol = new QwtSymbol(QwtSymbol::VLine,QBrush(Qt::red),QPen(Qt::red),QSize(50,5000));
+    QwtPlotMarker *mark=new QwtPlotMarker;
+    markrlist << mark;
+    mark->setSymbol(markerSymbol);
+    mark->setXValue(0);//here you have to set the coordinate axis i.e. where the axis are meeting.
+    mark->attach(d_plot);
 }
 
 MainWindow::~MainWindow()
@@ -151,6 +175,18 @@ void MainWindow::sendTimeOut()
 {
     qDebug()<< qPrintable("timeout");
 
+}
+
+void MainWindow::dataProcess100msTimeOut()
+{
+    for(int i=0; i<markrlist.length(); i++){
+        markrlist[i]->setXValue(markerXPos);
+        plotList[i]->replot();
+    }
+    markerXPos++;
+
+    if(markerXPos == xUdpRecv)
+        dataProcess100msTimer.stop();
 }
 
 //void MainWindow::on_butPos_clicked()
@@ -422,11 +458,12 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
     //foreach (QString motorStr, motorStrList) {
     for(int i=0; i<10; i++){
-        QString vs = motorStrList[i];
-        parseCmdMotorStr(i, vs);
+        QString vs = motorStrList[i];        
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
-        convertedString += QString("p%1").arg(convVal, 3, 'g', -1, '0');
+        vs = QString("%1").arg(convVal, 3, 'g', -1, '0');
+        parseCmdMotorStr(i, vs);
+        convertedString += "p" + vs;
 
     }
     convertedString += "\r\n";
@@ -483,6 +520,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         //mtstr[mn].contrStringQueue.enqueue(cmdStr);
 
 
+        int velIPS;
         if((pos>=0) && (pos<1000)){
 
             int x=0;
@@ -493,7 +531,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             polyPoslist[mn].append(QPointF(x, pos/10.));
             xMap[mn] = x+1;
 
-            if(polyPoslist[mn].length() > 500){
+            if(polyPoslist[mn].length() > 1500){
                 polyPoslist[mn].removeFirst();
             }
             posCurveList[mn]->setSamples(polyPoslist[mn]);
@@ -504,11 +542,13 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 lasPos = lastPosMap[mn];
             }
             int vel = pos - lasPos;
+
+            velIPS=abs( vel*400*10 );
             //qDebug("%d v %d", mn,  vel);
             lastPosMap[mn] = pos;
 
             polyVellist[mn].append(QPointF(x, vel));
-            if(polyVellist[mn].length() > 500){
+            if(polyVellist[mn].length() > 1500){
                 polyVellist[mn].removeFirst();
             }
             velCurveList[mn]->setSamples(polyVellist[mn]);
@@ -545,7 +585,15 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
 
         if(mn==0){
             // QString udpTextField = QString("%1:%2").arg(udpCnt++).arg(contrStr);
-            QString udpTextField = QString("%1\r\n").arg(pos);
+
+            int div = 0xfffff;
+            if(velIPS != 0){
+                div = 50000000/velIPS;
+            }
+            QString udpTextField = QString("%1 p%2 v%3 d%4\r\n").arg(xUdpRecv++, 5, 10)
+                                                                .arg(pos)
+                                                                .arg(velIPS)
+                                                                .arg(div, 4, 16);
             //udpSocket->writeDatagram()                ;
             ui->plainTextUDP->moveCursor (QTextCursor::End);
             ui->plainTextUDP->insertPlainText(udpTextField);
@@ -661,26 +709,34 @@ void MainWindow::graphReset()
 
 void MainWindow::readPendingDatagrams()
 {
+
     while (udpSocket->hasPendingDatagrams()) {
+        qDebug() << "pds:"<< udpSocket->pendingDatagramSize();
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
         //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
 
         QStringList outStrings;
         if(dataStr.compare("start\r\n") == 0){
-            lastCmdMap.clear();
-            lastPosMap.clear();
-            graphReset();
-            motorPosCmdStrings.clear();
+//            lastCmdMap.clear();
+//            lastPosMap.clear();
+//            graphReset();
+//            motorPosCmdStrings.clear();
+            if(dataProcess100msTimer.isActive() == false){
+                dataProcess100msTimer.start();
+            }
+        }
+        else if(dataStr.compare("stop\r\n") == 0){
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
+            //qDebug()<<dataStr;
             //QString  contrStr =  dataStr.left(13);
 //            QString debStr;
 //            foreach (QString posStr, list1) {
 //                debStr.append(posStr + " ");
 //            }
-//            qDebug("%s", debStr.toLatin1().constData());
+            //qDebug("%s", debStr.toLatin1().constData());
 
 
 //            if(list1.size() == 20){
@@ -993,5 +1049,34 @@ void MainWindow::on_pushTestData_clicked()
 void MainWindow::on_pushClearMap_clicked()
 {
 
+
+}
+
+void MainWindow::on_tabWidget_tabBarClicked(int index)
+{
+    if( index==0 ){
+
+        for(int i=0; i<5; i++){
+            ui->qwtWdgH1->layout()->removeWidget(plotList[i]);
+            ui->qwtWdgH2->layout()->removeWidget(plotList[5+i]);
+        }
+        for(int i=0; i<5; i++){
+            ui->qwtWdgH1->layout()->addWidget(plotList[i]);
+        }
+
+        for(int i=0; i<5; i++){
+            ui->qwtWdgH2->layout()->addWidget(plotList[5+i]);
+        }
+    }
+    else{
+        //int idx = index-1;
+        //if(idx>4)
+        ui->tabWidget->widget(index)->layout()->addWidget(plotList[index-1]);
+    }
+
+
+//    else if((index>5) && (index<=10)){
+//        ui->tabWidget->widget(index)->layout()->addWidget(plotList[0]);
+//    }
 
 }

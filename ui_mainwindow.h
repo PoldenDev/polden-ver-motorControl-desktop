@@ -23,6 +23,7 @@
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -45,6 +46,9 @@ public:
     QLineEdit *lineEditMinVal;
     QLabel *label_2;
     QLineEdit *lineEditMaxVal;
+    QTabWidget *tabWidget;
+    QWidget *tab;
+    QVBoxLayout *verticalLayout;
     QWidget *qwtWdgH1;
     QHBoxLayout *horizontalLayout_2;
     QWidget *widget_7;
@@ -135,7 +139,15 @@ public:
 
         verticalLayout_2->addWidget(widget_4);
 
-        qwtWdgH1 = new QWidget(centralWidget);
+        tabWidget = new QTabWidget(centralWidget);
+        tabWidget->setObjectName(QStringLiteral("tabWidget"));
+        tab = new QWidget();
+        tab->setObjectName(QStringLiteral("tab"));
+        verticalLayout = new QVBoxLayout(tab);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        qwtWdgH1 = new QWidget(tab);
         qwtWdgH1->setObjectName(QStringLiteral("qwtWdgH1"));
         horizontalLayout_2 = new QHBoxLayout(qwtWdgH1);
         horizontalLayout_2->setSpacing(6);
@@ -147,9 +159,9 @@ public:
         horizontalLayout_2->addWidget(widget_7);
 
 
-        verticalLayout_2->addWidget(qwtWdgH1);
+        verticalLayout->addWidget(qwtWdgH1);
 
-        qwtWdgH2 = new QWidget(centralWidget);
+        qwtWdgH2 = new QWidget(tab);
         qwtWdgH2->setObjectName(QStringLiteral("qwtWdgH2"));
         horizontalLayout_5 = new QHBoxLayout(qwtWdgH2);
         horizontalLayout_5->setSpacing(6);
@@ -161,7 +173,11 @@ public:
         horizontalLayout_5->addWidget(widget_8);
 
 
-        verticalLayout_2->addWidget(qwtWdgH2);
+        verticalLayout->addWidget(qwtWdgH2);
+
+        tabWidget->addTab(tab, QString());
+
+        verticalLayout_2->addWidget(tabWidget);
 
         widget_6 = new QWidget(centralWidget);
         widget_6->setObjectName(QStringLiteral("widget_6"));
@@ -236,6 +252,9 @@ public:
 
         retranslateUi(MainWindow);
 
+        tabWidget->setCurrentIndex(0);
+
+
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
 
@@ -252,6 +271,7 @@ public:
         label_2->setText(QApplication::translate("MainWindow", "max", Q_NULLPTR));
         lineEditMaxVal->setInputMask(QApplication::translate("MainWindow", "999", Q_NULLPTR));
         lineEditMaxVal->setText(QApplication::translate("MainWindow", "999", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
