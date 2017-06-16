@@ -108,6 +108,7 @@ void MainWindow::createPlot(QString name)
     //d_plot->setAxisTitle(QwtPlot::xBottom, "X");
     //d_plot->setAxisScale(QwtPlot::xBottom, 0, 100);
 
+    d_plot->setAxisScale(QwtPlot::yRight, -100, 100);
     //d_plot->insertLegend( new QwtLegend() );
     d_plot->enableAxis(QwtPlot::yRight);
 
@@ -115,11 +116,14 @@ void MainWindow::createPlot(QString name)
 
     // Включить сетку
     // #include <qwt_plot_grid.h>
-    QwtPlotGrid *grid = new QwtPlotGrid(); //
-    grid->setMajorPen(QPen( Qt::gray, 1 )); // цвет линий и толщина
+    QwtPlotGrid *gridL = new QwtPlotGrid(); //
+    gridL->setMajorPen(QPen( Qt::black, 1 )); // цвет линий и толщина
+    gridL->attach( d_plot ); // добавить сетку к полю графика
 
-    grid->attach( d_plot ); // добавить сетку к полю графика
-
+    QwtPlotGrid *gridR = new QwtPlotGrid(); //
+    gridR->setMajorPen(QPen( Qt::gray, 1 )); // цвет линий и толщина
+    gridR->setYAxis(QwtPlot::yRight);
+    gridR->attach( d_plot ); // добавить сетку к полю графика
 
 
     QwtPlotCurve *curve = new QwtPlotCurve();
@@ -184,6 +188,8 @@ void MainWindow::dataProcess100msTimeOut()
         plotList[i]->replot();
     }
     markerXPos++;
+
+    qDebug() << "tt " << markerXPos;
 
     if(markerXPos == xUdpRecv)
         dataProcess100msTimer.stop();
@@ -360,8 +366,19 @@ void MainWindow::handleReadyRead()
     //uartBuff.split("\r\n");
     bool bAcked = false;
     int lfInd = uartBuff.indexOf("\r\n");
-    QString cmd = uartBuff.left(lfInd+2);
-    uartBuff.remove(0, lfInd+2);
+    if(lfInd != -1){
+        QString cmd = uartBuff.left(lfInd+2);
+        uartBuff.remove(0, lfInd+2);
+
+        bool bOk;
+        //qDebug() << cmd.mid(11, 4);
+        markerXPos = cmd.mid(11, 4).toInt(&bOk, 16);
+        qDebug() << "corr >> "<< markerXPos;
+        for(int i=0; i<markrlist.length(); i++){
+            markrlist[i]->setXValue(markerXPos);
+            plotList[i]->replot();
+        }
+    }
 
     //processUartRecvExchange(cmd);
 
@@ -971,10 +988,10 @@ void MainWindow::on_pushMoveDownState_clicked()
 
 //    parseCmdMultiMotorStrList(strList);
 
-//    if(serial.isOpen()){
-//        QString str("Sd\r\n");
-//     serial.write(str.toLatin1());
-//    }
+    if(serial.isOpen()){
+        QString str("Sd\r\n");
+     serial.write(str.toLatin1());
+    }
 }
 
 void MainWindow::on_pushBUttonToIdle_clicked()
