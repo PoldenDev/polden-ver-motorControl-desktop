@@ -40,8 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->lineEditMaxVal->setText(QString::number(settings.value("maxPosValue").toInt()));
-    ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue").toInt()));
+    ui->lineEditMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
+    ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
 
     on_pushButton_refreshCom_clicked();
 
@@ -189,7 +189,7 @@ void MainWindow::dataProcess100msTimeOut()
     }
     markerXPos++;
 
-    qDebug() << "tt " << markerXPos;
+    //qDebug() << "tt " << markerXPos;
 
     if(markerXPos == xUdpRecv)
         dataProcess100msTimer.stop();
@@ -728,9 +728,8 @@ void MainWindow::readPendingDatagrams()
 {
 
     while (udpSocket->hasPendingDatagrams()) {
-        qDebug() << "pds:"<< udpSocket->pendingDatagramSize();
+        //qDebug() << "pds:"<< udpSocket->pendingDatagramSize();
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
-        //processTheDatagram(datagram);
         QString dataStr = QString(datagram.data());
 
         QStringList outStrings;
@@ -747,7 +746,7 @@ void MainWindow::readPendingDatagrams()
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
-            //qDebug()<<dataStr;
+            qDebug()<<dataStr;
             //QString  contrStr =  dataStr.left(13);
 //            QString debStr;
 //            foreach (QString posStr, list1) {
