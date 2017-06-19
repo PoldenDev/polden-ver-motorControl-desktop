@@ -726,12 +726,21 @@ void MainWindow::graphReset()
 
 void MainWindow::readPendingDatagrams()
 {
-
+    QTime rpdEst;
+    rpdEst.start();
+    //qDebug() << "0";
+    int gridLines = 0;
+    int rb = 0;
     while (udpSocket->hasPendingDatagrams()) {
+        //qDebug() << "1";
         //qDebug() << "pds:"<< udpSocket->pendingDatagramSize();
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
+        //qDebug() << "2";
+        rb += datagram.data().length();
         QString dataStr = QString(datagram.data());
+        //continue;
 
+        //qDebug() << "3";
         QStringList outStrings;
         if(dataStr.compare("start\r\n") == 0){
 //            lastCmdMap.clear();
@@ -746,7 +755,7 @@ void MainWindow::readPendingDatagrams()
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
-            qDebug()<<dataStr;
+            //qDebug()<<dataStr;
             //QString  contrStr =  dataStr.left(13);
 //            QString debStr;
 //            foreach (QString posStr, list1) {
@@ -782,6 +791,7 @@ void MainWindow::readPendingDatagrams()
                 outStrings << outString;
 
             }
+            gridLines++;
 //            }
             parseCmdMultiMotorStrList(outStrings);
         }
@@ -812,6 +822,8 @@ void MainWindow::readPendingDatagrams()
 
 //        }
     }
+    //qDebug() << "readPendingDatagrams time" << rpdEst.elapsed() << " gl " << gridLines;
+    qDebug("readPendingDatagrams rb %d gl %04d time %d", rb, gridLines, rpdEst.elapsed());
 }
 
 
