@@ -210,7 +210,7 @@ void MainWindow::dataProcess100msTimeOut()
 
 void MainWindow::on_pushButtonComOpen_clicked()
 {
-   serial.setBaudRate(115200);
+   serial.setBaudRate(230400);
     if(ui->pushButtonComOpen->text() == "open"){
         if(serial.isOpen() == false){
             QString comName = ui->comComboBox->currentText();
@@ -358,38 +358,79 @@ void MainWindow::initUdpSocket()
 }
 
 
+
+void MainWindow::sendDivPos(int mi, int div, int steps)
+{
+    quint32 temp = 0;
+    temp = mi&0xf;
+    temp |= ((div&0x7fff)<<4);
+    temp |= ((steps&0x3fff)<<19);
+    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint32));
+//    ba.resize(5);
+
+//    //ba[0] = 0x09;
+//    ba[0] = mi&0xf;
+//    ba[1] = 0xc0;
+//    ba[2] = 0x38;
+//    ba[3] = 0x00;
+//    ba[4] = 0x00;
+
+    ba.append((char)0);
+
+    serial.write(ba);
+}
+
 void MainWindow::handleReadyRead()
 {
     QByteArray str = serial.readAll();
 
-    uartBuff += str;
-    //uartBuff.split("\r\n");
-    bool bAcked = false;
-    int lfInd = uartBuff.indexOf("\r\n");
-    if(lfInd != -1){
-        QString cmd = uartBuff.left(lfInd+2);
-        uartBuff.remove(0, lfInd+2);
+//    uartBuff += str;
+//    //uartBuff.split("\r\n");
+//    bool bAcked = false;
+//    int lfInd = uartBuff.indexOf("\r\n");
+//    if(lfInd != -1){
+//        QString cmd = uartBuff.left(lfInd+2);
+//        uartBuff.remove(0, lfInd+2);
 
-        bool bOk;
-        //qDebug() << cmd.mid(11, 4);
-        markerXPos = cmd.mid(11, 4).toInt(&bOk, 16);
-        qDebug() << "corr >> "<< markerXPos;
-        for(int i=0; i<markrlist.length(); i++){
-            markrlist[i]->setXValue(markerXPos);
-            plotList[i]->replot();
-        }
-    }
+//        bool bOk;
+//        //qDebug() << cmd.mid(11, 4);
+//        markerXPos = cmd.mid(11, 4).toInt(&bOk, 16);
+//        qDebug() << "corr >> "<< markerXPos;
+//        for(int i=0; i<markrlist.length(); i++){
+//            markrlist[i]->setXValue(markerXPos);
+//            plotList[i]->replot();
+//        }
+//    }
 
     //processUartRecvExchange(cmd);
 
+    QString debStr;
+
+    for (int i=0; i<str.length(); i++) {
+        //debStr.append((char)str[i]);
+        int startMi = 0;
+        if((str[i]&0x80) != 0){
+            startMi = 5;
+        }
+        for(int i=0; i<5; i++){
+            if((str[i]&0x10) == 0){
+                sendDivPos(startMi+i, 0x4fff, 20);
+                //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" f");
+            }
+            else{
+                //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" b");
+            }
+        }
+    }
 
     //qDebug() << str;
-    ui->plainTextEdit->moveCursor (QTextCursor::End);
-    ui->plainTextEdit->insertPlainText(str);
-    ui->plainTextEdit->moveCursor (QTextCursor::End);
+    //ui->plainTextEdit->moveCursor (QTextCursor::End);
+    //ui->plainTextEdit->insertPlainText(str);
+    //ui->plainTextEdit->insertPlainText(QString(t.msecsSinceStartOfDay()));
+    //ui->plainTextEdit->moveCursor (QTextCursor::End);
     //ui->plainTextEdit->appendPlainText(str);
 
-    ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
+    ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());    
 }
 
 void MainWindow::handleSerialDataWritten(qint64 bytes)
