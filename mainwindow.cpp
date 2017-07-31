@@ -359,12 +359,13 @@ void MainWindow::initUdpSocket()
 
 
 
-void MainWindow::sendDivPos(int mi, int div, int steps)
+void MainWindow::sendDivPos(int mi, int div, int steps, int dir)
 {
     quint32 temp = 0;
     temp = mi&0xf;
     temp |= ((div&0x7fff)<<4);
-    temp |= ((steps&0x3fff)<<19);
+    temp |= ((steps&0xfff)<<19);
+    temp |= ((dir&0x1)<<31);
     QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint32));
 //    ba.resize(5);
 
@@ -413,13 +414,13 @@ void MainWindow::handleReadyRead()
             startMi = 5;
         }
         for(int i=0; i<5; i++){
-            if((str[i]&0x10) == 0){
+            if((str[i]&(1<<i)) == 0){
                 int curMi = startMi+i;
                 if(motorPosCmdData[curMi].isEmpty() == false){
-                    DivPosDataStr ds = motorPosCmdData[0].dequeue();
+                    DivPosDataStr ds = motorPosCmdData[curMi].dequeue();
                     //sendDivPos(startMi+i, 0x4fff, 20);
-                    sendDivPos(startMi+i, ds.div, ds.steps);
-                    //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" f");
+                    sendDivPos(startMi+i, ds.div, ds.steps, ds.dir);
+                    qDebug() << QTime::currentTime().msecsSinceStartOfDay() << curMi <<  qPrintable(" f");
                 }
 
             }
@@ -1086,43 +1087,58 @@ void MainWindow::on_pushButtonPosReset_clicked()
 void MainWindow::on_pushTestData_clicked()
 {
 
-    QStringList strList;
-    strList << "p000p000p000p000p000p000p000p000p000p000\r\n";
-    strList << "p005p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p010p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p015p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p020p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p025p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p030p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p035p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p040p000p000p000p000p000p000p000p000p050\r\n";
-    strList << "p045p000p000p000p000p000p000p000p000p050\r\n";
-    for(int i=0; i<40; i++)
-        strList << "p050p000p000p000p000p000p000p000p000p050\r\n";
-
+//    QStringList strList;
+//    strList << "p000p000p000p000p000p000p000p000p000p000\r\n";
+//    strList << "p005p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p010p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p015p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p020p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p025p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p030p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p035p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p040p000p000p000p000p000p000p000p000p050\r\n";
+//    strList << "p045p000p000p000p000p000p000p000p000p050\r\n";
 //    for(int i=0; i<40; i++)
-//        strList << "p080p000p000p000p000p000p000p000p000p080\r\n";
+//        strList << "p050p000p000p000p000p000p000p000p000p050\r\n";
+
+////    for(int i=0; i<40; i++)
+////        strList << "p080p000p000p000p000p000p000p000p000p080\r\n";
 
 
-//    for(int i=0; i<40; i++)
-//        strList << "p060p000p000p000p000p000p000p000p000p060\r\n";
+////    for(int i=0; i<40; i++)
+////        strList << "p060p000p000p000p000p000p000p000p000p060\r\n";
 
-    //strList << "p000p000p000p000p000p000p000p000p000p050\r\n";
-    //strList << "p000p000p000p000p000p000p000p000p000p060\r\n";
+//    //strList << "p000p000p000p000p000p000p000p000p000p050\r\n";
+//    //strList << "p000p000p000p000p000p000p000p000p000p060\r\n";
 
 
-//    for(int i=0; i<13; i++)
-//        strList << "p000p000p000p000p000p000p000p000p000p100\r\n";
+////    for(int i=0; i<13; i++)
+////        strList << "p000p000p000p000p000p000p000p000p000p100\r\n";
 
-//    for(int i=0; i<13; i++)
-//        strList << "p000p000p000p000p000p000p000p000p000p150\r\n";
+////    for(int i=0; i<13; i++)
+////        strList << "p000p000p000p000p000p000p000p000p000p150\r\n";
 
-    parseCmdMultiMotorStrList(strList);
+//    parseCmdMultiMotorStrList(strList);
 
     DivPosDataStr ds;
-    ds.div = 0x4fff;
-    ds.steps = 20;
-    motorPosCmdData[0] << ds;
+    //ds.div = 0x4fff;
+    ds.div = 0x3ff;
+    ds.steps = 4000;
+
+    for(int i=0; i<10; i++){
+        ds.dir = 1;
+        for(int k=0; k<10; k++)
+            motorPosCmdData[i] << ds;
+        ds.dir = 0;
+        for(int k=0; k<30; k++)
+            motorPosCmdData[i] << ds;
+    }
+
+    //ds.dir = 0;
+    //motorPosCmdData[0] << ds;
+    //motorPosCmdData[1] << ds;
+    //motorPosCmdData[4] << ds;
+    //motorPosCmdData[6] << ds;
 }
 
 void MainWindow::on_pushClearMap_clicked()

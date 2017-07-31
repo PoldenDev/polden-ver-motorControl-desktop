@@ -26,6 +26,7 @@ class MainWindow;
 typedef struct{
     int div;
     int steps;
+    int dir;
 } DivPosDataStr;
 
 class MainWindow : public QMainWindow
@@ -149,7 +150,7 @@ private:
     void graphReset();
     QSettings settings;
 
-    void sendDivPos(int mi, int div, int steps);
+    void sendDivPos(int mi, int div, int steps, int dir);
 };
 
 
