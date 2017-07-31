@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -52,6 +53,8 @@ public:
     QWidget *qwtWdgH1;
     QHBoxLayout *horizontalLayout_2;
     QWidget *widget_7;
+    QWidget *formLayoutWidget;
+    QFormLayout *formLayout;
     QWidget *qwtWdgH2;
     QHBoxLayout *horizontalLayout_5;
     QWidget *widget_8;
@@ -155,6 +158,14 @@ public:
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         widget_7 = new QWidget(qwtWdgH1);
         widget_7->setObjectName(QStringLiteral("widget_7"));
+        formLayoutWidget = new QWidget(widget_7);
+        formLayoutWidget->setObjectName(QStringLiteral("formLayoutWidget"));
+        formLayoutWidget->setGeometry(QRect(80, 150, 160, 80));
+        formLayout = new QFormLayout(formLayoutWidget);
+        formLayout->setSpacing(6);
+        formLayout->setContentsMargins(11, 11, 11, 11);
+        formLayout->setObjectName(QStringLiteral("formLayout"));
+        formLayout->setContentsMargins(0, 0, 0, 0);
 
         horizontalLayout_2->addWidget(widget_7);
 
@@ -215,7 +226,7 @@ public:
 
         widget = new QWidget(centralWidget);
         widget->setObjectName(QStringLiteral("widget"));
-        widget->setMinimumSize(QSize(0, 300));
+        widget->setMinimumSize(QSize(0, 150));
         horizontalLayout = new QHBoxLayout(widget);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);

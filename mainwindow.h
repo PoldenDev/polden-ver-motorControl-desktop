@@ -27,6 +27,7 @@ typedef struct{
     int div;
     int steps;
     int dir;
+    int pos;
 } DivPosDataStr;
 
 class MainWindow : public QMainWindow

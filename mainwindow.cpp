@@ -413,21 +413,31 @@ void MainWindow::handleReadyRead()
         if((str[i]&0x80) != 0){
             startMi = 5;
         }
+        bool bIsFreeExist = false;
+        bool bIsBusyExist = false;
+        QString freeMtrs;
+        QString busyMtrs;
         for(int i=0; i<5; i++){
+            int curMi = startMi+i;
             if((str[i]&(1<<i)) == 0){
-                int curMi = startMi+i;
-                if(motorPosCmdData[curMi].isEmpty() == false){
-                    DivPosDataStr ds = motorPosCmdData[curMi].dequeue();
-                    //sendDivPos(startMi+i, 0x4fff, 20);
-                    sendDivPos(startMi+i, ds.div, ds.steps, ds.dir);
-                    qDebug() << QTime::currentTime().msecsSinceStartOfDay() << curMi <<  qPrintable(" f");
-                }
-
+//                if(motorPosCmdData[curMi].isEmpty() == false){
+//                    DivPosDataStr ds = motorPosCmdData[curMi].dequeue();
+//                    //sendDivPos(startMi+i, 0x4fff, 20);
+//                    //sendDivPos(startMi+i, ds.div, ds.steps, ds.dir);
+//                    //
+//                }
+                freeMtrs = QString("%1 %2").arg(curMi).arg(freeMtrs);
+                bIsFreeExist = true;
             }
             else{
+                bIsBusyExist = true;
+                busyMtrs = QString("%1 %2").arg(curMi).arg(busyMtrs);
                 //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" b");
             }
         }
+
+       // if(bIsBusyExist)
+          //  qDebug() << QTime::currentTime().msecsSinceStartOfDay() << busyMtrs;
     }
 
     //qDebug() << str;
@@ -536,6 +546,7 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
     motorPosCmdStrings << convertedString;
 }
 
+DivPosDataStr ds;
 void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
 {
     //if(cmdStr[0] == 'S'){
@@ -546,6 +557,22 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         int pos = cmdStr.toInt();
         //int pos = cmdStr.right(3).toInt();
         if((mn>=0)&&(mn<10)){
+            int lastPos = 0;
+            if(motorPosCmdData[mn].size() == 0){
+                lastPos = 0;
+            }
+            else{
+                lastPos = motorPosCmdData[mn].last().pos;
+            }
+
+            int delta = pos - lastPos;
+
+            float prcnt = abs(delta)/100.;
+            ds.div = 0x7ff;
+            ds.steps = 40000*prcnt;
+            ds.dir = delta > 0? 1: 0;
+            ds.pos = pos;
+            motorPosCmdData[mn].append(ds);
             //qDebug("%s", mem.toLatin1().constData());
             //pos = contrStr.mid(8, 4).toInt();
             //slList[mn]->setValue(pos);
@@ -913,7 +940,7 @@ void MainWindow::sendOnTimer()
 {
     if(serial.isOpen() && !motorPosCmdStrings.isEmpty()){
         QString wrStr = motorPosCmdStrings.dequeue();
-        serial.write(wrStr.toLatin1());
+        //serial.write(wrStr.toLatin1());
     }
 
 //    if(mtstr[curMotorSendIdx].contrStringQueue.isEmpty() == false){
@@ -930,7 +957,18 @@ void MainWindow::sendOnTimer()
 //        curMotorSendIdx = 0;
 //    }
 
-
+    if(serial.isOpen()){
+        for(int i=0; i<10; i++){
+            if(motorPosCmdData[i].isEmpty() == false){
+                DivPosDataStr ds;
+                ds = motorPosCmdData[i].dequeue();
+                if(ds.steps > 0)
+                    sendDivPos(i, ds.div, ds.steps, ds.dir);
+            }
+        }
+        //QString wrStr = motorPosCmdStrings.dequeue();
+        //serial.write(wrStr.toLatin1());
+    }
 }
 
 
@@ -1047,10 +1085,23 @@ void MainWindow::on_pushMoveDownState_clicked()
 
 //    parseCmdMultiMotorStrList(strList);
 
-    if(serial.isOpen()){
-        QString str("Sd\r\n");
-     serial.write(str.toLatin1());
+    DivPosDataStr ds;
+    //ds.div = 0x4fff;
+    ds.div = 0xfff;
+    ds.steps = 4000;
+
+    for(int i=0; i<10; i++){
+        ds.dir = 0;
+        for(int k=0; k<10; k++)
+            motorPosCmdData[i] << ds;
+        //for(int k=0; k<30; k++)
+        //    motorPosCmdData[i] << ds;
     }
+
+//    if(serial.isOpen()){
+//        QString str("Sd\r\n");
+//     serial.write(str.toLatin1());
+//    }
 }
 
 void MainWindow::on_pushBUttonToIdle_clicked()
@@ -1122,7 +1173,7 @@ void MainWindow::on_pushTestData_clicked()
 
     DivPosDataStr ds;
     //ds.div = 0x4fff;
-    ds.div = 0x3ff;
+    ds.div = 0xfff;
     ds.steps = 4000;
 
     for(int i=0; i<10; i++){
@@ -1130,8 +1181,8 @@ void MainWindow::on_pushTestData_clicked()
         for(int k=0; k<10; k++)
             motorPosCmdData[i] << ds;
         ds.dir = 0;
-        for(int k=0; k<30; k++)
-            motorPosCmdData[i] << ds;
+        //for(int k=0; k<30; k++)
+        //    motorPosCmdData[i] << ds;
     }
 
     //ds.dir = 0;
