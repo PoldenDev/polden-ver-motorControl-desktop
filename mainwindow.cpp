@@ -414,8 +414,14 @@ void MainWindow::handleReadyRead()
         }
         for(int i=0; i<5; i++){
             if((str[i]&0x10) == 0){
-                sendDivPos(startMi+i, 0x4fff, 20);
-                //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" f");
+                int curMi = startMi+i;
+                if(motorPosCmdData[curMi].isEmpty() == false){
+                    DivPosDataStr ds = motorPosCmdData[0].dequeue();
+                    //sendDivPos(startMi+i, 0x4fff, 20);
+                    sendDivPos(startMi+i, ds.div, ds.steps);
+                    //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" f");
+                }
+
             }
             else{
                 //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" b");
@@ -1113,6 +1119,10 @@ void MainWindow::on_pushTestData_clicked()
 
     parseCmdMultiMotorStrList(strList);
 
+    DivPosDataStr ds;
+    ds.div = 0x4fff;
+    ds.steps = 20;
+    motorPosCmdData[0] << ds;
 }
 
 void MainWindow::on_pushClearMap_clicked()

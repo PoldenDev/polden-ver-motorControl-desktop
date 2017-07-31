@@ -23,6 +23,10 @@ class MainWindow;
 }
 
 
+typedef struct{
+    int div;
+    int steps;
+} DivPosDataStr;
 
 class MainWindow : public QMainWindow
 {
@@ -134,6 +138,9 @@ private:
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;
     QQueue<QString> motorPosCmdStrings;
+
+
+    QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
 
     //void convertPosModeToVelMode(QString);
     QMap<int, int> lastPosMap;
