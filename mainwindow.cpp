@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
-    dataProcess100msTimer.setInterval(100);
+    dataProcess100msTimer.setInterval(90);
     connect(&dataProcess100msTimer, SIGNAL(timeout()), this, SLOT(dataProcess100msTimeOut()));
 
 //    slList.append(ui->verticalMotorPos10);
@@ -565,13 +565,23 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 lastPos = motorPosCmdData[mn].last().pos;
             }
 
-            int delta = pos - lastPos;
-
-            float prcnt = abs(delta)/100.;
-            ds.div = 0x7ff;
-            ds.steps = 40000*prcnt;
-            ds.dir = delta > 0? 1: 0;
             ds.pos = pos;
+            int delta = pos - lastPos;
+            float prcnt = abs(delta)/100.;
+            ds.steps = 30000*prcnt;
+            if(ds.steps > 0){
+                ds.dir = delta > 0? 1: 0;
+                //calc speed
+                int freq = 24000000;
+                ds.div = freq/ (ds.steps*10);
+                if(ds.div > 0x7fff){
+                    qDebug() << "maxSpeed err on" << mn;
+                    ds.div = 0x7fff;
+                }
+                // = 0x7ff;
+            }
+            else{
+            }
             motorPosCmdData[mn].append(ds);
             //qDebug("%s", mem.toLatin1().constData());
             //pos = contrStr.mid(8, 4).toInt();
