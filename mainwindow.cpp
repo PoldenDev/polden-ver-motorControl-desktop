@@ -210,7 +210,7 @@ void MainWindow::dataProcess100msTimeOut()
 
 void MainWindow::on_pushButtonComOpen_clicked()
 {
-   serial.setBaudRate(230400);
+   serial.setBaudRate(115200);
     if(ui->pushButtonComOpen->text() == "open"){
         if(serial.isOpen() == false){
             QString comName = ui->comComboBox->currentText();
@@ -408,36 +408,70 @@ void MainWindow::handleReadyRead()
     QString debStr;
 
     for (int i=0; i<str.length(); i++) {
-        //debStr.append((char)str[i]);
-        int startMi = 0;
-        if((str[i]&0x80) != 0){
-            startMi = 5;
-        }
-        bool bIsFreeExist = false;
-        bool bIsBusyExist = false;
-        QString freeMtrs;
-        QString busyMtrs;
-        for(int i=0; i<5; i++){
-            int curMi = startMi+i;
-            if((str[i]&(1<<i)) == 0){
-//                if(motorPosCmdData[curMi].isEmpty() == false){
-//                    DivPosDataStr ds = motorPosCmdData[curMi].dequeue();
-//                    //sendDivPos(startMi+i, 0x4fff, 20);
-//                    //sendDivPos(startMi+i, ds.div, ds.steps, ds.dir);
-//                    //
-//                }
-                freeMtrs = QString("%1 %2").arg(curMi).arg(freeMtrs);
-                bIsFreeExist = true;
-            }
-            else{
-                bIsBusyExist = true;
-                busyMtrs = QString("%1 %2").arg(curMi).arg(busyMtrs);
-                //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" b");
-            }
-        }
+//        //debStr.append((char)str[i]);
+//        int startMi = 0;
+//        if((str[i]&0x80) != 0){
+//            startMi = 5;
+//        }
+//        bool bIsFreeExist = false;
+//        bool bIsBusyExist = false;
+//        QString freeMtrs;
+//        QString busyMtrs;
+//        for(int i=0; i<5; i++){
+//            int curMi = startMi+i;
+//            if((str[i]&(1<<i)) == 0){
+////                if(motorPosCmdData[curMi].isEmpty() == false){
+////                    DivPosDataStr ds = motorPosCmdData[curMi].dequeue();
+////                    //sendDivPos(startMi+i, 0x4fff, 20);
+////                    //sendDivPos(startMi+i, ds.div, ds.steps, ds.dir);
+////                    //
+////                }
+//                freeMtrs = QString("%1 %2").arg(curMi).arg(freeMtrs);
+//                bIsFreeExist = true;
+//            }
+//            else{
+//                bIsBusyExist = true;
+//                busyMtrs = QString("%1 %2").arg(curMi).arg(busyMtrs);
+//                //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" b");
+//            }
+//        }
 
-       // if(bIsBusyExist)
-          //  qDebug() << QTime::currentTime().msecsSinceStartOfDay() << busyMtrs;
+//       // if(bIsBusyExist)
+//          //  qDebug() << QTime::currentTime().msecsSinceStartOfDay() << busyMtrs;
+        //qDebug("%x ", str[i]);
+
+        char b = str[i];
+        switch((b>>6)&0x3){
+        case 0x0:
+            break;
+        case 0x1:
+            break;
+        case 0x2:
+            qDebug("%02x 1 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                switch(i){
+                    case 0: ui->term1->setChecked(b&(1<<i)); break;
+                    case 1: ui->term2->setChecked(b&(1<<i)); break;
+                    case 2: ui->term3->setChecked(b&(1<<i)); break;
+                    case 3: ui->term4->setChecked(b&(1<<i)); break;
+                    case 4: ui->term5->setChecked(b&(1<<i)); break;
+                }
+            }
+
+            break;
+        case 0x3:
+            qDebug("%02x 2 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                switch(i){
+                    case 0: ui->term6->setChecked(b&(1<<i)); break;
+                    case 1: ui->term7->setChecked(b&(1<<i)); break;
+                    case 2: ui->term8->setChecked(b&(1<<i)); break;
+                    case 3: ui->term9->setChecked(b&(1<<i)); break;
+                    case 4: ui->term10->setChecked(b&(1<<i)); break;
+                }
+            }
+            break;
+       }
     }
 
     //qDebug() << str;
@@ -448,6 +482,8 @@ void MainWindow::handleReadyRead()
     //ui->plainTextEdit->appendPlainText(str);
 
     ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());    
+
+
 }
 
 void MainWindow::handleSerialDataWritten(qint64 bytes)

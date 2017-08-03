@@ -13,8 +13,10 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -69,6 +71,22 @@ public:
     QHBoxLayout *horizontalLayout;
     QPlainTextEdit *plainTextEdit;
     QPlainTextEdit *plainTextUDP;
+    QGroupBox *groupBox;
+    QVBoxLayout *verticalLayout_4;
+    QWidget *widget_5;
+    QHBoxLayout *horizontalLayout_6;
+    QCheckBox *term1;
+    QCheckBox *term2;
+    QCheckBox *term3;
+    QCheckBox *term4;
+    QCheckBox *term5;
+    QWidget *widget_9;
+    QHBoxLayout *horizontalLayout_7;
+    QCheckBox *term6;
+    QCheckBox *term7;
+    QCheckBox *term8;
+    QCheckBox *term9;
+    QCheckBox *term10;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -246,6 +264,95 @@ public:
 
         horizontalLayout->addWidget(plainTextUDP);
 
+        groupBox = new QGroupBox(widget);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setAlignment(Qt::AlignCenter);
+        groupBox->setFlat(false);
+        verticalLayout_4 = new QVBoxLayout(groupBox);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        widget_5 = new QWidget(groupBox);
+        widget_5->setObjectName(QStringLiteral("widget_5"));
+        horizontalLayout_6 = new QHBoxLayout(widget_5);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        term1 = new QCheckBox(widget_5);
+        term1->setObjectName(QStringLiteral("term1"));
+        term1->setCheckable(true);
+
+        horizontalLayout_6->addWidget(term1);
+
+        term2 = new QCheckBox(widget_5);
+        term2->setObjectName(QStringLiteral("term2"));
+        term2->setCheckable(true);
+
+        horizontalLayout_6->addWidget(term2);
+
+        term3 = new QCheckBox(widget_5);
+        term3->setObjectName(QStringLiteral("term3"));
+        term3->setCheckable(true);
+
+        horizontalLayout_6->addWidget(term3);
+
+        term4 = new QCheckBox(widget_5);
+        term4->setObjectName(QStringLiteral("term4"));
+        term4->setCheckable(true);
+
+        horizontalLayout_6->addWidget(term4);
+
+        term5 = new QCheckBox(widget_5);
+        term5->setObjectName(QStringLiteral("term5"));
+        term5->setCheckable(true);
+
+        horizontalLayout_6->addWidget(term5);
+
+
+        verticalLayout_4->addWidget(widget_5);
+
+        widget_9 = new QWidget(groupBox);
+        widget_9->setObjectName(QStringLiteral("widget_9"));
+        horizontalLayout_7 = new QHBoxLayout(widget_9);
+        horizontalLayout_7->setSpacing(6);
+        horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
+        term6 = new QCheckBox(widget_9);
+        term6->setObjectName(QStringLiteral("term6"));
+        term6->setCheckable(true);
+
+        horizontalLayout_7->addWidget(term6);
+
+        term7 = new QCheckBox(widget_9);
+        term7->setObjectName(QStringLiteral("term7"));
+        term7->setCheckable(true);
+
+        horizontalLayout_7->addWidget(term7);
+
+        term8 = new QCheckBox(widget_9);
+        term8->setObjectName(QStringLiteral("term8"));
+        term8->setCheckable(true);
+
+        horizontalLayout_7->addWidget(term8);
+
+        term9 = new QCheckBox(widget_9);
+        term9->setObjectName(QStringLiteral("term9"));
+        term9->setCheckable(true);
+
+        horizontalLayout_7->addWidget(term9);
+
+        term10 = new QCheckBox(widget_9);
+        term10->setObjectName(QStringLiteral("term10"));
+        term10->setCheckable(true);
+
+        horizontalLayout_7->addWidget(term10);
+
+
+        verticalLayout_4->addWidget(widget_9);
+
+
+        horizontalLayout->addWidget(groupBox);
+
 
         verticalLayout_2->addWidget(widget);
 
@@ -288,6 +395,17 @@ public:
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
         pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));
+        groupBox->setTitle(QApplication::translate("MainWindow", "\320\232\320\276\320\275\321\206\320\265\320\262\320\270\320\272\320\270", Q_NULLPTR));
+        term1->setText(QApplication::translate("MainWindow", "1", Q_NULLPTR));
+        term2->setText(QApplication::translate("MainWindow", "2", Q_NULLPTR));
+        term3->setText(QApplication::translate("MainWindow", "3", Q_NULLPTR));
+        term4->setText(QApplication::translate("MainWindow", "4", Q_NULLPTR));
+        term5->setText(QApplication::translate("MainWindow", "5", Q_NULLPTR));
+        term6->setText(QApplication::translate("MainWindow", "6", Q_NULLPTR));
+        term7->setText(QApplication::translate("MainWindow", "7", Q_NULLPTR));
+        term8->setText(QApplication::translate("MainWindow", "8", Q_NULLPTR));
+        term9->setText(QApplication::translate("MainWindow", "9", Q_NULLPTR));
+        term10->setText(QApplication::translate("MainWindow", "10", Q_NULLPTR));
     } // retranslateUi
 
 };
