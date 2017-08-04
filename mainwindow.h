@@ -151,7 +151,7 @@ private:
     void graphReset();
     QSettings settings;
 
-    void sendDivPos(int mi, int div, int steps, int dir);
+    void sendDivPos(int mi, quint32 div, quint32 steps, int dir);
 };
 
 

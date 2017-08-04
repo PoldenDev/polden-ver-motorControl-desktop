@@ -359,24 +359,23 @@ void MainWindow::initUdpSocket()
 
 
 
-void MainWindow::sendDivPos(int mi, int div, int steps, int dir)
+void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, int dir)
 {
-    quint32 temp = 0;
+    quint64 temp = 0;
     temp = mi&0xf;
     temp |= ((div&0x7fff)<<4);
-    temp |= ((steps&0xfff)<<19);
-    temp |= ((dir&0x1)<<31);
-    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint32));
-//    ba.resize(5);
+    temp |= ((steps&0x7fff)<<19);
+    temp |= ((dir&0x1)<<34);
+    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
+
+    ba.resize(5);
 
 //    //ba[0] = 0x09;
 //    ba[0] = mi&0xf;
 //    ba[1] = 0xc0;
 //    ba[2] = 0x38;
 //    ba[3] = 0x00;
-//    ba[4] = 0x00;
-
-    ba.append((char)0);
+//    ba[4] = 0x00;    
 
     serial.write(ba);
 }
@@ -447,7 +446,7 @@ void MainWindow::handleReadyRead()
         case 0x1:
             break;
         case 0x2:
-            qDebug("%02x 1 %02x", b, (b&0x1f));
+            //qDebug("%02x 1 %02x", b, (b&0x1f));
             for(int i=0; i<5; i++){
                 switch(i){
                     case 0: ui->term1->setChecked(b&(1<<i)); break;
@@ -460,7 +459,7 @@ void MainWindow::handleReadyRead()
 
             break;
         case 0x3:
-            qDebug("%02x 2 %02x", b, (b&0x1f));
+            //qDebug("%02x 2 %02x", b, (b&0x1f));
             for(int i=0; i<5; i++){
                 switch(i){
                     case 0: ui->term6->setChecked(b&(1<<i)); break;
@@ -567,8 +566,9 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
     int maxVal = ui->lineEditMaxVal->text().toInt();
 
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
+    //if(motorStr)
     //foreach (QString motorStr, motorStrList) {
-    for(int i=0; i<10; i++){
+    for(int i=0; i<motorStrList.length(); i++){
         QString vs = motorStrList[i];        
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
@@ -1219,12 +1219,13 @@ void MainWindow::on_pushTestData_clicked()
 
     DivPosDataStr ds;
     //ds.div = 0x4fff;
-    ds.div = 0xfff;
-    ds.steps = 4000;
+    ds.div = 533;
+    //ds.pos = 1;
+    ds.steps = 4500;
 
     for(int i=0; i<10; i++){
         ds.dir = 1;
-        for(int k=0; k<10; k++)
+        for(int k=0; k<1; k++)
             motorPosCmdData[i] << ds;
         ds.dir = 0;
         //for(int k=0; k<30; k++)
