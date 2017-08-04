@@ -30,6 +30,12 @@ typedef struct{
     int pos;
 } DivPosDataStr;
 
+#define MOT_CNT 10
+typedef enum{
+    MT_IDLE,
+    MT_GoDOWN
+} TMotorState ;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -84,6 +90,8 @@ private slots:
 
 
     void on_tabWidget_tabBarClicked(int index);
+
+    void on_goToTerm_clicked();
 
 private:
     void setPos(int pos);
@@ -151,7 +159,11 @@ private:
     void graphReset();
     QSettings settings;
 
-    void sendDivPos(int mi, quint32 div, quint32 steps, int dir);
+    void sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir);
+
+    TMotorState mtState[MOT_CNT];
+
+    void terminatorState(int i, bool bEna);
 };
 
 

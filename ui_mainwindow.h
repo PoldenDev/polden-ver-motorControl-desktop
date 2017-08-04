@@ -63,10 +63,11 @@ public:
     QWidget *widget_6;
     QHBoxLayout *horizontalLayout_4;
     QPushButton *pushMoveDownState;
+    QPushButton *pushTestData;
+    QPushButton *goToTerm;
     QPushButton *pushButtonGotoPEriodState;
     QPushButton *pushBUttonToIdle;
     QPushButton *pushButtonPosReset;
-    QPushButton *pushTestData;
     QWidget *widget;
     QHBoxLayout *horizontalLayout;
     QPlainTextEdit *plainTextEdit;
@@ -219,6 +220,16 @@ public:
 
         horizontalLayout_4->addWidget(pushMoveDownState);
 
+        pushTestData = new QPushButton(widget_6);
+        pushTestData->setObjectName(QStringLiteral("pushTestData"));
+
+        horizontalLayout_4->addWidget(pushTestData);
+
+        goToTerm = new QPushButton(widget_6);
+        goToTerm->setObjectName(QStringLiteral("goToTerm"));
+
+        horizontalLayout_4->addWidget(goToTerm);
+
         pushButtonGotoPEriodState = new QPushButton(widget_6);
         pushButtonGotoPEriodState->setObjectName(QStringLiteral("pushButtonGotoPEriodState"));
 
@@ -233,11 +244,6 @@ public:
         pushButtonPosReset->setObjectName(QStringLiteral("pushButtonPosReset"));
 
         horizontalLayout_4->addWidget(pushButtonPosReset);
-
-        pushTestData = new QPushButton(widget_6);
-        pushTestData->setObjectName(QStringLiteral("pushTestData"));
-
-        horizontalLayout_4->addWidget(pushTestData);
 
 
         verticalLayout_2->addWidget(widget_6);
@@ -391,10 +397,11 @@ public:
         lineEditMaxVal->setText(QApplication::translate("MainWindow", "999", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
+        pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));
+        goToTerm->setText(QApplication::translate("MainWindow", "go term", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
-        pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("MainWindow", "\320\232\320\276\320\275\321\206\320\265\320\262\320\270\320\272\320\270", Q_NULLPTR));
         term1->setText(QApplication::translate("MainWindow", "1", Q_NULLPTR));
         term2->setText(QApplication::translate("MainWindow", "2", Q_NULLPTR));

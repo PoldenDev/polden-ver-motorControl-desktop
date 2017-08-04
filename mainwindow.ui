@@ -162,6 +162,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushTestData">
+         <property name="text">
+          <string>testData</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="goToTerm">
+         <property name="text">
+          <string>go term</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonGotoPEriodState">
          <property name="text">
           <string>to Period</string>
@@ -179,13 +193,6 @@
         <widget class="QPushButton" name="pushButtonPosReset">
          <property name="text">
           <string>pos reset</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushTestData">
-         <property name="text">
-          <string>testData</string>
          </property>
         </widget>
        </item>

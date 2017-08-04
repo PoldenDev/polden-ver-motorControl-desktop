@@ -92,6 +92,10 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
 
+    for(int i=0; i<MOT_CNT; i++){
+        mtState[i] = MT_IDLE;
+    }
+
 
 }
 void MainWindow::createPlot(QString name)
@@ -359,13 +363,13 @@ void MainWindow::initUdpSocket()
 
 
 
-void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, int dir)
+void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
 {
     quint64 temp = 0;
     temp = mi&0xf;
     temp |= ((div&0x7fff)<<4);
     temp |= ((steps&0x7fff)<<19);
-    temp |= ((dir&0x1)<<34);
+    temp |= (((quint64)dir&0x1)<<34);
     QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
 
     ba.resize(5);
@@ -448,26 +452,14 @@ void MainWindow::handleReadyRead()
         case 0x2:
             //qDebug("%02x 1 %02x", b, (b&0x1f));
             for(int i=0; i<5; i++){
-                switch(i){
-                    case 0: ui->term1->setChecked(b&(1<<i)); break;
-                    case 1: ui->term2->setChecked(b&(1<<i)); break;
-                    case 2: ui->term3->setChecked(b&(1<<i)); break;
-                    case 3: ui->term4->setChecked(b&(1<<i)); break;
-                    case 4: ui->term5->setChecked(b&(1<<i)); break;
-                }
+                terminatorState(i, b&(1<<i));
             }
 
             break;
         case 0x3:
             //qDebug("%02x 2 %02x", b, (b&0x1f));
             for(int i=0; i<5; i++){
-                switch(i){
-                    case 0: ui->term6->setChecked(b&(1<<i)); break;
-                    case 1: ui->term7->setChecked(b&(1<<i)); break;
-                    case 2: ui->term8->setChecked(b&(1<<i)); break;
-                    case 3: ui->term9->setChecked(b&(1<<i)); break;
-                    case 4: ui->term10->setChecked(b&(1<<i)); break;
-                }
+                terminatorState(5+i, b&(1<<i));
             }
             break;
        }
@@ -483,6 +475,40 @@ void MainWindow::handleReadyRead()
     ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());    
 
 
+}
+
+void MainWindow::terminatorState(int i, bool bEna)
+{
+    switch(i){
+        case 0: ui->term1->setChecked(bEna); break;
+        case 1: ui->term2->setChecked(bEna); break;
+        case 2: ui->term3->setChecked(bEna); break;
+        case 3: ui->term4->setChecked(bEna); break;
+        case 4: ui->term5->setChecked(bEna); break;
+        case 5: ui->term6->setChecked(bEna); break;
+        case 6: ui->term7->setChecked(bEna); break;
+        case 7: ui->term8->setChecked(bEna); break;
+        case 8: ui->term9->setChecked(bEna); break;
+        case 9: ui->term10->setChecked(bEna); break;
+    }
+
+    if(mtState[i] == MT_GoDOWN){
+        if(bEna == false){
+            if((motorPosCmdData[i].empty() == true)){
+                DivPosDataStr ds;
+                //ds.div = 0x4fff;
+                ds.div = 2669;
+                ds.dir = 0;
+                //ds.pos = 1;
+                ds.steps = 570;
+                motorPosCmdData[i] << ds;
+            }
+        }
+        else{
+            mtState[i] = MT_IDLE;
+        }
+
+    }
 }
 
 void MainWindow::handleSerialDataWritten(qint64 bytes)
@@ -1219,9 +1245,9 @@ void MainWindow::on_pushTestData_clicked()
 
     DivPosDataStr ds;
     //ds.div = 0x4fff;
-    ds.div = 533;
+    ds.div = 4000;
     //ds.pos = 1;
-    ds.steps = 4500;
+    ds.steps = 4000;
 
     for(int i=0; i<10; i++){
         ds.dir = 1;
@@ -1271,5 +1297,12 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
 //    else if((index>5) && (index<=10)){
 //        ui->tabWidget->widget(index)->layout()->addWidget(plotList[0]);
 //    }
+
+}
+
+void MainWindow::on_goToTerm_clicked()
+{
+    for(int i=0; i<MOT_CNT; i++)
+      mtState[i] = MT_GoDOWN;
 
 }
