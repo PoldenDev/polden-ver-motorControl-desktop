@@ -193,6 +193,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBoxCycle">
+         <property name="text">
+          <string>cycle</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonGotoPEriodState">
          <property name="text">
           <string>to Period</string>
