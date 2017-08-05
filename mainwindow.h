@@ -33,7 +33,8 @@ typedef struct{
 #define MOT_CNT 10
 typedef enum{
     MT_IDLE,
-    MT_GoDOWN
+    MT_GoDOWN,
+    MT_GoUP
 } TMotorState ;
 
 class MainWindow : public QMainWindow
@@ -149,6 +150,8 @@ private:
     QMap<int, QString> lastCmdMap;
     QQueue<QString> motorPosCmdStrings;
 
+    int absolutePos[MOTOR_CNT];
+    bool bCycle;
 
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
 

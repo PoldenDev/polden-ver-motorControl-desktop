@@ -36,7 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     curMotorSendIdx(0),
     settings("murinets", "vertolet"),
     xUdpRecv(0),
-    markerXPos(0)
+    markerXPos(0),
+    bCycle(false)
 {
     ui->setupUi(this);
 
@@ -92,8 +93,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
 
-    for(int i=0; i<MOT_CNT; i++){
+    for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
+        absolutePos[i] = 0;
     }
 
 
@@ -463,6 +465,24 @@ void MainWindow::handleReadyRead()
             }
             break;
        }
+
+        for(int i=0; i<MOTOR_CNT; i++){
+            if(mtState[i] == MT_GoUP){
+                if(absolutePos[i] < 360000){
+                    DivPosDataStr ds;
+                    //ds.div = 0x4fff;
+                    ds.div = 500;
+                    ds.dir = 1;
+                    //ds.pos = 1;
+                    ds.steps = 4560;
+                    motorPosCmdData[i] << ds;
+                    absolutePos[i] += 4560;
+                }
+                else{
+                    mtState[i] = MT_GoDOWN;
+                }
+            }
+        }
     }
 
     //qDebug() << str;
@@ -505,7 +525,12 @@ void MainWindow::terminatorState(int i, bool bEna)
             }
         }
         else{
-            mtState[i] = MT_IDLE;
+
+            absolutePos[i] = 0;
+            if(ui->checkBoxCycle->isChecked())
+                mtState[i] = MT_GoUP;
+            else
+                mtState[i] = MT_IDLE;
         }
 
     }
@@ -1187,10 +1212,11 @@ void MainWindow::on_pushBUttonToIdle_clicked()
 
 void MainWindow::on_pushButtonGotoPEriodState_clicked()
 {
-    if(serial.isOpen()){
-        QString str("Sp\r\n");
-     serial.write(str.toLatin1());
-    }
+//    if(serial.isOpen()){
+//        QString str("Sp\r\n");
+//     serial.write(str.toLatin1());
+//    }
+    //bCycle =
 
 }
 
