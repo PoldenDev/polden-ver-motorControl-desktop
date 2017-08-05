@@ -64,12 +64,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //    slList.append(ui->verticalMotorPos2);
 //    slList.append(ui->verticalMotorPos1);
 
-    for(int i=0; i<MOTOR_CNT; i++){
-//        timerSerialSendTo[i].setSingleShot(true);
-//        connect(&(timerSerialSendTo[i]), SIGNAL(timeout()),
-//                this, SLOT(sendTimeOut));
-    }
-
     connect(&waitForFifoFreeTimer, SIGNAL(timeout()), this, SLOT(waitForFifoFreeFifo()));
 
     //connect(&UartThread, SIGNAL(response(QString)), this, SLOT(response(QString)));
@@ -92,10 +86,16 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
 
-    for(int i=0; i<MOT_CNT; i++){
+    for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
     }
 
+    for(int i=0; i<MOTOR_CNT; i++){
+//        timerSerialSendTo[i].setSingleShot(true);
+//        connect(&(timerSerialSendTo[i]), SIGNAL(timeout()),
+//                this, SLOT(sendTimeOut));
+        motorAbsolutePos[i] = 0;
+    }
 
 }
 void MainWindow::createPlot(QString name)
@@ -619,18 +619,21 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         int pos = cmdStr.toInt();
         //int pos = cmdStr.right(3).toInt();
         if((mn>=0)&&(mn<10)){
-            int lastPos = 0;
-            if(motorPosCmdData[mn].size() == 0){
-                lastPos = 0;
-            }
-            else{
-                lastPos = motorPosCmdData[mn].last().pos;
-            }
+//            int lastPos = 0;
+//            if(motorPosCmdData[mn].size() == 0){
+//                lastPos = 0;
+//            }
+//            else{
+//                lastPos = motorPosCmdData[mn].last().pos;
+//            }
 
-            ds.pos = pos;
-            int delta = pos - lastPos;
-            float prcnt = abs(delta)/100.;
-            ds.steps = 30000*prcnt;
+            int maxVal = ui->maxSteps->text().toInt();
+            int newSteps = maxVal*(pos/100.);
+            ds.pos = newSteps;
+            int delta = newSteps - motorAbsolutePos[mn];
+            motorAbsolutePos[mn] = newSteps;
+            //float prcnt = abs(delta)/100.;
+            ds.steps = abs(delta);
             if(ds.steps > 0){
                 ds.dir = delta > 0? 1: 0;
                 //calc speed
@@ -760,7 +763,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                                                                 .arg(div, 4, 16);
             //udpSocket->writeDatagram()                ;
             ui->plainTextUDP->moveCursor (QTextCursor::End);
-            ui->plainTextUDP->insertPlainText(udpTextField);
+            //ui->plainTextUDP->insertPlainText(udpTextField);
             ui->plainTextUDP->moveCursor (QTextCursor::End);
             //ui->plainTextEdit->appendPlainText(str);
         }
@@ -1034,6 +1037,14 @@ void MainWindow::sendOnTimer()
             if(motorPosCmdData[i].isEmpty() == false){
                 DivPosDataStr ds;
                 ds = motorPosCmdData[i].dequeue();
+                if(i==9){
+                    int t = 1000*ds.steps*((float)ds.div/24000000);
+                    qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+
+                }
+                if(ds.div < 0x100)
+                    ds.div = 0x100;
+
                 if(ds.steps > 0)
                     sendDivPos(i, ds.div, ds.steps, ds.dir);
             }
@@ -1302,7 +1313,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
 
 void MainWindow::on_goToTerm_clicked()
 {
-    for(int i=0; i<MOT_CNT; i++)
+    for(int i=0; i<MOTOR_CNT; i++)
       mtState[i] = MT_GoDOWN;
 
 }

@@ -23,19 +23,6 @@ class MainWindow;
 }
 
 
-typedef struct{
-    int div;
-    int steps;
-    int dir;
-    int pos;
-} DivPosDataStr;
-
-#define MOT_CNT 10
-typedef enum{
-    MT_IDLE,
-    MT_GoDOWN
-} TMotorState ;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -150,6 +137,7 @@ private:
     QQueue<QString> motorPosCmdStrings;
 
 
+    int motorAbsolutePos[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
 
     //void convertPosModeToVelMode(QString);
@@ -161,7 +149,7 @@ private:
 
     void sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir);
 
-    TMotorState mtState[MOT_CNT];
+    TMotorState mtState[MOTOR_CNT];
 
     void terminatorState(int i, bool bEna);
 };

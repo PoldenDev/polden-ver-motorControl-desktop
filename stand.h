@@ -9,3 +9,15 @@ typedef struct{
     TSendState sendState;
 
 } TMotorStr;
+
+typedef struct{
+    int div;
+    int steps;
+    int dir;
+    int pos;
+} DivPosDataStr;
+
+typedef enum{
+    MT_IDLE,
+    MT_GoDOWN
+} TMotorState ;

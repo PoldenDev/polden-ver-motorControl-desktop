@@ -49,6 +49,8 @@ public:
     QLineEdit *lineEditMinVal;
     QLabel *label_2;
     QLineEdit *lineEditMaxVal;
+    QLabel *label_3;
+    QLineEdit *maxSteps;
     QTabWidget *tabWidget;
     QWidget *tab;
     QVBoxLayout *verticalLayout;
@@ -157,6 +159,17 @@ public:
         lineEditMaxVal->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_3->addWidget(lineEditMaxVal);
+
+        label_3 = new QLabel(widget_4);
+        label_3->setObjectName(QStringLiteral("label_3"));
+
+        horizontalLayout_3->addWidget(label_3);
+
+        maxSteps = new QLineEdit(widget_4);
+        maxSteps->setObjectName(QStringLiteral("maxSteps"));
+        maxSteps->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_3->addWidget(maxSteps);
 
 
         verticalLayout_2->addWidget(widget_4);
@@ -393,8 +406,10 @@ public:
         lineEditMinVal->setInputMask(QApplication::translate("MainWindow", "999", Q_NULLPTR));
         lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
         label_2->setText(QApplication::translate("MainWindow", "max", Q_NULLPTR));
-        lineEditMaxVal->setInputMask(QApplication::translate("MainWindow", "999", Q_NULLPTR));
-        lineEditMaxVal->setText(QApplication::translate("MainWindow", "999", Q_NULLPTR));
+        lineEditMaxVal->setInputMask(QApplication::translate("MainWindow", "99999", Q_NULLPTR));
+        lineEditMaxVal->setText(QApplication::translate("MainWindow", "20000", Q_NULLPTR));
+        label_3->setText(QApplication::translate("MainWindow", "steps:", Q_NULLPTR));
+        maxSteps->setText(QApplication::translate("MainWindow", "20000", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
         pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));

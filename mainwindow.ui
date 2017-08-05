@@ -94,10 +94,27 @@
        <item>
         <widget class="QLineEdit" name="lineEditMaxVal">
          <property name="inputMask">
-          <string>999</string>
+          <string>99999</string>
          </property>
          <property name="text">
-          <string>999</string>
+          <string>20000</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>steps:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="maxSteps">
+         <property name="text">
+          <string>20000</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
