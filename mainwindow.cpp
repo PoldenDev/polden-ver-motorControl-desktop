@@ -363,9 +363,9 @@ void MainWindow::initUdpSocket()
 }
 
 
-
+int lastMsec = 0;
 void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
-{
+{    
     quint64 temp = 0;
     temp = mi&0xf;
     temp |= ((div&0x7fff)<<4);
@@ -382,9 +382,14 @@ void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
 //    ba[3] = 0x00;
 //    ba[4] = 0x00;    
 
+    if(mi == 0){
+        int msec = QTime::currentTime().msecsSinceStartOfDay();
+        //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
+        lastMsec = msec;
+    }
     serial.write(ba);
-    if(mi==0)
-        serial.write(ba);
+ //   if(mi==0)
+//        serial.write(ba);
 }
 
 void MainWindow::handleReadyRead()
@@ -449,12 +454,11 @@ void MainWindow::handleReadyRead()
         char b = str[i];
         switch((b>>6)&0x3){
         case 0x0:
-
-            if(b&0x1)
-                qDebug("busy!");
-            else
-                qDebug("free!");
-
+            for(int i=0; i<1; i++){
+                if((b&(1<<i)) == 0){
+                    freeToWrite(i);
+                }
+            }
             break;
         case 0x1:
             break;
@@ -473,23 +477,23 @@ void MainWindow::handleReadyRead()
             break;
        }
 
-        for(int i=0; i<MOTOR_CNT; i++){
-            if(mtState[i] == MT_GoUP){
-                if(motorAbsolutePos[i] < 360000){
-                    DivPosDataStr ds;
-                    //ds.div = 0x4fff;
-                    ds.div = 500;
-                    ds.dir = 1;
-                    //ds.pos = 1;
-                    ds.steps = 4560;
-                    motorPosCmdData[i] << ds;
-                    motorAbsolutePos[i] += 4560;
-                }
-                else{
-                    mtState[i] = MT_GoDOWN;
-                }
-            }
-        }
+//        for(int i=0; i<MOTOR_CNT; i++){
+//            if(mtState[i] == MT_GoUP){
+//                if(motorAbsolutePos[i] < 360000){
+//                    DivPosDataStr ds;
+//                    //ds.div = 0x4fff;
+//                    ds.div = 500;
+//                    ds.dir = 1;
+//                    //ds.pos = 1;
+//                    ds.steps = 4560;
+//                    motorPosCmdData[i] << ds;
+//                    motorAbsolutePos[i] += 4560;
+//                }
+//                else{
+//                    mtState[i] = MT_GoDOWN;
+//                }
+//            }
+//        }
     }
 
     //qDebug() << str;
@@ -521,22 +525,8 @@ void MainWindow::terminatorState(int i, bool bEna)
 
     if(mtState[i] == MT_GoDOWN){
         if(bEna == false){
-            if((motorPosCmdData[i].empty() == true)){
-                DivPosDataStr ds;
-                //ds.div = 0x4fff;
-                ds.div = 2669;
-                ds.dir = 0;
-                //ds.pos = 1;
-                //ds.steps = 570;
-                ds.steps = 250;
-                motorPosCmdData[i] << ds;
-                //if(i==0)
-                //    motorPosCmdData[i] << ds;
-
-            }
         }
         else{
-
             motorAbsolutePos[i] = 0;
             if(ui->checkBoxCycle->isChecked())
                 mtState[i] = MT_GoUP;
@@ -545,6 +535,59 @@ void MainWindow::terminatorState(int i, bool bEna)
         }
 
     }
+}
+
+void MainWindow::freeToWrite(int i)
+{
+    switch(mtState[i]){
+    case MT_GoUP:
+        if(motorAbsolutePos[0] < 360000){
+            DivPosDataStr ds;
+            //ds.div = 0x4fff;
+            ds.div = 500;
+            ds.dir = 1;
+            //ds.pos = 1;
+            ds.steps = 4560;
+            //motorPosCmdData[i] << ds;
+            motorAbsolutePos[i] += 4560;
+            sendDivPos(i, ds.div, ds.steps, ds.dir);
+        }
+        else{
+            mtState[i] = MT_GoDOWN;
+        }
+        break;
+
+    case MT_GoDOWN:
+        DivPosDataStr ds;
+        //ds.div = 0x4fff;
+        ds.div = 2669;
+        ds.dir = 0;
+        //ds.pos = 1;
+        //ds.steps = 570;
+        ds.steps = 250;
+        sendDivPos(i, ds.div, ds.steps, ds.dir);
+
+        break;
+
+    case MT_IDLE:
+        if(motorPosCmdData[i].isEmpty() == false){
+            DivPosDataStr ds;
+            ds = motorPosCmdData[i].dequeue();
+            if(i==0){
+                //int t = 1000*ds.steps*((float)ds.div/24000000);
+                //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+            }
+            if(ds.div < 0x100)
+                ds.div = 0x100;
+
+            if(ds.steps > 0){
+                //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+                sendDivPos(i, ds.div, ds.steps, ds.dir);
+            }
+        }
+        break;
+    }
+
 }
 
 void MainWindow::handleSerialDataWritten(qint64 bytes)
@@ -682,6 +725,9 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 // = 0x7ff;
             }
             else{
+            }
+            if(mn == 0){
+                qDebug("pos=%d st=%d div=%d dir=%d", pos, ds.steps, ds.div, ds.dir);
             }
             motorPosCmdData[mn].append(ds);
             //qDebug("%s", mem.toLatin1().constData());
@@ -1070,20 +1116,20 @@ void MainWindow::sendOnTimer()
 
     if(serial.isOpen()){
         for(int i=0; i<10; i++){
-            if(motorPosCmdData[i].isEmpty() == false){
-                DivPosDataStr ds;
-                ds = motorPosCmdData[i].dequeue();
-                if(i==9){
-                    int t = 1000*ds.steps*((float)ds.div/24000000);
-                    qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+//            if(motorPosCmdData[i].isEmpty() == false){
+//                DivPosDataStr ds;
+//                ds = motorPosCmdData[i].dequeue();
+//                if(i==9){
+//                    int t = 1000*ds.steps*((float)ds.div/24000000);
+//                    qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
 
-                }
-                if(ds.div < 0x100)
-                    ds.div = 0x100;
+//                }
+//                if(ds.div < 0x100)
+//                    ds.div = 0x100;
 
-                if(ds.steps > 0)
-                    sendDivPos(i, ds.div, ds.steps, ds.dir);
-            }
+                //if(ds.steps > 0)
+                //    sendDivPos(i, ds.div, ds.steps, ds.dir);
+//            }
         }
         //QString wrStr = motorPosCmdStrings.dequeue();
         //serial.write(wrStr.toLatin1());

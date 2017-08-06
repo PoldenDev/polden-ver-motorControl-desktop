@@ -152,6 +152,7 @@ private:
 
     TMotorState mtState[MOTOR_CNT];
 
+    void freeToWrite(int i);
     void terminatorState(int i, bool bEna);
 };
 
