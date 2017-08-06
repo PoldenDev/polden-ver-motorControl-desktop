@@ -19,5 +19,6 @@ typedef struct{
 
 typedef enum{
     MT_IDLE,
-    MT_GoDOWN
+    MT_GoDOWN,
+    MT_GoUP
 } TMotorState ;

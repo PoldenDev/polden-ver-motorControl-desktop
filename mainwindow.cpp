@@ -36,8 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     curMotorSendIdx(0),
     settings("murinets", "vertolet"),
     xUdpRecv(0),
-    markerXPos(0),
-    bCycle(false)
+    markerXPos(0)
 {
     ui->setupUi(this);
 
@@ -89,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
-        absolutePos[i] = 0;
+        motorAbsolutePos[i] = 0;
     }
 
     for(int i=0; i<MOTOR_CNT; i++){
@@ -384,6 +383,8 @@ void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
 //    ba[4] = 0x00;    
 
     serial.write(ba);
+    if(mi==0)
+        serial.write(ba);
 }
 
 void MainWindow::handleReadyRead()
@@ -448,6 +449,12 @@ void MainWindow::handleReadyRead()
         char b = str[i];
         switch((b>>6)&0x3){
         case 0x0:
+
+            if(b&0x1)
+                qDebug("busy!");
+            else
+                qDebug("free!");
+
             break;
         case 0x1:
             break;
@@ -468,7 +475,7 @@ void MainWindow::handleReadyRead()
 
         for(int i=0; i<MOTOR_CNT; i++){
             if(mtState[i] == MT_GoUP){
-                if(absolutePos[i] < 360000){
+                if(motorAbsolutePos[i] < 360000){
                     DivPosDataStr ds;
                     //ds.div = 0x4fff;
                     ds.div = 500;
@@ -476,7 +483,7 @@ void MainWindow::handleReadyRead()
                     //ds.pos = 1;
                     ds.steps = 4560;
                     motorPosCmdData[i] << ds;
-                    absolutePos[i] += 4560;
+                    motorAbsolutePos[i] += 4560;
                 }
                 else{
                     mtState[i] = MT_GoDOWN;
@@ -520,13 +527,17 @@ void MainWindow::terminatorState(int i, bool bEna)
                 ds.div = 2669;
                 ds.dir = 0;
                 //ds.pos = 1;
-                ds.steps = 570;
+                //ds.steps = 570;
+                ds.steps = 250;
                 motorPosCmdData[i] << ds;
+                //if(i==0)
+                //    motorPosCmdData[i] << ds;
+
             }
         }
         else{
 
-            absolutePos[i] = 0;
+            motorAbsolutePos[i] = 0;
             if(ui->checkBoxCycle->isChecked())
                 mtState[i] = MT_GoUP;
             else

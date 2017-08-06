@@ -136,8 +136,7 @@ private:
     QMap<int, QString> lastCmdMap;
     QQueue<QString> motorPosCmdStrings;
 
-    int absolutePos[MOTOR_CNT];
-    bool bCycle;
+    //int absolutePos[MOTOR_CNT];
 
     int motorAbsolutePos[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
