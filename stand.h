@@ -3,6 +3,7 @@
 typedef enum {idle, waitForAck, waitForFifoFree} TSendState;
 
 #define MOTOR_CNT 10
+#define FPGA_FREQ 24000000
 typedef struct{
     QQueue<QString> contrStringQueue;
     bool bCmdOk;

@@ -140,6 +140,7 @@ private:
 
     quint32 lastCtrlTimeMsecs[MOTOR_CNT];
     quint32 motorAbsolutePos[MOTOR_CNT];
+    qint32 motorAbsolutePosCur[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
 
     //void convertPosModeToVelMode(QString);

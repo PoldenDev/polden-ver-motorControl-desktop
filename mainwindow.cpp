@@ -383,6 +383,14 @@ void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
         qDebug("mi %d steps exceed 0x7fff!", mi);
     }
 
+    if(dir == 1)
+        motorAbsolutePosCur[mi] += steps;
+    else if(dir == 0 )
+        motorAbsolutePosCur[mi] -= steps;
+
+    if( motorAbsolutePosCur[mi] < 0){
+        qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
+    }
 //    //ba[0] = 0x09;
 //    ba[0] = mi&0xf;
 //    ba[1] = 0xc0;
@@ -733,27 +741,46 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             int maxVal = ui->maxSteps->text().toInt();
             int newSteps = maxVal*(pos/1000.);
             ds.pos = newSteps;
-            int delta = newSteps - motorAbsolutePos[mn];
+            int delta = 0;
+            if(motorPosCmdData[mn].length() == 0){
+                delta = newSteps -  motorAbsolutePosCur[mn];
+            }
+            else{
+                delta = newSteps - motorAbsolutePos[mn];
+            }
+
             motorAbsolutePos[mn] = newSteps;
             //float prcnt = abs(delta)/100.;
+            ds.dir = delta > 0? 1: 0;
             ds.steps = abs(delta);
-            if(ds.steps > 0){
-                ds.dir = delta > 0? 1: 0;
+            if(ds.steps > 10000){
+                qDebug("delta exceed 10000 = %d", delta);
+                ds.steps /= 2;
                 //calc speed
-                int freq = 24000000;
-                ds.div = freq/ (ds.steps*10);
+                ds.div = FPGA_FREQ/ (ds.steps*10);
                 if(ds.div > 0x7fff){
                     qDebug() << "maxSpeed err on" << mn;
                     ds.div = 0x7fff;
                 }
-                // = 0x7ff;
+                motorPosCmdData[mn].append(ds);
+                motorPosCmdData[mn].append(ds);
+
             }
             else{
+                if(ds.steps > 0){
+                    //calc speed
+                    ds.div = FPGA_FREQ/ (ds.steps*10);
+                    if(ds.div > 0x7fff){
+                        qDebug() << "maxSpeed err on" << mn;
+                        ds.div = 0x7fff;
+                    }
+                    // = 0x7ff;
+                }
+                //if(mn == 0){
+                    //qDebug("pos=%d st=%d div=%d dir=%d", pos, ds.steps, ds.div, ds.dir);
+                //}
+                motorPosCmdData[mn].append(ds);
             }
-            if(mn == 0){
-                //qDebug("pos=%d st=%d div=%d dir=%d", pos, ds.steps, ds.div, ds.dir);
-            }
-            motorPosCmdData[mn].append(ds);
             //qDebug("%s", mem.toLatin1().constData());
             //pos = contrStr.mid(8, 4).toInt();
             //slList[mn]->setValue(pos);
@@ -1310,6 +1337,7 @@ void MainWindow::on_pushButtonPosReset_clicked()
 //    }
     for(int i=0; i<MOTOR_CNT; i++){
         motorAbsolutePos[i] = 0;
+        motorAbsolutePosCur[i] = 0;
     }
 }
 
