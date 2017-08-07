@@ -978,11 +978,16 @@ void MainWindow::readPendingDatagrams()
 //            lastPosMap.clear();
 //            graphReset();
 //            motorPosCmdStrings.clear();
-            if(dataProcess100msTimer.isActive() == false){
-                dataProcess100msTimer.start();
-            }
+//            if(dataProcess100msTimer.isActive() == false){
+//                dataProcess100msTimer.start();
+//            }
+            qDebug("start cmd");
         }
-        else if(dataStr.compare("stop\r\n") == 0){
+        else if(dataStr.compare("stop\r\n") == 0){            
+            qDebug("stop cmd");
+            for(int i=0; i<MOTOR_CNT; i++){
+                motorPosCmdData[i].clear();
+            }
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
