@@ -417,7 +417,7 @@ bool MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir, qui
         return true;
     }
     else{
-        if( (curMsec - lastCtrlTimeMsecs[mi]) >=98 ){
+        if( (curMsec - lastCtrlTimeMsecs[mi]) >=100 ){
             lastCtrlTimeMsecs[mi] = curMsec;
             if(mi==0){
                 //static int lastMsecs = 0;
@@ -573,13 +573,6 @@ void MainWindow::freeToWrite(int i)
     case MT_GoUP:
         if(getMotorAbsPos(0) < 360000){
             DivPosDataStr ds;
-            //ds.div = 0x4fff;
-            ds.div = 500;
-            ds.dir = 1;
-            //ds.pos = 1;
-            ds.steps = 4560;
-            //motorPosCmdData[i] << ds;
-            //motorAbsolutePos[i] += 4560;
             ds.pos = getMotorAbsPos(i) + 4560;
             sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos);
         }
@@ -590,13 +583,7 @@ void MainWindow::freeToWrite(int i)
 
     case MT_GoDOWN:
         DivPosDataStr ds;
-        //ds.div = 0x4fff;
-        ds.div = 2000;
-        ds.dir = 0;
-        //ds.pos = 1;
-        //ds.steps = 570;
-        ds.steps = 300;
-        ds.pos = getMotorAbsPos(i)-300;
+        ds.pos = getMotorAbsPos(i)-500;
         sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos);
 
         break;
@@ -747,16 +734,18 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             ds.pos = newPos;
             int delta = newPos - getMotorAbsPos(mn);
             if(motorPosCmdData[mn].length() == 0){
-                if(abs(delta) > 8000){
+                qDebug("mn %d d %d", mn, delta);
+                int n;
+                for(n=1; abs(delta)>2000; n*=2){
                     delta/=2;
-                    ds.pos = getMotorAbsPos(mn)+delta;
-                    motorPosCmdData[mn].append(ds);
-                    ds.pos += delta;
-                    motorPosCmdData[mn].append(ds);
                 }
-                else{
+                ds.pos = getMotorAbsPos(mn);
+                for(int i=0; i<n; i++){
+                    ds.pos = ds.pos+delta;
                     motorPosCmdData[mn].append(ds);
+
                 }
+
             }
             else{
                 motorPosCmdData[mn].append(ds);
@@ -1096,23 +1085,7 @@ void MainWindow::response(QString str)
 
 void MainWindow::on_pushMoveDownState_clicked()
 {
-    DivPosDataStr ds;
 
-    for(int i=0; i<10; i++){
-        int startPos =0;
-
-        if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPos(i);
-        else
-            startPos = motorPosCmdData[i].last().pos;
-        ds.pos = startPos-400;
-        for(int k=0; k<10; k++){
-            motorPosCmdData[i] << ds;
-            ds.pos -= 400;
-        }
-        //for(int k=0; k<30; k++)
-        //    motorPosCmdData[i] << ds;
-    }
 
 //    if(serial.isOpen()){
 //        QString str("Sd\r\n");
@@ -1155,7 +1128,7 @@ void MainWindow::on_pushButtonPosReset_clicked()
     }
 }
 
-void MainWindow::on_pushTestData_clicked()
+void MainWindow::on_pushMoveUp_clicked()
 {
     DivPosDataStr ds;
 
@@ -1168,7 +1141,7 @@ void MainWindow::on_pushTestData_clicked()
             startPos = motorPosCmdData[i].last().pos;
 
         ds.pos = startPos+400;
-        for(int k=0; k<10; k++){
+        for(int k=0; k<5; k++){
             motorPosCmdData[i] << ds;
              ds.pos += 400;
         }
@@ -1176,6 +1149,33 @@ void MainWindow::on_pushTestData_clicked()
 //        //for(int k=0; k<30; k++)
 //        //    motorPosCmdData[i] << ds;
     }
+
+}
+
+void MainWindow::on_pushMoveDown_clicked()
+{
+    DivPosDataStr ds;
+
+    for(int i=0; i<10; i++){
+        int startPos =0;
+
+        if(motorPosCmdData[i].length() == 0)
+            startPos = getMotorAbsPos(i);
+        else
+            startPos = motorPosCmdData[i].last().pos;
+        ds.pos = startPos-400;
+        for(int k=0; k<5; k++){
+            motorPosCmdData[i] << ds;
+            ds.pos -= 400;
+        }
+        //for(int k=0; k<30; k++)
+        //    motorPosCmdData[i] << ds;
+    }
+}
+
+
+void MainWindow::on_pushTestData_clicked()
+{
 
 //    DivPosDataStr ds;
 //    ds.pos = 1;
@@ -1248,3 +1248,4 @@ void MainWindow::on_goToTerm_clicked()
       mtState[i] = MT_GoDOWN;
 
 }
+

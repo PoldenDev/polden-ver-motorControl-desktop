@@ -172,16 +172,16 @@
      <widget class="QWidget" name="widget_6" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QPushButton" name="pushMoveDownState">
+        <widget class="QPushButton" name="pushMoveDown">
          <property name="text">
-          <string>moveDownState</string>
+          <string>moveDown</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushTestData">
+        <widget class="QPushButton" name="pushMoveUp">
          <property name="text">
-          <string>testData</string>
+          <string>moveUp</string>
          </property>
         </widget>
        </item>

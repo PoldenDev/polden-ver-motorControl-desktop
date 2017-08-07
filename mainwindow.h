@@ -80,6 +80,10 @@ private slots:
 
     void on_goToTerm_clicked();
 
+    void on_pushMoveUp_clicked();
+
+    void on_pushMoveDown_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;

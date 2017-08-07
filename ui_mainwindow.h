@@ -64,8 +64,8 @@ public:
     QWidget *widget_8;
     QWidget *widget_6;
     QHBoxLayout *horizontalLayout_4;
-    QPushButton *pushMoveDownState;
-    QPushButton *pushTestData;
+    QPushButton *pushMoveDown;
+    QPushButton *pushMoveUp;
     QPushButton *goToTerm;
     QCheckBox *checkBoxCycle;
     QPushButton *pushButtonGotoPEriodState;
@@ -229,15 +229,15 @@ public:
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        pushMoveDownState = new QPushButton(widget_6);
-        pushMoveDownState->setObjectName(QStringLiteral("pushMoveDownState"));
+        pushMoveDown = new QPushButton(widget_6);
+        pushMoveDown->setObjectName(QStringLiteral("pushMoveDown"));
 
-        horizontalLayout_4->addWidget(pushMoveDownState);
+        horizontalLayout_4->addWidget(pushMoveDown);
 
-        pushTestData = new QPushButton(widget_6);
-        pushTestData->setObjectName(QStringLiteral("pushTestData"));
+        pushMoveUp = new QPushButton(widget_6);
+        pushMoveUp->setObjectName(QStringLiteral("pushMoveUp"));
 
-        horizontalLayout_4->addWidget(pushTestData);
+        horizontalLayout_4->addWidget(pushMoveUp);
 
         goToTerm = new QPushButton(widget_6);
         goToTerm->setObjectName(QStringLiteral("goToTerm"));
@@ -417,8 +417,8 @@ public:
         label_3->setText(QApplication::translate("MainWindow", "steps:", Q_NULLPTR));
         maxSteps->setText(QApplication::translate("MainWindow", "200000", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
-        pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
-        pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));
+        pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
+        pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
         goToTerm->setText(QApplication::translate("MainWindow", "go term", Q_NULLPTR));
         checkBoxCycle->setText(QApplication::translate("MainWindow", "cycle", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
