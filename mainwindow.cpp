@@ -384,7 +384,7 @@ void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
 
     if(mi == 0){
         int msec = QTime::currentTime().msecsSinceStartOfDay();
-        //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
+        qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
         lastMsec = msec;
     }
     serial.write(ba);
@@ -416,42 +416,20 @@ void MainWindow::handleReadyRead()
 
     //processUartRecvExchange(cmd);
 
-    QString debStr;
 
+    qDebug("enter bytesRecv %d", str.length());
+    QMap<char, char> tempStor;
     for (int i=0; i<str.length(); i++) {
-//        //debStr.append((char)str[i]);
-//        int startMi = 0;
-//        if((str[i]&0x80) != 0){
-//            startMi = 5;
-//        }
-//        bool bIsFreeExist = false;
-//        bool bIsBusyExist = false;
-//        QString freeMtrs;
-//        QString busyMtrs;
-//        for(int i=0; i<5; i++){
-//            int curMi = startMi+i;
-//            if((str[i]&(1<<i)) == 0){
-////                if(motorPosCmdData[curMi].isEmpty() == false){
-////                    DivPosDataStr ds = motorPosCmdData[curMi].dequeue();
-////                    //sendDivPos(startMi+i, 0x4fff, 20);
-////                    //sendDivPos(startMi+i, ds.div, ds.steps, ds.dir);
-////                    //
-////                }
-//                freeMtrs = QString("%1 %2").arg(curMi).arg(freeMtrs);
-//                bIsFreeExist = true;
-//            }
-//            else{
-//                bIsBusyExist = true;
-//                busyMtrs = QString("%1 %2").arg(curMi).arg(busyMtrs);
-//                //qDebug() << QTime::currentTime().msecsSinceStartOfDay() <<  qPrintable(" b");
-//            }
-//        }
-
-//       // if(bIsBusyExist)
-//          //  qDebug() << QTime::currentTime().msecsSinceStartOfDay() << busyMtrs;
-        //qDebug("%x ", str[i]);
-
         char b = str[i];
+        char n = (b>>6)&0x3;
+//        if(tempStor.contains(n))
+//            qDebug("in this pack already contains!");
+        tempStor[n] = b|tempStor[n];
+    }
+
+
+
+    foreach (char b, tempStor){
         switch((b>>6)&0x3){
         case 0x0:
             for(int i=0; i<1; i++){
@@ -475,7 +453,10 @@ void MainWindow::handleReadyRead()
                 terminatorState(5+i, b&(1<<i));
             }
             break;
-       }
+        }
+    }
+
+
 
 //        for(int i=0; i<MOTOR_CNT; i++){
 //            if(mtState[i] == MT_GoUP){
@@ -493,8 +474,7 @@ void MainWindow::handleReadyRead()
 //                    mtState[i] = MT_GoDOWN;
 //                }
 //            }
-//        }
-    }
+//        }    
 
     //qDebug() << str;
     //ui->plainTextEdit->moveCursor (QTextCursor::End);
@@ -560,11 +540,11 @@ void MainWindow::freeToWrite(int i)
     case MT_GoDOWN:
         DivPosDataStr ds;
         //ds.div = 0x4fff;
-        ds.div = 2669;
+        ds.div = 1000;
         ds.dir = 0;
         //ds.pos = 1;
         //ds.steps = 570;
-        ds.steps = 250;
+        ds.steps = 600;
         sendDivPos(i, ds.div, ds.steps, ds.dir);
 
         break;
@@ -1295,68 +1275,60 @@ void MainWindow::on_pushButtonPosReset_clicked()
 //        curveList[i]->setSamples(polylist[i]);
 //        plotList[i]->replot();
 //    }
-    if(serial.isOpen()){
-        QString str("Sr\r\n");
-     serial.write(str.toLatin1());
+//    if(serial.isOpen()){
+//        QString str("Sr\r\n");
+//     serial.write(str.toLatin1());
+//    }
+    for(int i=0; i<MOTOR_CNT; i++){
+        motorAbsolutePos[i] = 0;
     }
 }
 
 void MainWindow::on_pushTestData_clicked()
 {
+//    DivPosDataStr ds;
+//    //ds.div = 0x4fff;
+//    ds.div = 4000;
+//    //ds.pos = 1;
+//    ds.steps = 4000;
 
-//    QStringList strList;
-//    strList << "p000p000p000p000p000p000p000p000p000p000\r\n";
-//    strList << "p005p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p010p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p015p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p020p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p025p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p030p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p035p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p040p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p045p000p000p000p000p000p000p000p000p050\r\n";
-//    for(int i=0; i<40; i++)
-//        strList << "p050p000p000p000p000p000p000p000p000p050\r\n";
-
-////    for(int i=0; i<40; i++)
-////        strList << "p080p000p000p000p000p000p000p000p000p080\r\n";
-
-
-////    for(int i=0; i<40; i++)
-////        strList << "p060p000p000p000p000p000p000p000p000p060\r\n";
-
-//    //strList << "p000p000p000p000p000p000p000p000p000p050\r\n";
-//    //strList << "p000p000p000p000p000p000p000p000p000p060\r\n";
-
-
-////    for(int i=0; i<13; i++)
-////        strList << "p000p000p000p000p000p000p000p000p000p100\r\n";
-
-////    for(int i=0; i<13; i++)
-////        strList << "p000p000p000p000p000p000p000p000p000p150\r\n";
-
-//    parseCmdMultiMotorStrList(strList);
+//    for(int i=0; i<10; i++){
+//        ds.dir = 1;
+//        for(int k=0; k<1; k++)
+//            motorPosCmdData[i] << ds;
+//        ds.dir = 0;
+//        //for(int k=0; k<30; k++)
+//        //    motorPosCmdData[i] << ds;
+//    }
 
     DivPosDataStr ds;
-    //ds.div = 0x4fff;
-    ds.div = 4000;
-    //ds.pos = 1;
-    ds.steps = 4000;
+    ds.pos = 1;
+    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 4800; ds.div = 500; ds.dir = 1; motorPosCmdData[0] << ds;
+    //ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+    //ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+    //ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+    //ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
 
-    for(int i=0; i<10; i++){
-        ds.dir = 1;
-        for(int k=0; k<1; k++)
-            motorPosCmdData[i] << ds;
-        ds.dir = 0;
-        //for(int k=0; k<30; k++)
-        //    motorPosCmdData[i] << ds;
-    }
+//    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
 
-    //ds.dir = 0;
-    //motorPosCmdData[0] << ds;
-    //motorPosCmdData[1] << ds;
-    //motorPosCmdData[4] << ds;
-    //motorPosCmdData[6] << ds;
+//    ds.steps = 33599; ds.div = 71; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32801; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
+
+//    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 18399; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 13601; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 3200; ds.div = 750; ds.dir = 1; motorPosCmdData[0] << ds;
+
 }
 
 void MainWindow::on_pushClearMap_clicked()
