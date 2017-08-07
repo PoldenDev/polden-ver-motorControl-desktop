@@ -529,6 +529,7 @@ void MainWindow::terminatorState(int i, bool bEna)
         }
         else{
             motorAbsolutePos[i] = 0;
+            motorAbsolutePosCur[i] = 0;
             if(ui->checkBoxCycle->isChecked())
                 mtState[i] = MT_GoUP;
             else
