@@ -138,6 +138,7 @@ private:
 
     //int absolutePos[MOTOR_CNT];
 
+    quint32 lastCtrlTimeMsecs[MOTOR_CNT];
     quint32 motorAbsolutePos[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
 

@@ -10,15 +10,16 @@ typedef struct{
 
 } TMotorStr;
 
+typedef enum{
+    MT_IDLE,
+    MT_GoDOWN,
+    MT_GoUP
+} TMotorState ;
+
+
 typedef struct{
     int div;
     int steps;
     int dir;
     int pos;
 } DivPosDataStr;
-
-typedef enum{
-    MT_IDLE,
-    MT_GoDOWN,
-    MT_GoUP
-} TMotorState ;

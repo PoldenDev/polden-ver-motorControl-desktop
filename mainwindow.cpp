@@ -96,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //        connect(&(timerSerialSendTo[i]), SIGNAL(timeout()),
 //                this, SLOT(sendTimeOut));
         motorAbsolutePos[i] = 0;
+        lastCtrlTimeMsecs[i] = 0;
     }
 
 }
@@ -529,6 +530,7 @@ void MainWindow::terminatorState(int i, bool bEna)
     }
 }
 
+int lastMsecs;
 void MainWindow::freeToWrite(int i)
 {
     switch(mtState[i]){
@@ -552,11 +554,11 @@ void MainWindow::freeToWrite(int i)
     case MT_GoDOWN:
         DivPosDataStr ds;
         //ds.div = 0x4fff;
-        ds.div = 1000;
+        ds.div = 2000;
         ds.dir = 0;
         //ds.pos = 1;
         //ds.steps = 570;
-        ds.steps = 600;
+        ds.steps = 300;
         sendDivPos(i, ds.div, ds.steps, ds.dir);
 
         break;
@@ -564,18 +566,42 @@ void MainWindow::freeToWrite(int i)
     case MT_IDLE:
         if(motorPosCmdData[i].isEmpty() == false){
             DivPosDataStr ds;
-            ds = motorPosCmdData[i].dequeue();
-            if(i==0){
-                //int t = 1000*ds.steps*((float)ds.div/24000000);
-                //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
-            }
+            ds = motorPosCmdData[i].first();
+            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+
             //if(ds.div < 0x100)
             //    ds.div = 0x100;
 
             if(ds.steps > 0){
                 //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
                 sendDivPos(i, ds.div, ds.steps, ds.dir);
+                motorPosCmdData[i].dequeue();
+                if(i==0){
+                    //int t = 1000*ds.steps*((float)ds.div/24000000);
+                    //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+                    int delta = curMsec -lastMsecs;
+                    lastMsecs = curMsec;
+                    //qDebug("nz %d %s", delta, delta <98 ? "!!": " ");
+                }
             }
+            else{
+                if( (curMsec - lastCtrlTimeMsecs[i]) >=98 ){
+                    lastCtrlTimeMsecs[i] = curMsec;
+                    motorPosCmdData[i].dequeue();
+                    if(i==0){
+                        //int t = 1000*ds.steps*((float)ds.div/24000000);
+                        //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+                        int delta = curMsec -lastMsecs;
+                        lastMsecs = curMsec;
+                        //qDebug("z %d %s", delta, delta <98 ? "!!": " ");
+                    }
+                }
+                else{
+                }
+
+            }
+
+
         }
         break;
     }
@@ -698,8 +724,14 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
 //                lastPos = motorPosCmdData[mn].last().pos;
 //            }
 
+            if(pos > 999){
+                qDebug("pos exceed 100! pos=%d", pos);
+            }
+            if(pos <0){
+                qDebug("pos less 0! pos=%d", pos);
+            }
             int maxVal = ui->maxSteps->text().toInt();
-            int newSteps = maxVal*(pos/100.);
+            int newSteps = maxVal*(pos/1000.);
             ds.pos = newSteps;
             int delta = newSteps - motorAbsolutePos[mn];
             motorAbsolutePos[mn] = newSteps;
@@ -719,7 +751,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             else{
             }
             if(mn == 0){
-                qDebug("pos=%d st=%d div=%d dir=%d", pos, ds.steps, ds.div, ds.dir);
+                //qDebug("pos=%d st=%d div=%d dir=%d", pos, ds.steps, ds.div, ds.dir);
             }
             motorPosCmdData[mn].append(ds);
             //qDebug("%s", mem.toLatin1().constData());
@@ -764,61 +796,36 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         int velIPS;
         if((pos>=0) && (pos<1000)){
 
-            int x=0;
-            if(xMap.contains(mn) == true){
-                x = xMap[mn];
-            }
+//            int x=0;
+//            if(xMap.contains(mn) == true){
+//                x = xMap[mn];
+//            }
 
-            polyPoslist[mn].append(QPointF(x, pos/10.));
-            xMap[mn] = x+1;
+//            polyPoslist[mn].append(QPointF(x, pos/10.));
+//            xMap[mn] = x+1;
 
-            if(polyPoslist[mn].length() > 1500){
-                polyPoslist[mn].removeFirst();
-            }
-            posCurveList[mn]->setSamples(polyPoslist[mn]);
-
-
-            int lasPos = 0;
-            if(lastPosMap.contains(mn) == true){
-                lasPos = lastPosMap[mn];
-            }
-            int vel = pos - lasPos;
-
-            velIPS=abs( vel*400*10 );
-            //qDebug("%d v %d", mn,  vel);
-            lastPosMap[mn] = pos;
-
-            polyVellist[mn].append(QPointF(x, vel));
-            if(polyVellist[mn].length() > 1500){
-                polyVellist[mn].removeFirst();
-            }
-            velCurveList[mn]->setSamples(polyVellist[mn]);
-            plotList[mn]->replot();
+//            if(polyPoslist[mn].length() > 1500){
+//                polyPoslist[mn].removeFirst();
+//            }
+//            posCurveList[mn]->setSamples(polyPoslist[mn]);
 
 
-            //   UartThread.transaction(mn, contrStr);
-            //if(serial.isOpen() /*&& (bCmdOk == true)*/){
-            //       serial.write(contrStr.toLatin1());
-            //drply = datagram.makeReply(cmdOkba);
-            //bCmdOk = false;
+//            int lasPos = 0;
+//            if(lastPosMap.contains(mn) == true){
+//                lasPos = lastPosMap[mn];
+//            }
+//            int vel = pos - lasPos;
 
-            //            if(noDataSending){
-            //                serial.write(contrStr.toLatin1());
-            //                noDataSending = false;
-            //            }
-            //            else{
-            //                contrStringQueue.enqueue(contrStr);
+//            velIPS=abs( vel*400*10 );
+//            //qDebug("%d v %d", mn,  vel);
+//            lastPosMap[mn] = pos;
 
-            //            }
-
-            //if(serial.waitForBytesWritten(10000)){
-
-            //}
-            //else{
-            //qDebug("serial port write byte error!");
-            //}
-
-            // }
+//            polyVellist[mn].append(QPointF(x, vel));
+//            if(polyVellist[mn].length() > 1500){
+//                polyVellist[mn].removeFirst();
+//            }
+//            velCurveList[mn]->setSamples(polyVellist[mn]);
+//            plotList[mn]->replot();
         }
         else{
             qDebug("pos diap error %d", pos);
@@ -827,18 +834,18 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         if(mn==0){
             // QString udpTextField = QString("%1:%2").arg(udpCnt++).arg(contrStr);
 
-            int div = 0xfffff;
-            if(velIPS != 0){
-                div = 50000000/velIPS;
-            }
-            QString udpTextField = QString("%1 p%2 v%3 d%4\r\n").arg(xUdpRecv++, 5, 10)
-                                                                .arg(pos)
-                                                                .arg(velIPS)
-                                                                .arg(div, 4, 16);
+//            int div = 0xfffff;
+//            if(velIPS != 0){
+//                div = 50000000/velIPS;
+//            }
+//            QString udpTextField = QString("%1 p%2 v%3 d%4\r\n").arg(xUdpRecv++, 5, 10)
+//                                                                .arg(pos)
+//                                                                .arg(velIPS)
+//                                                                .arg(div, 4, 16);
             //udpSocket->writeDatagram()                ;
-            ui->plainTextUDP->moveCursor (QTextCursor::End);
+            //ui->plainTextUDP->moveCursor (QTextCursor::End);
             //ui->plainTextUDP->insertPlainText(udpTextField);
-            ui->plainTextUDP->moveCursor (QTextCursor::End);
+            //ui->plainTextUDP->moveCursor (QTextCursor::End);
             //ui->plainTextEdit->appendPlainText(str);
         }
 
@@ -1126,6 +1133,11 @@ void MainWindow::sendOnTimer()
         //QString wrStr = motorPosCmdStrings.dequeue();
         //serial.write(wrStr.toLatin1());
     }
+//   qDebug("deq %d %d %d %d %d", motorPosCmdData[0].length(),
+//                                motorPosCmdData[1].length(),
+//                                motorPosCmdData[2].length(),
+//                                motorPosCmdData[3].length(),
+//                                motorPosCmdData[4].length());
 }
 
 

@@ -415,7 +415,7 @@ public:
         lineEditMaxVal->setInputMask(QApplication::translate("MainWindow", "99999", Q_NULLPTR));
         lineEditMaxVal->setText(QApplication::translate("MainWindow", "20000", Q_NULLPTR));
         label_3->setText(QApplication::translate("MainWindow", "steps:", Q_NULLPTR));
-        maxSteps->setText(QApplication::translate("MainWindow", "20000", Q_NULLPTR));
+        maxSteps->setText(QApplication::translate("MainWindow", "200000", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
         pushMoveDownState->setText(QApplication::translate("MainWindow", "moveDownState", Q_NULLPTR));
         pushTestData->setText(QApplication::translate("MainWindow", "testData", Q_NULLPTR));
