@@ -365,15 +365,22 @@ void MainWindow::initUdpSocket()
 
 int lastMsec = 0;
 void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
-{    
+{        
     quint64 temp = 0;
     temp = mi&0xf;
     temp |= ((div&0x7fff)<<4);
-    temp |= ((steps&0x7fff)<<19);
+    temp |= (((quint64)steps&0x7fff)<<19);
     temp |= (((quint64)dir&0x1)<<34);
     QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
 
     ba.resize(5);
+
+    if(div > 0x7fff){
+        qDebug("mi %d div exceed 0x7fff!", mi);
+    }
+    if(steps > 0x7fff){
+        qDebug("mi %d steps exceed 0x7fff!", mi);
+    }
 
 //    //ba[0] = 0x09;
 //    ba[0] = mi&0xf;
@@ -384,7 +391,7 @@ void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
 
     if(mi == 0){
         int msec = QTime::currentTime().msecsSinceStartOfDay();
-        qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
+        //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
         lastMsec = msec;
     }
     serial.write(ba);
@@ -417,7 +424,7 @@ void MainWindow::handleReadyRead()
     //processUartRecvExchange(cmd);
 
 
-    qDebug("enter bytesRecv %d", str.length());
+    //qDebug("enter bytesRecv %d", str.length());
     QMap<char, char> tempStor;
     for (int i=0; i<str.length(); i++) {
         char b = str[i];
@@ -432,13 +439,18 @@ void MainWindow::handleReadyRead()
     foreach (char b, tempStor){
         switch((b>>6)&0x3){
         case 0x0:
-            for(int i=0; i<1; i++){
+            for(int i=0; i<5; i++){
                 if((b&(1<<i)) == 0){
                     freeToWrite(i);
                 }
             }
             break;
         case 0x1:
+            for(int i=0; i<5; i++){
+                if((b&(1<<i)) == 0){
+                    freeToWrite(5+i);
+                }
+            }
             break;
         case 0x2:
             //qDebug("%02x 1 %02x", b, (b&0x1f));
@@ -557,8 +569,8 @@ void MainWindow::freeToWrite(int i)
                 //int t = 1000*ds.steps*((float)ds.div/24000000);
                 //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
             }
-            if(ds.div < 0x100)
-                ds.div = 0x100;
+            //if(ds.div < 0x100)
+            //    ds.div = 0x100;
 
             if(ds.steps > 0){
                 //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
@@ -1286,29 +1298,27 @@ void MainWindow::on_pushButtonPosReset_clicked()
 
 void MainWindow::on_pushTestData_clicked()
 {
-//    DivPosDataStr ds;
-//    //ds.div = 0x4fff;
-//    ds.div = 4000;
-//    //ds.pos = 1;
-//    ds.steps = 4000;
+    DivPosDataStr ds;
+    ds.div = 4000;
+    ds.steps = 4000;
 
-//    for(int i=0; i<10; i++){
-//        ds.dir = 1;
-//        for(int k=0; k<1; k++)
-//            motorPosCmdData[i] << ds;
+    for(int i=0; i<10; i++){
+        ds.dir = 1;
+        for(int k=0; k<1; k++)
+            motorPosCmdData[i] << ds;
 //        ds.dir = 0;
 //        //for(int k=0; k<30; k++)
 //        //    motorPosCmdData[i] << ds;
-//    }
+    }
 
-    DivPosDataStr ds;
-    ds.pos = 1;
-    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 4800; ds.div = 500; ds.dir = 1; motorPosCmdData[0] << ds;
-    //ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
-    //ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
-    //ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
-    //ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
+//    DivPosDataStr ds;
+//    ds.pos = 1;
+//    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
+    //ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
 
 //    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
 //    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
