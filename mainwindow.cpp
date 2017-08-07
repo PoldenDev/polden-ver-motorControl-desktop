@@ -88,14 +88,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
-        motorAbsolutePos[i] = 0;
     }
 
     for(int i=0; i<MOTOR_CNT; i++){
 //        timerSerialSendTo[i].setSingleShot(true);
 //        connect(&(timerSerialSendTo[i]), SIGNAL(timeout()),
 //                this, SLOT(sendTimeOut));
-        motorAbsolutePos[i] = 0;
+        motorAbsolutePosCur[i] = 0;
         lastCtrlTimeMsecs[i] = 0;
     }
 
@@ -365,47 +364,76 @@ void MainWindow::initUdpSocket()
 
 
 int lastMsec = 0;
-void MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir)
-{        
-    quint64 temp = 0;
-    temp = mi&0xf;
-    temp |= ((div&0x7fff)<<4);
-    temp |= (((quint64)steps&0x7fff)<<19);
-    temp |= (((quint64)dir&0x1)<<34);
-    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
+bool MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir, quint32 pos)
+{
+    int delta = pos - getMotorAbsPos(mi);
+    dir = delta > 0? 1: 0;
+    steps = abs(delta);
 
-    ba.resize(5);
+    int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+    if(steps > 0){
+        //calc speed
+        div = FPGA_FREQ/ (steps*10);
+        if(div > 0x7fff){
+            qDebug() << "maxSpeed err on" << mi;
+            div = 0x7fff;
+        }
 
-    if(div > 0x7fff){
-        qDebug("mi %d div exceed 0x7fff!", mi);
+        quint64 temp = 0;
+        temp = mi&0xf;
+        temp |= ((div&0x7fff)<<4);
+        temp |= (((quint64)steps&0x7fff)<<19);
+        temp |= (((quint64)dir&0x1)<<34);
+        QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
+
+        ba.resize(5);
+
+        if(div > 0x7fff){
+            qDebug("mi %d div exceed 0x7fff!", mi);
+        }
+        if(steps > 0x7fff){
+            qDebug("mi %d steps exceed 0x7fff!", mi);
+        }
+
+    //    //ba[0] = 0x09;
+    //    ba[0] = mi&0xf;
+    //    ba[1] = 0xc0;
+    //    ba[2] = 0x38;
+    //    ba[3] = 0x00;
+    //    ba[4] = 0x00;
+
+        if(mi == 0){
+            int msec = QTime::currentTime().msecsSinceStartOfDay();
+            //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
+            lastMsec = msec;
+        }
+        serial.write(ba);
+        motorAbsolutePosCur[mi] += delta;
+        if( motorAbsolutePosCur[mi] < 0){
+            qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
+        }
+     //   if(mi==0)
+    //        serial.write(ba);
+        return true;
     }
-    if(steps > 0x7fff){
-        qDebug("mi %d steps exceed 0x7fff!", mi);
+    else{
+        if( (curMsec - lastCtrlTimeMsecs[mi]) >=98 ){
+            lastCtrlTimeMsecs[mi] = curMsec;
+            if(mi==0){
+                //static int lastMsecs = 0;
+                //int t = 1000*ds.steps*((float)ds.div/24000000);
+                //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+                //int delta = curMsec -lastMsecs;
+                //lastMsecs = curMsec;
+                //qDebug("z %d %s", delta, delta <98 ? "!!": " ");
+            }
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
-    if(dir == 1)
-        motorAbsolutePosCur[mi] += steps;
-    else if(dir == 0 )
-        motorAbsolutePosCur[mi] -= steps;
-
-    if( motorAbsolutePosCur[mi] < 0){
-        qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
-    }
-//    //ba[0] = 0x09;
-//    ba[0] = mi&0xf;
-//    ba[1] = 0xc0;
-//    ba[2] = 0x38;
-//    ba[3] = 0x00;
-//    ba[4] = 0x00;    
-
-    if(mi == 0){
-        int msec = QTime::currentTime().msecsSinceStartOfDay();
-        //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
-        lastMsec = msec;
-    }
-    serial.write(ba);
- //   if(mi==0)
-//        serial.write(ba);
 }
 
 void MainWindow::handleReadyRead()
@@ -528,7 +556,6 @@ void MainWindow::terminatorState(int i, bool bEna)
         if(bEna == false){
         }
         else{
-            motorAbsolutePos[i] = 0;
             motorAbsolutePosCur[i] = 0;
             if(ui->checkBoxCycle->isChecked())
                 mtState[i] = MT_GoUP;
@@ -539,12 +566,12 @@ void MainWindow::terminatorState(int i, bool bEna)
     }
 }
 
-int lastMsecs;
+
 void MainWindow::freeToWrite(int i)
 {
     switch(mtState[i]){
     case MT_GoUP:
-        if(motorAbsolutePos[0] < 360000){
+        if(getMotorAbsPos(0) < 360000){
             DivPosDataStr ds;
             //ds.div = 0x4fff;
             ds.div = 500;
@@ -552,8 +579,9 @@ void MainWindow::freeToWrite(int i)
             //ds.pos = 1;
             ds.steps = 4560;
             //motorPosCmdData[i] << ds;
-            motorAbsolutePos[i] += 4560;
-            sendDivPos(i, ds.div, ds.steps, ds.dir);
+            //motorAbsolutePos[i] += 4560;
+            ds.pos = getMotorAbsPos(i) + 4560;
+            sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos);
         }
         else{
             mtState[i] = MT_GoDOWN;
@@ -568,7 +596,8 @@ void MainWindow::freeToWrite(int i)
         //ds.pos = 1;
         //ds.steps = 570;
         ds.steps = 300;
-        sendDivPos(i, ds.div, ds.steps, ds.dir);
+        ds.pos = getMotorAbsPos(i)-300;
+        sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos);
 
         break;
 
@@ -581,36 +610,10 @@ void MainWindow::freeToWrite(int i)
             //if(ds.div < 0x100)
             //    ds.div = 0x100;
 
-            if(ds.steps > 0){
-                //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-                sendDivPos(i, ds.div, ds.steps, ds.dir);
+            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+            if(sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos) == true){
                 motorPosCmdData[i].dequeue();
-                if(i==0){
-                    //int t = 1000*ds.steps*((float)ds.div/24000000);
-                    //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
-                    int delta = curMsec -lastMsecs;
-                    lastMsecs = curMsec;
-                    //qDebug("nz %d %s", delta, delta <98 ? "!!": " ");
-                }
             }
-            else{
-                if( (curMsec - lastCtrlTimeMsecs[i]) >=98 ){
-                    lastCtrlTimeMsecs[i] = curMsec;
-                    motorPosCmdData[i].dequeue();
-                    if(i==0){
-                        //int t = 1000*ds.steps*((float)ds.div/24000000);
-                        //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
-                        int delta = curMsec -lastMsecs;
-                        lastMsecs = curMsec;
-                        //qDebug("z %d %s", delta, delta <98 ? "!!": " ");
-                    }
-                }
-                else{
-                }
-
-            }
-
-
         }
         break;
     }
@@ -740,203 +743,25 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 qDebug("pos less 0! pos=%d", pos);
             }
             int maxVal = ui->maxSteps->text().toInt();
-            int newSteps = maxVal*(pos/1000.);
-            ds.pos = newSteps;
-            int delta = 0;
+            int newPos = maxVal*(pos/1000.);
+            ds.pos = newPos;
+            int delta = newPos - getMotorAbsPos(mn);
             if(motorPosCmdData[mn].length() == 0){
-                delta = newSteps -  motorAbsolutePosCur[mn];
+                if(abs(delta) > 8000){
+                    delta/=2;
+                    ds.pos = getMotorAbsPos(mn)+delta;
+                    motorPosCmdData[mn].append(ds);
+                    ds.pos += delta;
+                    motorPosCmdData[mn].append(ds);
+                }
+                else{
+                    motorPosCmdData[mn].append(ds);
+                }
             }
             else{
-                delta = newSteps - motorAbsolutePos[mn];
-            }
-
-            motorAbsolutePos[mn] = newSteps;
-            //float prcnt = abs(delta)/100.;
-            ds.dir = delta > 0? 1: 0;
-            ds.steps = abs(delta);
-            if(ds.steps > 10000){
-                qDebug("delta exceed 10000 = %d", delta);
-                ds.steps /= 2;
-                //calc speed
-                ds.div = FPGA_FREQ/ (ds.steps*10);
-                if(ds.div > 0x7fff){
-                    qDebug() << "maxSpeed err on" << mn;
-                    ds.div = 0x7fff;
-                }
-                motorPosCmdData[mn].append(ds);
-                motorPosCmdData[mn].append(ds);
-
-            }
-            else{
-                if(ds.steps > 0){
-                    //calc speed
-                    ds.div = FPGA_FREQ/ (ds.steps*10);
-                    if(ds.div > 0x7fff){
-                        qDebug() << "maxSpeed err on" << mn;
-                        ds.div = 0x7fff;
-                    }
-                    // = 0x7ff;
-                }
-                //if(mn == 0){
-                    //qDebug("pos=%d st=%d div=%d dir=%d", pos, ds.steps, ds.div, ds.dir);
-                //}
                 motorPosCmdData[mn].append(ds);
             }
-            //qDebug("%s", mem.toLatin1().constData());
-            //pos = contrStr.mid(8, 4).toInt();
-            //slList[mn]->setValue(pos);
-
-            //            if(mn == 1)
-            //                qDebug("mn %d pos %d", mn, pos);
         }
-        //        foreach (QString mem, list1) {
-        //            int mn = QString(mem[1]).toInt();
-        //            if((mn>=0)&&(mn<10)){
-        //                //qDebug("%s", mem.toLatin1().constData());
-        //                int pos = mem.mid(8, 4).toInt();
-        //                slList[mn]->setValue(pos);
-        //                if(mn == 1)
-        //                    qDebug("mn %d pos %d", mn, pos);
-        //            }
-        //        }
-
-
-
-        //        for(int i=0; i<10; i++){
-        //            QString posData = dataStr.mid(8*(i+1),4);
-        //            int pos = posData.toInt();
-        //            slList[i]->setValue(pos);
-        //        }
-
-
-        //qDebug("%s", contrStr.toLatin1().constData());
-        //contrStr+= "\r\n";
-        //qDebug() << datagram.data();
-        //QByteArray cmdOkba = QString("cmdOK\r\n").toLatin1();
-        //QByteArray cmdFailba = QString("cmdFail\r\n").toLatin1();
-        //QNetworkDatagram drply = datagram.makeReply(cmdOkba);
-        //udpSocket->writeDatagram(drply);
-        //if(mn != 2)
-        //  return;
-        //mtstr[mn].contrStringQueue.enqueue(cmdStr);
-
-
-        int velIPS;
-        if((pos>=0) && (pos<1000)){
-
-//            int x=0;
-//            if(xMap.contains(mn) == true){
-//                x = xMap[mn];
-//            }
-
-//            polyPoslist[mn].append(QPointF(x, pos/10.));
-//            xMap[mn] = x+1;
-
-//            if(polyPoslist[mn].length() > 1500){
-//                polyPoslist[mn].removeFirst();
-//            }
-//            posCurveList[mn]->setSamples(polyPoslist[mn]);
-
-
-//            int lasPos = 0;
-//            if(lastPosMap.contains(mn) == true){
-//                lasPos = lastPosMap[mn];
-//            }
-//            int vel = pos - lasPos;
-
-//            velIPS=abs( vel*400*10 );
-//            //qDebug("%d v %d", mn,  vel);
-//            lastPosMap[mn] = pos;
-
-//            polyVellist[mn].append(QPointF(x, vel));
-//            if(polyVellist[mn].length() > 1500){
-//                polyVellist[mn].removeFirst();
-//            }
-//            velCurveList[mn]->setSamples(polyVellist[mn]);
-//            plotList[mn]->replot();
-        }
-        else{
-            qDebug("pos diap error %d", pos);
-        }
-
-        if(mn==0){
-            // QString udpTextField = QString("%1:%2").arg(udpCnt++).arg(contrStr);
-
-//            int div = 0xfffff;
-//            if(velIPS != 0){
-//                div = 50000000/velIPS;
-//            }
-//            QString udpTextField = QString("%1 p%2 v%3 d%4\r\n").arg(xUdpRecv++, 5, 10)
-//                                                                .arg(pos)
-//                                                                .arg(velIPS)
-//                                                                .arg(div, 4, 16);
-            //udpSocket->writeDatagram()                ;
-            //ui->plainTextUDP->moveCursor (QTextCursor::End);
-            //ui->plainTextUDP->insertPlainText(udpTextField);
-            //ui->plainTextUDP->moveCursor (QTextCursor::End);
-            //ui->plainTextEdit->appendPlainText(str);
-        }
-
-
-
-    //        if((serial.isOpen() == true)&&(mn<MOTOR_CNT)){
-
-    //            mtstr[mn].contrStringQueue.enqueue(contrStr);
-    //            if(uartSendState == idle){
-    //                processUartSendExchange();
-    //            }
-    //            else{
-    //                qDebug() << "data added";
-
-    //            };
-    //        }
-
-                    //
-    //                lastMotorReceptInd = mn;
-
-    //                timerSerialSendTo[mn].start(10);
-    //                //drply = datagram.makeReply(cmdOkba);
-    //                //bCmdOk = false;
-
-    //                //добавили  посылку в очередь
-
-
-    //                bool bMotorsIdleState = true;
-    //                for(int i=0; i<MOTOR_CNT; i++)
-    //                {
-    //                    bMotorsIdleState = (bMotorsIdleState &&(mtstr[mn].sendState == idle));
-
-    //                }
-    //                //если все молчат, то запустим пересылку
-    //                if(bMotorsIdleState == true){
-    //                    emit handleSerialDataWritten(-1);
-
-    //                }
-    //                if((mtstr[mn].sendState == idle)){
-    //                    serial.write(contrStr.toLatin1());
-    //                }
-    //                contrStringQueue;
-    //                if(noDataSending){
-    //                    noDataSending = false;
-
-    //                }
-
-                    //if(serial.waitForBytesWritten(10000)){
-
-                    //}
-                    //else{
-                        //qDebug("serial port write byte error!");
-                    //}
-
-                //}
-        //        else{
-        //            drply = datagram.makeReply(cmdFailba);
-
-        //        }
-        //        if(serial.isOpen() /*&& (bCmdOk == true)*/){
-        //            //serial.write(contrStr.toLatin1());
-//            contrStringQueue.enqueue(contrStr);
-//        }
     }
 }
 
@@ -1271,31 +1096,20 @@ void MainWindow::response(QString str)
 
 void MainWindow::on_pushMoveDownState_clicked()
 {
-//    QStringList strList;
-//    strList << "p000p000p000p000p000p000p000p000p000p000\r\n";
-//    strList << "p005p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p010p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p015p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p020p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p025p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p030p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p035p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p040p000p000p000p000p000p000p000p000p050\r\n";
-//    strList << "p045p000p000p000p000p000p000p000p000p050\r\n";
-//    for(int i=0; i<40; i++)
-//        strList << "p050p000p000p000p000p000p000p000p000p050\r\n";
-
-//    parseCmdMultiMotorStrList(strList);
-
     DivPosDataStr ds;
-    //ds.div = 0x4fff;
-    ds.div = 0xfff;
-    ds.steps = 4000;
 
     for(int i=0; i<10; i++){
-        ds.dir = 0;
-        for(int k=0; k<10; k++)
+        int startPos =0;
+
+        if(motorPosCmdData[i].length() == 0)
+            startPos = getMotorAbsPos(i);
+        else
+            startPos = motorPosCmdData[i].last().pos;
+        ds.pos = startPos-400;
+        for(int k=0; k<10; k++){
             motorPosCmdData[i] << ds;
+            ds.pos -= 400;
+        }
         //for(int k=0; k<30; k++)
         //    motorPosCmdData[i] << ds;
     }
@@ -1337,7 +1151,6 @@ void MainWindow::on_pushButtonPosReset_clicked()
 //     serial.write(str.toLatin1());
 //    }
     for(int i=0; i<MOTOR_CNT; i++){
-        motorAbsolutePos[i] = 0;
         motorAbsolutePosCur[i] = 0;
     }
 }
@@ -1345,13 +1158,20 @@ void MainWindow::on_pushButtonPosReset_clicked()
 void MainWindow::on_pushTestData_clicked()
 {
     DivPosDataStr ds;
-    ds.div = 4000;
-    ds.steps = 4000;
 
     for(int i=0; i<10; i++){
-        ds.dir = 1;
-        for(int k=0; k<1; k++)
+        int startPos =0;
+
+        if(motorPosCmdData[i].length() == 0)
+            startPos = getMotorAbsPos(i);
+        else
+            startPos = motorPosCmdData[i].last().pos;
+
+        ds.pos = startPos+400;
+        for(int k=0; k<10; k++){
             motorPosCmdData[i] << ds;
+             ds.pos += 400;
+        }
 //        ds.dir = 0;
 //        //for(int k=0; k<30; k++)
 //        //    motorPosCmdData[i] << ds;

@@ -139,9 +139,10 @@ private:
     //int absolutePos[MOTOR_CNT];
 
     quint32 lastCtrlTimeMsecs[MOTOR_CNT];
-    quint32 motorAbsolutePos[MOTOR_CNT];
+    //quint32 motorAbsolutePos[MOTOR_CNT];
     qint32 motorAbsolutePosCur[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
+    qint32 getMotorAbsPos(int i) { return motorAbsolutePosCur[i];}
 
     //void convertPosModeToVelMode(QString);
     QMap<int, int> lastPosMap;
@@ -150,7 +151,7 @@ private:
     void graphReset();
     QSettings settings;
 
-    void sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir);
+    bool sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir, quint32 pos);
 
     TMotorState mtState[MOTOR_CNT];
 
