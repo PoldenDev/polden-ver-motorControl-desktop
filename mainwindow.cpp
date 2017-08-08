@@ -36,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
     curMotorSendIdx(0),
     settings("murinets", "vertolet"),
     xUdpRecv(0),
-    markerXPos(0)
+    markerXPos(0)/*,
+    timeShiftMaxPos(2000),
+    timeShiftMaxNeg(-2000)*/
 {
     ui->setupUi(this);
 
@@ -394,7 +396,7 @@ void MainWindow::initUdpSocket()
 
 
 int lastMsec = 0;
-bool MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir, quint32 pos)
+bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 steps, quint32 dir, quint32 pos)
 {
     int delta = pos - getMotorAbsPos(mi);
     dir = delta > 0? 1: 0;
@@ -447,9 +449,14 @@ bool MainWindow::sendDivPos(int mi, quint32 div, quint32 steps, quint32 dir, qui
         return true;
     }
     else{
-        if( (curMsec - lastCtrlTimeMsecs[mi]) >=100 ){
-            lastCtrlTimeMsecs[mi] = curMsec;
+        int shift = ds.absMsec - curMsec;
+        if(mi == 0){
+            //qDebug("%d", shift);
+        }
+        if( abs(shift) <=100 ){
+            //lastCtrlTimeMsecs[mi] = curMsec;
             if(mi==0){
+                qDebug("%d", shift);
                 //static int lastMsecs = 0;
                 //int t = 1000*ds.steps*((float)ds.div/24000000);
                 //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
@@ -604,7 +611,7 @@ void MainWindow::freeToWrite(int i)
         if(getMotorAbsPos(0) < 360000){
             DivPosDataStr ds;
             ds.pos = getMotorAbsPos(i) + 4560;
-            sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos);
+            sendDivPos(i, ds, ds.div, ds.steps, ds.dir, ds.pos);
         }
         else{
             mtState[i] = MT_GoDOWN;
@@ -614,7 +621,7 @@ void MainWindow::freeToWrite(int i)
     case MT_GoDOWN:
         DivPosDataStr ds;
         ds.pos = getMotorAbsPos(i)-500;
-        sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos);
+        sendDivPos(i, ds, ds.div, ds.steps, ds.dir, ds.pos);
 
         break;
 
@@ -628,7 +635,7 @@ void MainWindow::freeToWrite(int i)
             //    ds.div = 0x100;
 
             //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-            if(sendDivPos(i, ds.div, ds.steps, ds.dir, ds.pos) == true){
+            if(sendDivPos(i, ds, ds.div, ds.steps, ds.dir, ds.pos) == true){
                 motorPosCmdData[i].dequeue();
             }
         }
@@ -779,7 +786,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
 
             }
             else{
-                ds.absMsec = motorPosCmdData[mn].first().absMsec += 100;
+                ds.absMsec = motorPosCmdData[mn].last().absMsec + 100;
                 motorPosCmdData[mn].append(ds);
             }
         }
@@ -1287,15 +1294,28 @@ void MainWindow::uiUpdateTimerSlot()
     for(int i=0; i<MOTOR_CNT; i++){
         if(motorPosCmdData[i].size() != 0){
             int shift = 0;
+            if(i==0){
+               // qDebug("%d >> %d",curMsec, motorPosCmdData[i].first().absMsec);
+            }
             shift = motorPosCmdData[i].first().absMsec - curMsec;
+
+//            if(shift > timeShiftMaxPos){
+//                timeShiftMaxPos = (shift-shift%100)+500;
+//                timeStatSlider[i]->setMinimum(timeShiftMaxPos);
+//            }
+//            else if(shift < timeShiftMaxNeg){
+//                timeShiftMaxNeg = (shift-shift%100)-500;
+//                timeStatSlider[i]->setMinimum(timeShiftMaxNeg);
+//            }
             timeStatLE[i]->setText(QString::number(shift));
             timeStatSlider[i]->setValue(shift);
         }
         else{
             timeStatLE[i]->setText("n/a");
+             timeStatSlider[i]->setValue(0);
         }
 
-        timeStatSlider[i]->setStyleSheet("QSlider::handle:vertical {background: red;}");
+        //timeStatSlider[i]->setStyleSheet("QSlider::handle:vertical {background: red;}");
         //timeStatSlider[i]->setStyleSheet("QSlider::sub-page:vertical {background: red;}");
     }
 
