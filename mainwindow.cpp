@@ -453,7 +453,8 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 step
         if(mi == 0){
             //qDebug("%d", shift);
         }
-        if( abs(shift) <=100 ){
+        if( (abs(shift) <=100) ||
+             (shift <0) ){        //если проигрывание отстаёт
             //lastCtrlTimeMsecs[mi] = curMsec;
             if(mi==0){
                 qDebug("%d", shift);
