@@ -23,4 +23,5 @@ typedef struct{
     int steps;
     int dir;
     qint32 pos;
+    int absMsec;
 } DivPosDataStr;

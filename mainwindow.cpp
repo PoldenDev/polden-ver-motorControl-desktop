@@ -98,6 +98,36 @@ MainWindow::MainWindow(QWidget *parent) :
         lastCtrlTimeMsecs[i] = 0;
     }
 
+    ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
+    ui->widget_11->layout()->setAlignment(Qt::AlignHCenter);
+
+    timeStatSlider.append(ui->timeShift_0);
+    timeStatSlider.append(ui->timeShift_1);
+    timeStatSlider.append(ui->timeShift_2);
+    timeStatSlider.append(ui->timeShift_3);
+    timeStatSlider.append(ui->timeShift_4);
+    timeStatSlider.append(ui->timeShift_5);
+    timeStatSlider.append(ui->timeShift_6);
+    timeStatSlider.append(ui->timeShift_7);
+    timeStatSlider.append(ui->timeShift_8);
+    timeStatSlider.append(ui->timeShift_9);
+
+    timeStatLE.append(ui->lineEditTimeShift_0);
+    timeStatLE.append(ui->lineEditTimeShift_1);
+    timeStatLE.append(ui->lineEditTimeShift_2);
+    timeStatLE.append(ui->lineEditTimeShift_3);
+    timeStatLE.append(ui->lineEditTimeShift_4);
+    timeStatLE.append(ui->lineEditTimeShift_5);
+    timeStatLE.append(ui->lineEditTimeShift_6);
+    timeStatLE.append(ui->lineEditTimeShift_7);
+    timeStatLE.append(ui->lineEditTimeShift_8);
+    timeStatLE.append(ui->lineEditTimeShift_9);
+
+    uiUpdateTimer.setInterval(500);
+    connect(&uiUpdateTimer, SIGNAL(timeout()), this, SLOT(uiUpdateTimerSlot()));
+    uiUpdateTimer.start();
+
+
 }
 void MainWindow::createPlot(QString name)
 {
@@ -733,21 +763,23 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             int newPos = maxVal*(pos/1000.);
             ds.pos = newPos;
             int delta = newPos - getMotorAbsPos(mn);
-            if(motorPosCmdData[mn].length() == 0){
-                qDebug("mn %d d %d", mn, delta);
-                int n;
-                for(n=1; abs(delta)>2000; n*=2){
+            if(motorPosCmdData[mn].length() == 0){                
+                qDebug("mn %d d %d", mn, delta);                
+                int n=1;
+                for(; abs(delta)>2000; n*=2){
                     delta/=2;
                 }
                 ds.pos = getMotorAbsPos(mn);
+                ds.absMsec = QTime::currentTime().msecsSinceStartOfDay();
                 for(int i=0; i<n; i++){
+                    ds.absMsec += 100;
                     ds.pos = ds.pos+delta;
-                    motorPosCmdData[mn].append(ds);
-
+                    motorPosCmdData[mn].append(ds);                    
                 }
 
             }
             else{
+                ds.absMsec = motorPosCmdData[mn].first().absMsec += 100;
                 motorPosCmdData[mn].append(ds);
             }
         }
@@ -1249,3 +1281,22 @@ void MainWindow::on_goToTerm_clicked()
 
 }
 
+void MainWindow::uiUpdateTimerSlot()
+{
+    int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(motorPosCmdData[i].size() != 0){
+            int shift = 0;
+            shift = motorPosCmdData[i].first().absMsec - curMsec;
+            timeStatLE[i]->setText(QString::number(shift));
+            timeStatSlider[i]->setValue(shift);
+        }
+        else{
+            timeStatLE[i]->setText("n/a");
+        }
+
+        timeStatSlider[i]->setStyleSheet("QSlider::handle:vertical {background: red;}");
+        //timeStatSlider[i]->setStyleSheet("QSlider::sub-page:vertical {background: red;}");
+    }
+
+}

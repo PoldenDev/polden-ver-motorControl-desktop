@@ -11,7 +11,8 @@
 #include <QMap>
 #include <QSettings>
 #include <qwt_plot_marker.h>
-
+#include <QLineEdit>
+#include <QSlider>
 //#include <uartthread.h>
 
 
@@ -64,25 +65,19 @@ private slots:
 
 
     void on_pushMoveDownState_clicked();
-
     void on_pushBUttonToIdle_clicked();
-
     void on_pushButtonGotoPEriodState_clicked();
-
     void on_pushButtonPosReset_clicked();
-
     void on_pushTestData_clicked();
-
     void on_pushClearMap_clicked();
 
-
     void on_tabWidget_tabBarClicked(int index);
-
     void on_goToTerm_clicked();
-
     void on_pushMoveUp_clicked();
-
     void on_pushMoveDown_clicked();
+
+    void uiUpdateTimerSlot();
+
 
 private:
     void setPos(int pos);
@@ -113,6 +108,7 @@ private:
     QTimer waitForFifoFreeTimer;
     //UartThread UartThread;
     QTimer dataProcess100msTimer;
+    QTimer uiUpdateTimer;
 
 
     //TMotorStr mtstr[MOTOR_CNT];
@@ -161,6 +157,9 @@ private:
 
     void freeToWrite(int i);
     void terminatorState(int i, bool bEna);
+
+    QList<QLineEdit*> timeStatLE;
+    QList<QSlider*> timeStatSlider;
 };
 
 
