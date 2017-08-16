@@ -442,7 +442,7 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 step
         serial.write(ba);
         motorAbsolutePosCur[mi] += delta;
         if( motorAbsolutePosCur[mi] < 0){
-            qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
+            //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
         }
      //   if(mi==0)
     //        serial.write(ba);
