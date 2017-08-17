@@ -442,7 +442,7 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 step
         serial.write(ba);
         motorAbsolutePosCur[mi] += delta;
         if( motorAbsolutePosCur[mi] < 0){
-            //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
+            qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
         }
      //   if(mi==0)
     //        serial.write(ba);
@@ -457,7 +457,7 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 step
              (shift <0) ){        //если проигрывание отстаёт
             //lastCtrlTimeMsecs[mi] = curMsec;
             if(mi==0){
-                qDebug("%d", shift);
+                //qDebug("%d", shift);
                 //static int lastMsecs = 0;
                 //int t = 1000*ds.steps*((float)ds.div/24000000);
                 //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
@@ -672,7 +672,7 @@ void MainWindow::handleSerialDataWritten(qint64 bytes)
 //            if((pMst->sendState == idle) && (pMst->contrStringQueue.isEmpty() == false)){
 //                QString wrStr = contrStringQueue.head();
 //                //qDebug("%s", qPrintable(wrStr));
-//                serial.write(wrStr.toLatin1());\
+//                serial.write(wrStr.toLatin1());
 //            }
 
 ////            if(mtstr[i].contrStringQueue.isEmpty()){
