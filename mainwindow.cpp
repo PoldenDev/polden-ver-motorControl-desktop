@@ -7,7 +7,7 @@
 #include <QNetworkDatagram>
 #include <QThread>
 #include <QDateTime>
-#include <QTime>
+
 
 
 #include <qwt_plot.h>
@@ -36,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
     curMotorSendIdx(0),
     settings("murinets", "vertolet"),
     xUdpRecv(0),
-    markerXPos(0)/*,
+    markerXPos(0),
+    comExchanges(0),
+    bytesOnIter(0)/*,
     timeShiftMaxPos(2000),
     timeShiftMaxNeg(-2000)*/
 {
@@ -125,7 +127,56 @@ MainWindow::MainWindow(QWidget *parent) :
     timeStatLE.append(ui->lineEditTimeShift_8);
     timeStatLE.append(ui->lineEditTimeShift_9);
 
-    uiUpdateTimer.setInterval(500);
+    absPosSlider.append(ui->SliderPos0);
+    absPosSlider.append(ui->SliderPos1);
+    absPosSlider.append(ui->SliderPos2);
+    absPosSlider.append(ui->SliderPos3);
+    absPosSlider.append(ui->SliderPos4);
+    absPosSlider.append(ui->SliderPos5);
+    absPosSlider.append(ui->SliderPos6);
+    absPosSlider.append(ui->SliderPos7);
+    absPosSlider.append(ui->SliderPos8);
+    absPosSlider.append(ui->SliderPos9);
+
+    absPosLineEdit.append(ui->lineEditPos0);
+    absPosLineEdit.append(ui->lineEditPos1);
+    absPosLineEdit.append(ui->lineEditPos2);
+    absPosLineEdit.append(ui->lineEditPos3);
+    absPosLineEdit.append(ui->lineEditPos4);
+    absPosLineEdit.append(ui->lineEditPos5);
+    absPosLineEdit.append(ui->lineEditPos6);
+    absPosLineEdit.append(ui->lineEditPos7);
+    absPosLineEdit.append(ui->lineEditPos8);
+    absPosLineEdit.append(ui->lineEditPos9);
+
+    stateLineEdit.append(ui->lineEditState0);
+    stateLineEdit.append(ui->lineEditState1);
+    stateLineEdit.append(ui->lineEditState2);
+    stateLineEdit.append(ui->lineEditState3);
+    stateLineEdit.append(ui->lineEditState4);
+    stateLineEdit.append(ui->lineEditState5);
+    stateLineEdit.append(ui->lineEditState6);
+    stateLineEdit.append(ui->lineEditState7);
+    stateLineEdit.append(ui->lineEditState8);
+    stateLineEdit.append(ui->lineEditState9);
+
+    termCheckBox.append(ui->checkBoxTerm0);
+    termCheckBox.append(ui->checkBoxTerm1);
+    termCheckBox.append(ui->checkBoxTerm2);
+    termCheckBox.append(ui->checkBoxTerm3);
+    termCheckBox.append(ui->checkBoxTerm4);
+    termCheckBox.append(ui->checkBoxTerm5);
+    termCheckBox.append(ui->checkBoxTerm6);
+    termCheckBox.append(ui->checkBoxTerm7);
+    termCheckBox.append(ui->checkBoxTerm8);
+    termCheckBox.append(ui->checkBoxTerm9);
+
+    for(int i=0; i<MOTOR_CNT; i++){
+        bTermState[i] = false;
+    }
+
+    //connectionTime = 0;
+    uiUpdateTimer.setInterval(100);
     connect(&uiUpdateTimer, SIGNAL(timeout()), this, SLOT(uiUpdateTimerSlot()));
     uiUpdateTimer.start();
 
@@ -264,6 +315,8 @@ void MainWindow::on_pushButtonComOpen_clicked()
                 connect(&serial, SIGNAL(bytesWritten(qint64)),
                         this, SLOT(handleSerialDataWritten(qint64)));
                 ui->pushButtonComOpen->setText("close");
+                comExchanges = 0;
+                connectionTime.start();
             }
         }
     }
@@ -271,7 +324,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
         serial.close();
         //udpSocket->close();
         qDebug("com port closed");
-        ui->pushButtonComOpen->setText("open");
+        ui->pushButtonComOpen->setText("open");        
         //contrStringQueue.clear();
     }
 
@@ -499,6 +552,7 @@ void MainWindow::handleReadyRead()
     //processUartRecvExchange(cmd);
 
 
+    bytesOnIter = str.length();
     //qDebug("enter bytesRecv %d", str.length());
     QMap<char, char> tempStor;
     for (int i=0; i<str.length(); i++) {
@@ -570,9 +624,8 @@ void MainWindow::handleReadyRead()
     //ui->plainTextEdit->moveCursor (QTextCursor::End);
     //ui->plainTextEdit->appendPlainText(str);
 
-    ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());    
-
-
+    //ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
+    comExchanges++;
 }
 
 void MainWindow::terminatorState(int i, bool bEna)
@@ -602,6 +655,7 @@ void MainWindow::terminatorState(int i, bool bEna)
         }
 
     }
+    bTermState[i] = bEna;
 }
 
 
@@ -1140,6 +1194,10 @@ void MainWindow::on_pushBUttonToIdle_clicked()
      serial.write(str.toLatin1());
     }
 
+    for(int i=0; i<MOTOR_CNT; i++){
+        mtState[i] = MT_IDLE;
+    }
+
 }
 
 void MainWindow::on_pushButtonGotoPEriodState_clicked()
@@ -1291,33 +1349,65 @@ void MainWindow::on_goToTerm_clicked()
 
 void MainWindow::uiUpdateTimerSlot()
 {
-    int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-    for(int i=0; i<MOTOR_CNT; i++){
-        if(motorPosCmdData[i].size() != 0){
-            int shift = 0;
-            if(i==0){
-               // qDebug("%d >> %d",curMsec, motorPosCmdData[i].first().absMsec);
+    int curTabInd = ui->tabWidget->currentIndex();
+    QString tabName = ui->tabWidget->tabText(curTabInd);
+    if(tabName == "mainStat"){
+        bool bOk = false;
+        int sliderMaxVal = ui->maxSteps->text().toInt(&bOk);
+        for(int i=0; i<MOTOR_CNT; i++){
+            if(bOk){
+                absPosSlider[i]->setMaximum(sliderMaxVal);
+                absPosSlider[i]->setTickInterval(sliderMaxVal/5);
             }
-            shift = motorPosCmdData[i].first().absMsec - curMsec;
+            switch(mtState[i]){
+                case MT_IDLE:   stateLineEdit[i]->setText("idle"); ;break;
+                case MT_GoDOWN: stateLineEdit[i]->setText("mvD");break;
+                case MT_GoUP:   stateLineEdit[i]->setText("mvU");break;
+            }
 
-//            if(shift > timeShiftMaxPos){
-//                timeShiftMaxPos = (shift-shift%100)+500;
-//                timeStatSlider[i]->setMinimum(timeShiftMaxPos);
-//            }
-//            else if(shift < timeShiftMaxNeg){
-//                timeShiftMaxNeg = (shift-shift%100)-500;
-//                timeStatSlider[i]->setMinimum(timeShiftMaxNeg);
-//            }
-            timeStatLE[i]->setText(QString::number(shift));
-            timeStatSlider[i]->setValue(shift);
-        }
-        else{
-            timeStatLE[i]->setText("n/a");
-             timeStatSlider[i]->setValue(0);
-        }
+            absPosSlider[i]->setValue(motorAbsolutePosCur[i]);
+            absPosLineEdit[i]->setText(QString::number(motorAbsolutePosCur[i]));
+            termCheckBox[i]->setChecked(bTermState[i]);
 
-        //timeStatSlider[i]->setStyleSheet("QSlider::handle:vertical {background: red;}");
-        //timeStatSlider[i]->setStyleSheet("QSlider::sub-page:vertical {background: red;}");
+        }
+        ui->lineEditComExchanges->setText(QString::number(comExchanges));
+
+        if(serial.isOpen() == true){
+            ui->lineEditConnectionTime->setText(QTime::fromMSecsSinceStartOfDay(connectionTime.elapsed()).toString());
+        }
+        ui->lineEditBytesOnIter->setText(QString::number(bytesOnIter));
+        //qDebug() << connectionTime.elapsed() << connectionTime.toString("zzz");
+        //connectionTime.elapsed()
+    }
+    else if(tabName == "timeStat"){
+        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+        for(int i=0; i<MOTOR_CNT; i++){
+            if(motorPosCmdData[i].size() != 0){
+                int shift = 0;
+                if(i==0){
+                   // qDebug("%d >> %d",curMsec, motorPosCmdData[i].first().absMsec);
+                }
+                shift = motorPosCmdData[i].first().absMsec - curMsec;
+
+    //            if(shift > timeShiftMaxPos){
+    //                timeShiftMaxPos = (shift-shift%100)+500;
+    //                timeStatSlider[i]->setMinimum(timeShiftMaxPos);
+    //            }
+    //            else if(shift < timeShiftMaxNeg){
+    //                timeShiftMaxNeg = (shift-shift%100)-500;
+    //                timeStatSlider[i]->setMinimum(timeShiftMaxNeg);
+    //            }
+                timeStatLE[i]->setText(QString::number(shift));
+                timeStatSlider[i]->setValue(shift);
+            }
+            else{
+                timeStatLE[i]->setText("n/a");
+                 timeStatSlider[i]->setValue(0);
+            }
+
+            //timeStatSlider[i]->setStyleSheet("QSlider::handle:vertical {background: red;}");
+            //timeStatSlider[i]->setStyleSheet("QSlider::sub-page:vertical {background: red;}");
+        }
     }
 
 }

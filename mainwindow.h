@@ -13,6 +13,8 @@
 #include <qwt_plot_marker.h>
 #include <QLineEdit>
 #include <QSlider>
+#include <QTime>
+#include <QCheckBox>
 //#include <uartthread.h>
 
 
@@ -160,8 +162,19 @@ private:
 
     QList<QLineEdit*> timeStatLE;
     QList<QSlider*> timeStatSlider;
+
+    QList<QSlider*> absPosSlider;
+    QList<QLineEdit*> absPosLineEdit;
+    QList<QLineEdit*> stateLineEdit;
     //int timeShiftMaxPos, timeShiftMaxNeg;
+
+    quint32 comExchanges;
+    QTime connectionTime;
+    int bytesOnIter;
+    QList<QCheckBox*> termCheckBox;
+    bool bTermState[MOTOR_CNT];
 };
 
 
 #endif // MAINWINDOW_H
+
