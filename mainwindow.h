@@ -18,7 +18,7 @@
 //#include <uartthread.h>
 
 
-#include <qwt_plot_curve.h>
+//#include <qwt_plot_curve.h>
 
 #include "stand.h"
 namespace Ui {
@@ -53,6 +53,7 @@ private slots:
     //void on_verticalSlider_sliderMoved(int position);
     //void on_verticalSlider_2_sliderReleased();
     void readPendingDatagrams();
+    void stateChanged(QAbstractSocket::SocketState socketState);
     void handleReadyRead();
     void handleSerialDataWritten(qint64 bytes);
     void on_pushButton_refreshCom_clicked();
@@ -80,6 +81,7 @@ private slots:
 
     void uiUpdateTimerSlot();
 
+    void on_pushButtonUdpOpenClose_clicked();
 
 private:
     void setPos(int pos);
@@ -88,7 +90,6 @@ private:
 
     int speed;
 
-    void initUdpSocket();
     QUdpSocket *udpSocket;
 
 
@@ -98,8 +99,6 @@ private:
 
     QTimer timer;
     QList<QSlider*> slList;
-
-    quint32 udpCnt;
 
     quint8 lastMotorReceptInd;
     //QTimer timerSerialSendTo[MOTOR_CNT];
@@ -116,10 +115,10 @@ private:
     //TMotorStr mtstr[MOTOR_CNT];
     quint8 curMotorSendIdx;
 
-    QList<QwtPlot*> plotList;
-    QList<QwtPlotCurve*> posCurveList, velCurveList;
-    QList<QPolygonF> polyPoslist, polyVellist;
-    QList<QwtPlotMarker*> markrlist;
+//    QList<QwtPlot*> plotList;
+//    QList<QwtPlotCurve*> posCurveList, velCurveList;
+//    QList<QPolygonF> polyPoslist, polyVellist;
+//    QList<QwtPlotMarker*> markrlist;
     int markerXPos;
     //QwtPlot *d_plot;
     //QwtPlotCurve *curve;
@@ -169,10 +168,15 @@ private:
     //int timeShiftMaxPos, timeShiftMaxNeg;
 
     quint32 comExchanges;
-    QTime connectionTime;
+    QTime usbConnectionTime, udpConnectionTime;
     int bytesOnIter;
     QList<QCheckBox*> termCheckBox;
     bool bTermState[MOTOR_CNT];
+    QList<QLineEdit*> euqueLineEdit;
+    quint32 dataGramCnt;
+
+    void udpServerOpen();
+    void udpServerClose();
 };
 
 

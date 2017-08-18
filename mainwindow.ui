@@ -19,7 +19,7 @@
      <widget class="QWidget" name="widget_4" native="true">
       <property name="maximumSize">
        <size>
-        <width>600</width>
+        <width>700</width>
         <height>16777215</height>
        </size>
       </property>
@@ -47,20 +47,6 @@
         <widget class="QPushButton" name="pushButton_refreshCom">
          <property name="text">
           <string>refresh</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonClear">
-         <property name="text">
-          <string>clear</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushClearMap">
-         <property name="text">
-          <string>clearMap</string>
          </property>
         </widget>
        </item>
@@ -121,6 +107,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonUdpOpenClose">
+         <property name="text">
+          <string>UDP Open</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -139,14 +132,14 @@
        <widget class="QGroupBox" name="groupBox_2">
         <property name="geometry">
          <rect>
-          <x>630</x>
+          <x>580</x>
           <y>30</y>
           <width>153</width>
           <height>111</height>
          </rect>
         </property>
         <property name="title">
-         <string>Соединение</string>
+         <string>USB</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_15">
          <item>
@@ -165,7 +158,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLineEdit" name="lineEditConnectionTime">
+             <widget class="QLineEdit" name="lineEditUSBConnectionTime">
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
@@ -195,7 +188,7 @@
             <item>
              <widget class="QLabel" name="label_4">
               <property name="text">
-               <string>Обмены</string>
+               <string>Пакетов</string>
               </property>
              </widget>
             </item>
@@ -265,6 +258,9 @@
          <item>
           <widget class="QWidget" name="widget_2" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QSlider" name="SliderPos0">
               <property name="orientation">
@@ -598,6 +594,9 @@
             <property name="topMargin">
              <number>0</number>
             </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QCheckBox" name="checkBoxTerm0">
               <property name="text">
@@ -674,11 +673,204 @@
            </layout>
           </widget>
          </item>
+         <item>
+          <widget class="QWidget" name="widget_25" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt0">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt1">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt2">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt3">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt4">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt5">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt6">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt7">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt8">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditEuqueCnt9">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="geometry">
+         <rect>
+          <x>580</x>
+          <y>160</y>
+          <width>151</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>UDP</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QWidget" name="widget_28" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>state</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditUdpState">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditUDPConnectionTime">
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_26" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Дгрм</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditDataGramCnt">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </widget>
        <zorder>groupBox_2</zorder>
        <zorder>widget_2</zorder>
        <zorder>groupBox_3</zorder>
+       <zorder>groupBox_4</zorder>
       </widget>
       <widget class="QWidget" name="tabTimeStat">
        <attribute name="title">
@@ -1083,6 +1275,31 @@
      </widget>
     </item>
     <item>
+     <widget class="QWidget" name="widget_27" native="true">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_18">
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Запустить</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <widget class="QWidget" name="widget_6" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
@@ -1134,6 +1351,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonClear">
+         <property name="text">
+          <string>clear queue</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -1142,6 +1366,12 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
         <height>150</height>
        </size>
       </property>

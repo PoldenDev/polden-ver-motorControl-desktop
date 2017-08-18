@@ -10,21 +10,21 @@
 
 
 
-#include <qwt_plot.h>
-#include <qwt_plot_grid.h>
+//#include <qwt_plot.h>
+//#include <qwt_plot_grid.h>
 
-#include <qwt_legend.h>
+//#include <qwt_legend.h>
 
-#include <qwt_plot_curve.h>
-#include <qwt_symbol.h>
+//#include <qwt_plot_curve.h>
+//#include <qwt_symbol.h>
 
-#include <qwt_plot_magnifier.h>
+//#include <qwt_plot_magnifier.h>
 
-#include <qwt_plot_panner.h>
+//#include <qwt_plot_panner.h>
 
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-#include <qwt_plot_marker.h>
+//#include <qwt_plot_picker.h>
+//#include <qwt_picker_machine.h>
+//#include <qwt_plot_marker.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,13 +32,13 @@ MainWindow::MainWindow(QWidget *parent) :
     speed(100),
     udpSocket(NULL),    
     cmdNum(0),
-    udpCnt(0),
     curMotorSendIdx(0),
     settings("murinets", "vertolet"),
     xUdpRecv(0),
     markerXPos(0),
     comExchanges(0),
-    bytesOnIter(0)/*,
+    bytesOnIter(0),
+    dataGramCnt(0)/*,
     timeShiftMaxPos(2000),
     timeShiftMaxNeg(-2000)*/
 {
@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     on_pushButton_refreshCom_clicked();
 
-    initUdpSocket();
+    on_pushButtonUdpOpenClose_clicked();
     timer.setInterval(50);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
@@ -72,22 +72,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect(&UartThread, SIGNAL(response(QString)), this, SLOT(response(QString)));
 
-    QWidget *tabWdg;
-    for(int i=0; i<10; i++){
-        createPlot(QString::number(i));
-        tabWdg = new QWidget();
-        tabWdg->setLayout(new QVBoxLayout());
-        ui->tabWidget->addTab(tabWdg, QString::number(i));
-    }
+//    QWidget *tabWdg;
+//    for(int i=0; i<10; i++){
+//        createPlot(QString::number(i));
+//        tabWdg = new QWidget();
+//        tabWdg->setLayout(new QVBoxLayout());
+//        ui->tabWidget->addTab(tabWdg, QString::number(i));
+//    }
 
 
-    for(int i=0; i<5; i++){
-        ui->qwtWdgH1->layout()->addWidget(plotList[i]);
-    }
+//    for(int i=0; i<5; i++){
+//        ui->qwtWdgH1->layout()->addWidget(plotList[i]);
+//    }
 
-    for(int i=0; i<5; i++){
-        ui->qwtWdgH2->layout()->addWidget(plotList[5+i]);
-    }
+//    for(int i=0; i<5; i++){
+//        ui->qwtWdgH2->layout()->addWidget(plotList[5+i]);
+//    }
 
 
     for(int i=0; i<MOTOR_CNT; i++){
@@ -171,6 +171,17 @@ MainWindow::MainWindow(QWidget *parent) :
     termCheckBox.append(ui->checkBoxTerm8);
     termCheckBox.append(ui->checkBoxTerm9);
 
+
+    euqueLineEdit.append(ui->lineEditEuqueCnt0);
+    euqueLineEdit.append(ui->lineEditEuqueCnt1);
+    euqueLineEdit.append(ui->lineEditEuqueCnt2);
+    euqueLineEdit.append(ui->lineEditEuqueCnt3);
+    euqueLineEdit.append(ui->lineEditEuqueCnt4);
+    euqueLineEdit.append(ui->lineEditEuqueCnt5);
+    euqueLineEdit.append(ui->lineEditEuqueCnt6);
+    euqueLineEdit.append(ui->lineEditEuqueCnt7);
+    euqueLineEdit.append(ui->lineEditEuqueCnt8);
+    euqueLineEdit.append(ui->lineEditEuqueCnt9);
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
     }
@@ -184,76 +195,76 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 void MainWindow::createPlot(QString name)
 {
-    QwtPlot *d_plot = new QwtPlot(this);    
-    plotList << d_plot;
-    //d_plot->setTitle( "Qwt demonstration" ); // заголовок
-    //d_plot->setCanvasBackground( Qt::white ); // цвет фона
+//    QwtPlot *d_plot = new QwtPlot(this);
+//    plotList << d_plot;
+//    //d_plot->setTitle( "Qwt demonstration" ); // заголовок
+//    //d_plot->setCanvasBackground( Qt::white ); // цвет фона
 
-    d_plot->setMinimumSize(50, 50);
-    // Параметры осей координат
-    //d_plot->setAxisTitle(QwtPlot::yLeft, "Y");
-    d_plot->setAxisScale(QwtPlot::yLeft, 0, 100);
-    //d_plot->setAxisTitle(QwtPlot::xBottom, "X");
-    //d_plot->setAxisScale(QwtPlot::xBottom, 0, 100);
+//    d_plot->setMinimumSize(50, 50);
+//    // Параметры осей координат
+//    //d_plot->setAxisTitle(QwtPlot::yLeft, "Y");
+//    d_plot->setAxisScale(QwtPlot::yLeft, 0, 100);
+//    //d_plot->setAxisTitle(QwtPlot::xBottom, "X");
+//    //d_plot->setAxisScale(QwtPlot::xBottom, 0, 100);
 
-    d_plot->setAxisScale(QwtPlot::yRight, -100, 100);
-    //d_plot->insertLegend( new QwtLegend() );
-    d_plot->enableAxis(QwtPlot::yRight);
-
-
-
-    // Включить сетку
-    // #include <qwt_plot_grid.h>
-    QwtPlotGrid *gridL = new QwtPlotGrid(); //
-    gridL->setMajorPen(QPen( Qt::black, 1 )); // цвет линий и толщина
-    gridL->attach( d_plot ); // добавить сетку к полю графика
-
-    QwtPlotGrid *gridR = new QwtPlotGrid(); //
-    gridR->setMajorPen(QPen( Qt::gray, 1 )); // цвет линий и толщина
-    gridR->setYAxis(QwtPlot::yRight);
-    gridR->attach( d_plot ); // добавить сетку к полю графика
-
-
-    QwtPlotCurve *curve = new QwtPlotCurve();
-    posCurveList << curve;
-    //curve->setTitle( name );
-    curve->setPen( Qt::blue, 2 ); // цвет и толщина кривой
-//        curve->setRenderHint
-//                ( QwtPlotItem::RenderAntialiased, true ); // сглаживание
-//        QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Ellipse,
-//            QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
-//        curve->setSymbol( symbol );
-
-    //ui->widget_3->layout()->invalidate();
-
-//        points << QPointF( 1.0, 1.0 ) // координаты x, y
-//     << QPointF( 1.5, 2.0 ) << QPointF( 3.0, 2.0 )
-//     << QPointF( 3.5, 3.0 ) << QPointF( 5.0, 3.0 );
-
-  //curve->setSamples( points ); // ассоциировать набор точек с кривой
-
-  curve->attach( d_plot ); // отобразить кривую на графике
-
-    curve = new QwtPlotCurve();
-    velCurveList << curve;
-    curve->setPen( Qt::red, 2 ); // цвет и толщина кривой
-    curve->setYAxis(QwtPlot::yRight);
-
-    curve->attach(d_plot ); // отобразить кривую на графике
+//    d_plot->setAxisScale(QwtPlot::yRight, -100, 100);
+//    //d_plot->insertLegend( new QwtLegend() );
+//    d_plot->enableAxis(QwtPlot::yRight);
 
 
 
-  polyPoslist << QPolygonF();
-  polyVellist << QPolygonF();
-  x=0;
+//    // Включить сетку
+//    // #include <qwt_plot_grid.h>
+//    QwtPlotGrid *gridL = new QwtPlotGrid(); //
+//    gridL->setMajorPen(QPen( Qt::black, 1 )); // цвет линий и толщина
+//    gridL->attach( d_plot ); // добавить сетку к полю графика
+
+//    QwtPlotGrid *gridR = new QwtPlotGrid(); //
+//    gridR->setMajorPen(QPen( Qt::gray, 1 )); // цвет линий и толщина
+//    gridR->setYAxis(QwtPlot::yRight);
+//    gridR->attach( d_plot ); // добавить сетку к полю графика
 
 
-   QwtSymbol *markerSymbol = new QwtSymbol(QwtSymbol::VLine,QBrush(Qt::red),QPen(Qt::red),QSize(50,5000));
-    QwtPlotMarker *mark=new QwtPlotMarker;
-    markrlist << mark;
-    mark->setSymbol(markerSymbol);
-    mark->setXValue(0);//here you have to set the coordinate axis i.e. where the axis are meeting.
-    mark->attach(d_plot);
+//    QwtPlotCurve *curve = new QwtPlotCurve();
+//    posCurveList << curve;
+//    //curve->setTitle( name );
+//    curve->setPen( Qt::blue, 2 ); // цвет и толщина кривой
+////        curve->setRenderHint
+////                ( QwtPlotItem::RenderAntialiased, true ); // сглаживание
+////        QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Ellipse,
+////            QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
+////        curve->setSymbol( symbol );
+
+//    //ui->widget_3->layout()->invalidate();
+
+////        points << QPointF( 1.0, 1.0 ) // координаты x, y
+////     << QPointF( 1.5, 2.0 ) << QPointF( 3.0, 2.0 )
+////     << QPointF( 3.5, 3.0 ) << QPointF( 5.0, 3.0 );
+
+//  //curve->setSamples( points ); // ассоциировать набор точек с кривой
+
+//  curve->attach( d_plot ); // отобразить кривую на графике
+
+//    curve = new QwtPlotCurve();
+//    velCurveList << curve;
+//    curve->setPen( Qt::red, 2 ); // цвет и толщина кривой
+//    curve->setYAxis(QwtPlot::yRight);
+
+//    curve->attach(d_plot ); // отобразить кривую на графике
+
+
+
+//  polyPoslist << QPolygonF();
+//  polyVellist << QPolygonF();
+//  x=0;
+
+
+//   QwtSymbol *markerSymbol = new QwtSymbol(QwtSymbol::VLine,QBrush(Qt::red),QPen(Qt::red),QSize(50,5000));
+//    QwtPlotMarker *mark=new QwtPlotMarker;
+//    markrlist << mark;
+//    mark->setSymbol(markerSymbol);
+//    mark->setXValue(0);//here you have to set the coordinate axis i.e. where the axis are meeting.
+//    mark->attach(d_plot);
 }
 
 MainWindow::~MainWindow()
@@ -271,10 +282,10 @@ void MainWindow::sendTimeOut()
 
 void MainWindow::dataProcess100msTimeOut()
 {
-    for(int i=0; i<markrlist.length(); i++){
-        markrlist[i]->setXValue(markerXPos);
-        plotList[i]->replot();
-    }
+//    for(int i=0; i<markrlist.length(); i++){
+//        markrlist[i]->setXValue(markerXPos);
+//        plotList[i]->replot();
+//    }
     markerXPos++;
 
     //qDebug() << "tt " << markerXPos;
@@ -316,7 +327,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
                         this, SLOT(handleSerialDataWritten(qint64)));
                 ui->pushButtonComOpen->setText("close");
                 comExchanges = 0;
-                connectionTime.start();
+                usbConnectionTime.start();
             }
         }
     }
@@ -429,24 +440,6 @@ void MainWindow::setPos(int pos)
 
 }
 
-//void MainWindow::on_verticalSlider_2_sliderReleased()
-//{
-////    speed = (ui->verticalSlider_2->value()/100.00)*4000;
-
-//}
-
-void MainWindow::initUdpSocket()
-{
-    udpSocket = new QUdpSocket(this);
-    //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
-    if(udpSocket->bind(QHostAddress::Any, 8051) == true){
-        qDebug("UDP bind OK");
-    }
-
-    connect(udpSocket, SIGNAL(readyRead()),
-            this, SLOT(readPendingDatagrams()));
-}
-
 
 int lastMsec = 0;
 bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 steps, quint32 dir, quint32 pos)
@@ -495,7 +488,7 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 step
         serial.write(ba);
         motorAbsolutePosCur[mi] += delta;
         if( motorAbsolutePosCur[mi] < 0){
-            qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
+            //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
         }
      //   if(mi==0)
     //        serial.write(ba);
@@ -871,22 +864,33 @@ void MainWindow::graphReset()
 {
     xMap.clear();
 
-    foreach (QPolygonF plg, polyPoslist) {
-        plg.clear();
-    }
-    foreach (QPolygonF plg, polyVellist) {
-        plg.clear();
-    }
+//    foreach (QPolygonF plg, polyPoslist) {
+//        plg.clear();
+//    }
+//    foreach (QPolygonF plg, polyVellist) {
+//        plg.clear();
+//    }
 
-    foreach (QwtPlotCurve* crv, posCurveList) {
-        crv->setSamples(QPolygonF());
-    }
-    foreach (QwtPlotCurve* crv, velCurveList) {
-        crv->setSamples(QPolygonF());
-    }
+//    foreach (QwtPlotCurve* crv, posCurveList) {
+//        crv->setSamples(QPolygonF());
+//    }
+//    foreach (QwtPlotCurve* crv, velCurveList) {
+//        crv->setSamples(QPolygonF());
+//    }
 
-    foreach (QwtPlot* plt, plotList) {
-        plt->replot();
+//    foreach (QwtPlot* plt, plotList) {
+//        plt->replot();
+//    }
+
+}
+void MainWindow::stateChanged(QAbstractSocket::SocketState socketState)
+{
+    switch(socketState){
+    case QAbstractSocket::ListeningState: ui->lineEditUdpState->setText("listen"); break;
+    case QAbstractSocket::BoundState: ui->lineEditUdpState->setText("bound"); break;
+    case QAbstractSocket::UnconnectedState: ui->lineEditUdpState->setText("uncon"); break;
+
+
     }
 
 }
@@ -899,6 +903,7 @@ void MainWindow::readPendingDatagrams()
     int gridLines = 0;
     int rb = 0;
     while (udpSocket->hasPendingDatagrams()) {
+        dataGramCnt++;
         //qDebug() << "1";
         //qDebug() << "pds:"<< udpSocket->pendingDatagramSize();
         QNetworkDatagram datagram = udpSocket->receiveDatagram();
@@ -995,7 +1000,7 @@ void MainWindow::readPendingDatagrams()
 //        }
     }
     //qDebug() << "readPendingDatagrams time" << rpdEst.elapsed() << " gl " << gridLines;
-    qDebug("readPendingDatagrams rb %d gl %04d time %d", rb, gridLines, rpdEst.elapsed());
+    //qDebug("readPendingDatagrams rb %d gl %04d time %d", rb, gridLines, rpdEst.elapsed());
 }
 
 
@@ -1026,10 +1031,14 @@ void MainWindow::on_pushButton_refreshCom_clicked()
 }
 
 void MainWindow::on_pushButtonClear_clicked()
-{
+{    
     ui->plainTextEdit->clear();
     ui->plainTextUDP->clear();
-    udpCnt = 0;
+
+    for(int i=0; i<MOTOR_CNT; i++){
+        motorPosCmdData[i].clear();
+
+    }
 
 }
 
@@ -1313,25 +1322,25 @@ void MainWindow::on_pushClearMap_clicked()
 
 void MainWindow::on_tabWidget_tabBarClicked(int index)
 {
-    if( index==0 ){
+//    if( index==0 ){
 
-        for(int i=0; i<5; i++){
-            ui->qwtWdgH1->layout()->removeWidget(plotList[i]);
-            ui->qwtWdgH2->layout()->removeWidget(plotList[5+i]);
-        }
-        for(int i=0; i<5; i++){
-            ui->qwtWdgH1->layout()->addWidget(plotList[i]);
-        }
+//        for(int i=0; i<5; i++){
+//            ui->qwtWdgH1->layout()->removeWidget(plotList[i]);
+//            ui->qwtWdgH2->layout()->removeWidget(plotList[5+i]);
+//        }
+//        for(int i=0; i<5; i++){
+//            ui->qwtWdgH1->layout()->addWidget(plotList[i]);
+//        }
 
-        for(int i=0; i<5; i++){
-            ui->qwtWdgH2->layout()->addWidget(plotList[5+i]);
-        }
-    }
-    else{
-        //int idx = index-1;
-        //if(idx>4)
-        ui->tabWidget->widget(index)->layout()->addWidget(plotList[index-1]);
-    }
+//        for(int i=0; i<5; i++){
+//            ui->qwtWdgH2->layout()->addWidget(plotList[5+i]);
+//        }
+//    }
+//    else{
+//        //int idx = index-1;
+//        //if(idx>4)
+//        ui->tabWidget->widget(index)->layout()->addWidget(plotList[index-1]);
+//    }
 
 
 //    else if((index>5) && (index<=10)){
@@ -1368,14 +1377,23 @@ void MainWindow::uiUpdateTimerSlot()
             absPosSlider[i]->setValue(motorAbsolutePosCur[i]);
             absPosLineEdit[i]->setText(QString::number(motorAbsolutePosCur[i]));
             termCheckBox[i]->setChecked(bTermState[i]);
+            euqueLineEdit[i]->setText(QString::number(motorPosCmdData[i].length()));
 
         }
         ui->lineEditComExchanges->setText(QString::number(comExchanges));
 
         if(serial.isOpen() == true){
-            ui->lineEditConnectionTime->setText(QTime::fromMSecsSinceStartOfDay(connectionTime.elapsed()).toString());
+            ui->lineEditUSBConnectionTime->setText(QTime::fromMSecsSinceStartOfDay(usbConnectionTime.elapsed()).toString());
         }
+        if(udpSocket->state()== QAbstractSocket::BoundState){
+            ui->lineEditUDPConnectionTime->setText(QTime::fromMSecsSinceStartOfDay(udpConnectionTime.elapsed()).toString());
+        }
+
         ui->lineEditBytesOnIter->setText(QString::number(bytesOnIter));
+
+        ui->lineEditDataGramCnt->setText(QString::number(dataGramCnt));
+
+
         //qDebug() << connectionTime.elapsed() << connectionTime.toString("zzz");
         //connectionTime.elapsed()
     }
@@ -1410,4 +1428,48 @@ void MainWindow::uiUpdateTimerSlot()
         }
     }
 
+}
+
+void MainWindow::udpServerOpen()
+{
+    udpSocket = new QUdpSocket(this);
+    connect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+            this, SLOT(stateChanged(QAbstractSocket::SocketState)));
+
+    //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
+    if(udpSocket->bind(QHostAddress::Any, 8051) == true){
+        //qDebug("UDP bind OK");
+        ui->plainTextEdit->appendPlainText("UDP bind OK");
+    }
+    else{
+        ui->plainTextEdit->appendPlainText("UDP bind FAIL");
+
+    }
+
+    connect(udpSocket, SIGNAL(readyRead()),
+            this, SLOT(readPendingDatagrams()));
+    udpConnectionTime.start();
+}
+
+void MainWindow::udpServerClose()
+{
+    udpSocket->close();
+    disconnect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+               this, SLOT(stateChanged(QAbstractSocket::SocketState)));
+    disconnect(udpSocket, SIGNAL(readyRead()),
+               this, SLOT(readPendingDatagrams()));
+
+}
+
+
+void MainWindow::on_pushButtonUdpOpenClose_clicked()
+{
+    if(ui->pushButtonUdpOpenClose->text() == "UDP Open"){
+        udpServerOpen();
+        ui->pushButtonUdpOpenClose->setText("UDP Close");
+    }
+    else{
+        udpServerClose();
+        ui->pushButtonUdpOpenClose->setText("UDP Open");
+    }
 }

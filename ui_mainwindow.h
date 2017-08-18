@@ -44,21 +44,20 @@ public:
     QComboBox *comComboBox;
     QPushButton *pushButtonComOpen;
     QPushButton *pushButton_refreshCom;
-    QPushButton *pushButtonClear;
-    QPushButton *pushClearMap;
     QLabel *label;
     QLineEdit *lineEditMinVal;
     QLabel *label_2;
     QLineEdit *lineEditMaxVal;
     QLabel *label_3;
     QLineEdit *maxSteps;
+    QPushButton *pushButtonUdpOpenClose;
     QTabWidget *tabWidget;
     QWidget *tabMainStat;
     QGroupBox *groupBox_2;
     QVBoxLayout *verticalLayout_15;
     QWidget *widget_20;
     QHBoxLayout *horizontalLayout_13;
-    QLineEdit *lineEditConnectionTime;
+    QLineEdit *lineEditUSBConnectionTime;
     QWidget *widget_22;
     QHBoxLayout *horizontalLayout_12;
     QLabel *label_4;
@@ -117,6 +116,29 @@ public:
     QCheckBox *checkBoxTerm7;
     QCheckBox *checkBoxTerm8;
     QCheckBox *checkBoxTerm9;
+    QWidget *widget_25;
+    QHBoxLayout *horizontalLayout_16;
+    QLineEdit *lineEditEuqueCnt0;
+    QLineEdit *lineEditEuqueCnt1;
+    QLineEdit *lineEditEuqueCnt2;
+    QLineEdit *lineEditEuqueCnt3;
+    QLineEdit *lineEditEuqueCnt4;
+    QLineEdit *lineEditEuqueCnt5;
+    QLineEdit *lineEditEuqueCnt6;
+    QLineEdit *lineEditEuqueCnt7;
+    QLineEdit *lineEditEuqueCnt8;
+    QLineEdit *lineEditEuqueCnt9;
+    QGroupBox *groupBox_4;
+    QVBoxLayout *verticalLayout_3;
+    QWidget *widget_28;
+    QHBoxLayout *horizontalLayout_19;
+    QLabel *label_7;
+    QLineEdit *lineEditUdpState;
+    QLineEdit *lineEditUDPConnectionTime;
+    QWidget *widget_26;
+    QHBoxLayout *horizontalLayout_17;
+    QLabel *label_6;
+    QLineEdit *lineEditDataGramCnt;
     QWidget *tabTimeStat;
     QHBoxLayout *horizontalLayout_8;
     QWidget *widget_10;
@@ -169,6 +191,9 @@ public:
     QWidget *qwtWdgH2;
     QHBoxLayout *horizontalLayout_5;
     QWidget *widget_8;
+    QWidget *widget_27;
+    QHBoxLayout *horizontalLayout_18;
+    QPushButton *pushButton;
     QWidget *widget_6;
     QHBoxLayout *horizontalLayout_4;
     QPushButton *pushMoveDown;
@@ -178,6 +203,7 @@ public:
     QCheckBox *checkBoxCycle;
     QPushButton *pushButtonGotoPEriodState;
     QPushButton *pushButtonPosReset;
+    QPushButton *pushButtonClear;
     QWidget *widget;
     QHBoxLayout *horizontalLayout;
     QPlainTextEdit *plainTextEdit;
@@ -215,7 +241,7 @@ public:
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         widget_4 = new QWidget(centralWidget);
         widget_4->setObjectName(QStringLiteral("widget_4"));
-        widget_4->setMaximumSize(QSize(600, 16777215));
+        widget_4->setMaximumSize(QSize(700, 16777215));
         horizontalLayout_3 = new QHBoxLayout(widget_4);
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -235,16 +261,6 @@ public:
         pushButton_refreshCom->setObjectName(QStringLiteral("pushButton_refreshCom"));
 
         horizontalLayout_3->addWidget(pushButton_refreshCom);
-
-        pushButtonClear = new QPushButton(widget_4);
-        pushButtonClear->setObjectName(QStringLiteral("pushButtonClear"));
-
-        horizontalLayout_3->addWidget(pushButtonClear);
-
-        pushClearMap = new QPushButton(widget_4);
-        pushClearMap->setObjectName(QStringLiteral("pushClearMap"));
-
-        horizontalLayout_3->addWidget(pushClearMap);
 
         label = new QLabel(widget_4);
         label->setObjectName(QStringLiteral("label"));
@@ -279,6 +295,11 @@ public:
 
         horizontalLayout_3->addWidget(maxSteps);
 
+        pushButtonUdpOpenClose = new QPushButton(widget_4);
+        pushButtonUdpOpenClose->setObjectName(QStringLiteral("pushButtonUdpOpenClose"));
+
+        horizontalLayout_3->addWidget(pushButtonUdpOpenClose);
+
 
         verticalLayout_2->addWidget(widget_4);
 
@@ -289,7 +310,7 @@ public:
         tabMainStat->setObjectName(QStringLiteral("tabMainStat"));
         groupBox_2 = new QGroupBox(tabMainStat);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(630, 30, 153, 111));
+        groupBox_2->setGeometry(QRect(580, 30, 153, 111));
         verticalLayout_15 = new QVBoxLayout(groupBox_2);
         verticalLayout_15->setSpacing(6);
         verticalLayout_15->setContentsMargins(11, 11, 11, 11);
@@ -301,12 +322,12 @@ public:
         horizontalLayout_13->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_13->setObjectName(QStringLiteral("horizontalLayout_13"));
         horizontalLayout_13->setContentsMargins(0, 0, 0, 0);
-        lineEditConnectionTime = new QLineEdit(widget_20);
-        lineEditConnectionTime->setObjectName(QStringLiteral("lineEditConnectionTime"));
-        lineEditConnectionTime->setAlignment(Qt::AlignCenter);
-        lineEditConnectionTime->setReadOnly(true);
+        lineEditUSBConnectionTime = new QLineEdit(widget_20);
+        lineEditUSBConnectionTime->setObjectName(QStringLiteral("lineEditUSBConnectionTime"));
+        lineEditUSBConnectionTime->setAlignment(Qt::AlignCenter);
+        lineEditUSBConnectionTime->setReadOnly(true);
 
-        horizontalLayout_13->addWidget(lineEditConnectionTime);
+        horizontalLayout_13->addWidget(lineEditUSBConnectionTime);
 
 
         verticalLayout_15->addWidget(widget_20);
@@ -368,6 +389,7 @@ public:
         horizontalLayout_9->setSpacing(6);
         horizontalLayout_9->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
+        horizontalLayout_9->setContentsMargins(-1, 0, -1, -1);
         SliderPos0 = new QSlider(widget_2);
         SliderPos0->setObjectName(QStringLiteral("SliderPos0"));
         SliderPos0->setOrientation(Qt::Vertical);
@@ -607,7 +629,7 @@ public:
         horizontalLayout_15->setSpacing(6);
         horizontalLayout_15->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_15->setObjectName(QStringLiteral("horizontalLayout_15"));
-        horizontalLayout_15->setContentsMargins(-1, 0, -1, -1);
+        horizontalLayout_15->setContentsMargins(-1, 0, -1, 0);
         checkBoxTerm0 = new QCheckBox(widget_24);
         checkBoxTerm0->setObjectName(QStringLiteral("checkBoxTerm0"));
 
@@ -662,10 +684,149 @@ public:
 
         verticalLayout_16->addWidget(widget_24);
 
+        widget_25 = new QWidget(groupBox_3);
+        widget_25->setObjectName(QStringLiteral("widget_25"));
+        horizontalLayout_16 = new QHBoxLayout(widget_25);
+        horizontalLayout_16->setSpacing(6);
+        horizontalLayout_16->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_16->setObjectName(QStringLiteral("horizontalLayout_16"));
+        horizontalLayout_16->setContentsMargins(-1, 0, -1, -1);
+        lineEditEuqueCnt0 = new QLineEdit(widget_25);
+        lineEditEuqueCnt0->setObjectName(QStringLiteral("lineEditEuqueCnt0"));
+        lineEditEuqueCnt0->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt0->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt0);
+
+        lineEditEuqueCnt1 = new QLineEdit(widget_25);
+        lineEditEuqueCnt1->setObjectName(QStringLiteral("lineEditEuqueCnt1"));
+        lineEditEuqueCnt1->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt1->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt1);
+
+        lineEditEuqueCnt2 = new QLineEdit(widget_25);
+        lineEditEuqueCnt2->setObjectName(QStringLiteral("lineEditEuqueCnt2"));
+        lineEditEuqueCnt2->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt2->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt2);
+
+        lineEditEuqueCnt3 = new QLineEdit(widget_25);
+        lineEditEuqueCnt3->setObjectName(QStringLiteral("lineEditEuqueCnt3"));
+        lineEditEuqueCnt3->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt3->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt3);
+
+        lineEditEuqueCnt4 = new QLineEdit(widget_25);
+        lineEditEuqueCnt4->setObjectName(QStringLiteral("lineEditEuqueCnt4"));
+        lineEditEuqueCnt4->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt4->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt4);
+
+        lineEditEuqueCnt5 = new QLineEdit(widget_25);
+        lineEditEuqueCnt5->setObjectName(QStringLiteral("lineEditEuqueCnt5"));
+        lineEditEuqueCnt5->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt5->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt5);
+
+        lineEditEuqueCnt6 = new QLineEdit(widget_25);
+        lineEditEuqueCnt6->setObjectName(QStringLiteral("lineEditEuqueCnt6"));
+        lineEditEuqueCnt6->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt6->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt6);
+
+        lineEditEuqueCnt7 = new QLineEdit(widget_25);
+        lineEditEuqueCnt7->setObjectName(QStringLiteral("lineEditEuqueCnt7"));
+        lineEditEuqueCnt7->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt7->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt7);
+
+        lineEditEuqueCnt8 = new QLineEdit(widget_25);
+        lineEditEuqueCnt8->setObjectName(QStringLiteral("lineEditEuqueCnt8"));
+        lineEditEuqueCnt8->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt8->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt8);
+
+        lineEditEuqueCnt9 = new QLineEdit(widget_25);
+        lineEditEuqueCnt9->setObjectName(QStringLiteral("lineEditEuqueCnt9"));
+        lineEditEuqueCnt9->setAlignment(Qt::AlignCenter);
+        lineEditEuqueCnt9->setReadOnly(true);
+
+        horizontalLayout_16->addWidget(lineEditEuqueCnt9);
+
+
+        verticalLayout_16->addWidget(widget_25);
+
+        groupBox_4 = new QGroupBox(tabMainStat);
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        groupBox_4->setGeometry(QRect(580, 160, 151, 111));
+        verticalLayout_3 = new QVBoxLayout(groupBox_4);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        widget_28 = new QWidget(groupBox_4);
+        widget_28->setObjectName(QStringLiteral("widget_28"));
+        horizontalLayout_19 = new QHBoxLayout(widget_28);
+        horizontalLayout_19->setSpacing(6);
+        horizontalLayout_19->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_19->setObjectName(QStringLiteral("horizontalLayout_19"));
+        horizontalLayout_19->setContentsMargins(-1, 0, -1, 0);
+        label_7 = new QLabel(widget_28);
+        label_7->setObjectName(QStringLiteral("label_7"));
+
+        horizontalLayout_19->addWidget(label_7);
+
+        lineEditUdpState = new QLineEdit(widget_28);
+        lineEditUdpState->setObjectName(QStringLiteral("lineEditUdpState"));
+        lineEditUdpState->setAlignment(Qt::AlignCenter);
+        lineEditUdpState->setReadOnly(true);
+
+        horizontalLayout_19->addWidget(lineEditUdpState);
+
+
+        verticalLayout_3->addWidget(widget_28);
+
+        lineEditUDPConnectionTime = new QLineEdit(groupBox_4);
+        lineEditUDPConnectionTime->setObjectName(QStringLiteral("lineEditUDPConnectionTime"));
+        lineEditUDPConnectionTime->setAlignment(Qt::AlignCenter);
+        lineEditUDPConnectionTime->setReadOnly(true);
+
+        verticalLayout_3->addWidget(lineEditUDPConnectionTime);
+
+        widget_26 = new QWidget(groupBox_4);
+        widget_26->setObjectName(QStringLiteral("widget_26"));
+        horizontalLayout_17 = new QHBoxLayout(widget_26);
+        horizontalLayout_17->setSpacing(6);
+        horizontalLayout_17->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_17->setObjectName(QStringLiteral("horizontalLayout_17"));
+        horizontalLayout_17->setContentsMargins(-1, 0, -1, 0);
+        label_6 = new QLabel(widget_26);
+        label_6->setObjectName(QStringLiteral("label_6"));
+
+        horizontalLayout_17->addWidget(label_6);
+
+        lineEditDataGramCnt = new QLineEdit(widget_26);
+        lineEditDataGramCnt->setObjectName(QStringLiteral("lineEditDataGramCnt"));
+        lineEditDataGramCnt->setAlignment(Qt::AlignCenter);
+        lineEditDataGramCnt->setReadOnly(true);
+
+        horizontalLayout_17->addWidget(lineEditDataGramCnt);
+
+
+        verticalLayout_3->addWidget(widget_26);
+
         tabWidget->addTab(tabMainStat, QString());
         groupBox_2->raise();
         widget_2->raise();
         groupBox_3->raise();
+        groupBox_4->raise();
         tabTimeStat = new QWidget();
         tabTimeStat->setObjectName(QStringLiteral("tabTimeStat"));
         horizontalLayout_8 = new QHBoxLayout(tabTimeStat);
@@ -984,6 +1145,22 @@ public:
 
         verticalLayout_2->addWidget(tabWidget);
 
+        widget_27 = new QWidget(centralWidget);
+        widget_27->setObjectName(QStringLiteral("widget_27"));
+        widget_27->setMaximumSize(QSize(16777215, 16777215));
+        horizontalLayout_18 = new QHBoxLayout(widget_27);
+        horizontalLayout_18->setSpacing(6);
+        horizontalLayout_18->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_18->setObjectName(QStringLiteral("horizontalLayout_18"));
+        pushButton = new QPushButton(widget_27);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setMaximumSize(QSize(200, 16777215));
+
+        horizontalLayout_18->addWidget(pushButton);
+
+
+        verticalLayout_2->addWidget(widget_27);
+
         widget_6 = new QWidget(centralWidget);
         widget_6->setObjectName(QStringLiteral("widget_6"));
         horizontalLayout_4 = new QHBoxLayout(widget_6);
@@ -1025,12 +1202,18 @@ public:
 
         horizontalLayout_4->addWidget(pushButtonPosReset);
 
+        pushButtonClear = new QPushButton(widget_6);
+        pushButtonClear->setObjectName(QStringLiteral("pushButtonClear"));
+
+        horizontalLayout_4->addWidget(pushButtonClear);
+
 
         verticalLayout_2->addWidget(widget_6);
 
         widget = new QWidget(centralWidget);
         widget->setObjectName(QStringLiteral("widget"));
-        widget->setMinimumSize(QSize(0, 150));
+        widget->setMinimumSize(QSize(0, 50));
+        widget->setMaximumSize(QSize(16777215, 150));
         horizontalLayout = new QHBoxLayout(widget);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
@@ -1167,8 +1350,6 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", Q_NULLPTR));
         pushButtonComOpen->setText(QApplication::translate("MainWindow", "open", Q_NULLPTR));
         pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
-        pushButtonClear->setText(QApplication::translate("MainWindow", "clear", Q_NULLPTR));
-        pushClearMap->setText(QApplication::translate("MainWindow", "clearMap", Q_NULLPTR));
         label->setText(QApplication::translate("MainWindow", "min:", Q_NULLPTR));
         lineEditMinVal->setInputMask(QApplication::translate("MainWindow", "999", Q_NULLPTR));
         lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
@@ -1177,8 +1358,9 @@ public:
         lineEditMaxVal->setText(QApplication::translate("MainWindow", "20000", Q_NULLPTR));
         label_3->setText(QApplication::translate("MainWindow", "steps:", Q_NULLPTR));
         maxSteps->setText(QApplication::translate("MainWindow", "200000", Q_NULLPTR));
-        groupBox_2->setTitle(QApplication::translate("MainWindow", "\320\241\320\276\320\265\320\264\320\270\320\275\320\265\320\275\320\270\320\265", Q_NULLPTR));
-        label_4->setText(QApplication::translate("MainWindow", "\320\236\320\261\320\274\320\265\320\275\321\213", Q_NULLPTR));
+        pushButtonUdpOpenClose->setText(QApplication::translate("MainWindow", "UDP Open", Q_NULLPTR));
+        groupBox_2->setTitle(QApplication::translate("MainWindow", "USB", Q_NULLPTR));
+        label_4->setText(QApplication::translate("MainWindow", "\320\237\320\260\320\272\320\265\321\202\320\276\320\262", Q_NULLPTR));
         label_5->setText(QApplication::translate("MainWindow", "bytesOnIter", Q_NULLPTR));
         groupBox_3->setTitle(QApplication::translate("MainWindow", "\320\237\320\276 \320\277\321\200\320\270\320\262\320\276\320\264\320\260\320\274", Q_NULLPTR));
         checkBoxTerm0->setText(QString());
@@ -1191,9 +1373,13 @@ public:
         checkBoxTerm7->setText(QString());
         checkBoxTerm8->setText(QString());
         checkBoxTerm9->setText(QString());
+        groupBox_4->setTitle(QApplication::translate("MainWindow", "UDP", Q_NULLPTR));
+        label_7->setText(QApplication::translate("MainWindow", "state", Q_NULLPTR));
+        label_6->setText(QApplication::translate("MainWindow", "\320\224\320\263\321\200\320\274", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabMainStat), QApplication::translate("MainWindow", "mainStat", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabTimeStat), QApplication::translate("MainWindow", "timeStat", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("MainWindow", "\320\227\320\260\320\277\321\203\321\201\321\202\320\270\321\202\321\214", Q_NULLPTR));
         pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
@@ -1201,6 +1387,7 @@ public:
         checkBoxCycle->setText(QApplication::translate("MainWindow", "cycle", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
+        pushButtonClear->setText(QApplication::translate("MainWindow", "clear queue", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("MainWindow", "\320\232\320\276\320\275\321\206\320\265\320\262\320\270\320\272\320\270", Q_NULLPTR));
         term1->setText(QApplication::translate("MainWindow", "1", Q_NULLPTR));
         term2->setText(QApplication::translate("MainWindow", "2", Q_NULLPTR));

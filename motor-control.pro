@@ -9,8 +9,9 @@ QT       += core gui
 QT += serialport
 QT += network
 
-CONFIG += qwt
+# CONFIG += qwt
 
+QMAKE_LFLAGS_RELEASE += -static -static-libgcc
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
