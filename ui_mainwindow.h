@@ -632,52 +632,62 @@ public:
         horizontalLayout_15->setContentsMargins(-1, 0, -1, 0);
         checkBoxTerm0 = new QCheckBox(widget_24);
         checkBoxTerm0->setObjectName(QStringLiteral("checkBoxTerm0"));
+        checkBoxTerm0->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm0);
 
         checkBoxTerm1 = new QCheckBox(widget_24);
         checkBoxTerm1->setObjectName(QStringLiteral("checkBoxTerm1"));
         checkBoxTerm1->setLayoutDirection(Qt::LeftToRight);
+        checkBoxTerm1->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm1);
 
         checkBoxTerm2 = new QCheckBox(widget_24);
         checkBoxTerm2->setObjectName(QStringLiteral("checkBoxTerm2"));
+        checkBoxTerm2->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm2);
 
         checkBoxTerm3 = new QCheckBox(widget_24);
         checkBoxTerm3->setObjectName(QStringLiteral("checkBoxTerm3"));
+        checkBoxTerm3->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm3);
 
         checkBoxTerm4 = new QCheckBox(widget_24);
         checkBoxTerm4->setObjectName(QStringLiteral("checkBoxTerm4"));
+        checkBoxTerm4->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm4);
 
         checkBoxTerm5 = new QCheckBox(widget_24);
         checkBoxTerm5->setObjectName(QStringLiteral("checkBoxTerm5"));
+        checkBoxTerm5->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm5);
 
         checkBoxTerm6 = new QCheckBox(widget_24);
         checkBoxTerm6->setObjectName(QStringLiteral("checkBoxTerm6"));
+        checkBoxTerm6->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm6);
 
         checkBoxTerm7 = new QCheckBox(widget_24);
         checkBoxTerm7->setObjectName(QStringLiteral("checkBoxTerm7"));
+        checkBoxTerm7->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm7);
 
         checkBoxTerm8 = new QCheckBox(widget_24);
         checkBoxTerm8->setObjectName(QStringLiteral("checkBoxTerm8"));
+        checkBoxTerm8->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm8);
 
         checkBoxTerm9 = new QCheckBox(widget_24);
         checkBoxTerm9->setObjectName(QStringLiteral("checkBoxTerm9"));
+        checkBoxTerm9->setCheckable(true);
 
         horizontalLayout_15->addWidget(checkBoxTerm9);
 
@@ -823,10 +833,6 @@ public:
         verticalLayout_3->addWidget(widget_26);
 
         tabWidget->addTab(tabMainStat, QString());
-        groupBox_2->raise();
-        widget_2->raise();
-        groupBox_3->raise();
-        groupBox_4->raise();
         tabTimeStat = new QWidget();
         tabTimeStat->setObjectName(QStringLiteral("tabTimeStat"));
         horizontalLayout_8 = new QHBoxLayout(tabTimeStat);

@@ -154,7 +154,7 @@ private:
     void graphReset();
     QSettings settings;
 
-    bool sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 steps, quint32 dir, quint32 pos);
+    bool sendDivPos(int mi, DivPosDataStr &ds, quint32 pos);
 
     TMotorState mtState[MOTOR_CNT];
 

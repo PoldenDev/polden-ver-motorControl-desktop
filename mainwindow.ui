@@ -602,6 +602,9 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -612,12 +615,18 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="checkBoxTerm2">
               <property name="text">
                <string/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -626,12 +635,18 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="checkBoxTerm4">
               <property name="text">
                <string/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -640,12 +655,18 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="checkBoxTerm6">
               <property name="text">
                <string/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -654,6 +675,9 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -661,12 +685,18 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="checkBoxTerm9">
               <property name="text">
                <string/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -867,10 +897,6 @@
          </item>
         </layout>
        </widget>
-       <zorder>groupBox_2</zorder>
-       <zorder>widget_2</zorder>
-       <zorder>groupBox_3</zorder>
-       <zorder>groupBox_4</zorder>
       </widget>
       <widget class="QWidget" name="tabTimeStat">
        <attribute name="title">
