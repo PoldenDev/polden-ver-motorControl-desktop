@@ -484,6 +484,7 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
             int msec = QTime::currentTime().msecsSinceStartOfDay();
             //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
             lastMsec = msec;
+            qDebug("steps=%d div=%d dir=%d", steps, div, dir);
         }
         quint64 dSend = serial.write(ba);
 
@@ -561,7 +562,7 @@ void MainWindow::handleReadyRead()
         char n = (b>>6)&0x3;
 //        if(tempStor.contains(n))
 //            qDebug("in this pack already contains!");
-        tempStor[n] = b|tempStor[n];
+        tempStor[n] = b/*|tempStor[n]*/;
     }
 
 
@@ -644,9 +645,9 @@ void MainWindow::terminatorState(int i, bool bEna)
         case 9: ui->term10->setChecked(bEna); break;
     }
 
-    if(bEna == true){
-        motorAbsolutePosCur[i] = 0;
-    }
+//    if(bEna == true){
+//        motorAbsolutePosCur[i] = 0;
+//    }
     if(mtState[i] == MT_GoDOWN){
         if(bEna == false){
         }
@@ -660,6 +661,7 @@ void MainWindow::terminatorState(int i, bool bEna)
 
     }
     else if((mtState[i] == MT_INIT_GoDOWN) && (bEna == true)){
+         motorAbsolutePosCur[i] = 0;
 
         //mtState[i] = MT_IDLE;
         mtState[i] = MT_INIT_GoUp;
@@ -1540,4 +1542,28 @@ void MainWindow::on_pushButtonInitiate_clicked()
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_INIT_GoDOWN;
     }
+}
+
+void MainWindow::on_pushButtonGoZero_clicked()
+{
+    DivPosDataStr ds;
+    int startPos =0;
+
+    if(motorPosCmdData[0].length() == 0)
+        startPos = getMotorAbsPos(0);
+    else
+        startPos = motorPosCmdData[0].last().pos;
+
+    int iters = startPos/400;
+    ds.pos = startPos;
+    for(int i=0; i<iters; i++){
+        ds.pos -=400;
+        motorPosCmdData[0] << ds;
+    }
+    if(ds.pos > 0){
+        ds.pos = 0;
+        motorPosCmdData[0] << ds;
+    }
+
+
 }

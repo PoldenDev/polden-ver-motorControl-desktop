@@ -1357,6 +1357,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonGoZero">
+         <property name="text">
+          <string>go zero</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBoxCycle">
          <property name="text">
           <string>cycle</string>

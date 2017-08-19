@@ -200,6 +200,7 @@ public:
     QPushButton *pushMoveUp;
     QPushButton *pushBUttonToIdle;
     QPushButton *goToTerm;
+    QPushButton *pushButtonGoZero;
     QCheckBox *checkBoxCycle;
     QPushButton *pushButtonGotoPEriodState;
     QPushButton *pushButtonPosReset;
@@ -1193,6 +1194,11 @@ public:
 
         horizontalLayout_4->addWidget(goToTerm);
 
+        pushButtonGoZero = new QPushButton(widget_6);
+        pushButtonGoZero->setObjectName(QStringLiteral("pushButtonGoZero"));
+
+        horizontalLayout_4->addWidget(pushButtonGoZero);
+
         checkBoxCycle = new QCheckBox(widget_6);
         checkBoxCycle->setObjectName(QStringLiteral("checkBoxCycle"));
 
@@ -1390,6 +1396,7 @@ public:
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         goToTerm->setText(QApplication::translate("MainWindow", "go term", Q_NULLPTR));
+        pushButtonGoZero->setText(QApplication::translate("MainWindow", "go zero", Q_NULLPTR));
         checkBoxCycle->setText(QApplication::translate("MainWindow", "cycle", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
