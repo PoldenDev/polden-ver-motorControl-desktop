@@ -486,8 +486,12 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
             lastMsec = msec;
         }
         quint64 dSend = serial.write(ba);
+
         if(dSend != ba.length()){
             qDebug("dSend != length()!!");
+        }
+        if(serial.flush() == false){
+            //qDebug("dataFlushed");
         }
         motorAbsolutePosCur[mi] += delta;
         if( motorAbsolutePosCur[mi] < 0){
@@ -657,21 +661,21 @@ void MainWindow::terminatorState(int i, bool bEna)
     }
     else if((mtState[i] == MT_INIT_GoDOWN) && (bEna == true)){
 
-        mtState[i] = MT_IDLE;
-//        mtState[i] = MT_INIT_GoUp;
-//        DivPosDataStr ds;
-//        int startPos =0;
+        //mtState[i] = MT_IDLE;
+        mtState[i] = MT_INIT_GoUp;
+        DivPosDataStr ds;
+        int startPos =0;
 
-//        if(motorPosCmdData[i].length() == 0)
-//            startPos = getMotorAbsPos(i);
-//        else
-//            startPos = motorPosCmdData[i].last().pos;
+        if(motorPosCmdData[i].length() == 0)
+            startPos = getMotorAbsPos(i);
+        else
+            startPos = motorPosCmdData[i].last().pos;
 
-//        ds.pos = startPos+400;
-//        for(int k=0; k<40; k++){
-//            motorPosCmdData[i] << ds;
-//             ds.pos += 400;
-//        }
+        ds.pos = startPos+400;
+        for(int k=0; k<40; k++){
+            motorPosCmdData[i] << ds;
+             ds.pos += 400;
+        }
 
     }
     bTermState[i] = bEna;
@@ -707,24 +711,19 @@ void MainWindow::freeToWrite(int i)
             ds = motorPosCmdData[i].first();
             int curMsec = QTime::currentTime().msecsSinceStartOfDay();
 
-            //if(ds.div < 0x100)
-            //    ds.div = 0x100;
 
-            if((i==0) && (ds.pos==0)){
-                //ui->plainTextEdit->appendPlainText("ds.pos == 0");
-                qDebug("ds.pos == 0");
-            }
             //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
-                qDebug("not in zero and no term!");
-                ds.pos = -400;
-                sendDivPos(i, ds, ds.pos);
-            }
-            else{
+//            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
+//                qDebug("not in zero and no term!");
+//                ds.pos = -400;
+//                sendDivPos(i, ds, ds.pos);
+//            }
+//            else{
                 if(sendDivPos(i, ds, ds.pos) == true){
                     motorPosCmdData[i].dequeue();
                 }
-            }
+                //motorPosCmdData[i].dequeue();
+//            }
 
 
         }
@@ -981,8 +980,9 @@ void MainWindow::readPendingDatagrams()
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
             for(int i=0; i<MOTOR_CNT; i++){
-                motorPosCmdData[i].clear();
+                motorPosCmdData[i].clear();                
             }
+
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
