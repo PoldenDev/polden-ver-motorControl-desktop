@@ -193,7 +193,7 @@ public:
     QWidget *widget_8;
     QWidget *widget_27;
     QHBoxLayout *horizontalLayout_18;
-    QPushButton *pushButton;
+    QPushButton *pushButtonInitiate;
     QWidget *widget_6;
     QHBoxLayout *horizontalLayout_4;
     QPushButton *pushMoveDown;
@@ -1152,11 +1152,11 @@ public:
         horizontalLayout_18->setSpacing(6);
         horizontalLayout_18->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_18->setObjectName(QStringLiteral("horizontalLayout_18"));
-        pushButton = new QPushButton(widget_27);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setMaximumSize(QSize(200, 16777215));
+        pushButtonInitiate = new QPushButton(widget_27);
+        pushButtonInitiate->setObjectName(QStringLiteral("pushButtonInitiate"));
+        pushButtonInitiate->setMaximumSize(QSize(200, 16777215));
 
-        horizontalLayout_18->addWidget(pushButton);
+        horizontalLayout_18->addWidget(pushButtonInitiate);
 
 
         verticalLayout_2->addWidget(widget_27);
@@ -1379,7 +1379,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tabMainStat), QApplication::translate("MainWindow", "mainStat", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabTimeStat), QApplication::translate("MainWindow", "timeStat", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("MainWindow", "\320\227\320\260\320\277\321\203\321\201\321\202\320\270\321\202\321\214", Q_NULLPTR));
+        pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
         pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));

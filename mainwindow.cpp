@@ -38,9 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     markerXPos(0),
     comExchanges(0),
     bytesOnIter(0),
-    dataGramCnt(0)/*,
-    timeShiftMaxPos(2000),
-    timeShiftMaxNeg(-2000)*/
+    dataGramCnt(0)
 {
     ui->setupUi(this);
 
@@ -320,7 +318,8 @@ void MainWindow::on_pushButtonComOpen_clicked()
                     qDebug("%s port open FAIL", qUtf8Printable(comName));
                     return;
                 }
-                qDebug("%s port opened", qUtf8Printable(comName));
+                //qDebug("%s port opened", qUtf8Printable(comName));
+                ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
                 connect(&serial, SIGNAL(readyRead()),
                         this, SLOT(handleReadyRead()));
                 connect(&serial, SIGNAL(bytesWritten(qint64)),
@@ -334,7 +333,8 @@ void MainWindow::on_pushButtonComOpen_clicked()
     else{
         serial.close();
         //udpSocket->close();
-        qDebug("com port closed");
+        //qDebug("com port closed");
+        ui->plainTextEdit->appendPlainText(QString("com port closed"));
         ui->pushButtonComOpen->setText("open");        
         //contrStringQueue.clear();
     }
@@ -522,6 +522,7 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 div, quint32 step
 
 void MainWindow::handleReadyRead()
 {
+    comExchanges++;
     QByteArray str = serial.readAll();
 
 //    uartBuff += str;
@@ -618,7 +619,7 @@ void MainWindow::handleReadyRead()
     //ui->plainTextEdit->appendPlainText(str);
 
     //ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
-    comExchanges++;
+
 }
 
 void MainWindow::terminatorState(int i, bool bEna)
@@ -648,6 +649,24 @@ void MainWindow::terminatorState(int i, bool bEna)
         }
 
     }
+    else if((mtState[i] == MT_INIT_GoDOWN) && (bEna == true)){
+        motorAbsolutePosCur[i] = 0;
+        mtState[i] = MT_INIT_GoUp;
+        DivPosDataStr ds;
+        int startPos =0;
+
+        if(motorPosCmdData[i].length() == 0)
+            startPos = getMotorAbsPos(i);
+        else
+            startPos = motorPosCmdData[i].last().pos;
+
+        ds.pos = startPos+400;
+        for(int k=0; k<15; k++){
+            motorPosCmdData[i] << ds;
+             ds.pos += 400;
+        }
+
+    }
     bTermState[i] = bEna;
 }
 
@@ -667,6 +686,7 @@ void MainWindow::freeToWrite(int i)
         break;
 
     case MT_GoDOWN:
+    case MT_INIT_GoDOWN:
         DivPosDataStr ds;
         ds.pos = getMotorAbsPos(i)-500;
         sendDivPos(i, ds, ds.div, ds.steps, ds.dir, ds.pos);
@@ -674,6 +694,7 @@ void MainWindow::freeToWrite(int i)
         break;
 
     case MT_IDLE:
+    case MT_INIT_GoUp:
         if(motorPosCmdData[i].isEmpty() == false){
             DivPosDataStr ds;
             ds = motorPosCmdData[i].first();
@@ -689,6 +710,18 @@ void MainWindow::freeToWrite(int i)
         }
         break;
     }
+
+    if((mtState[i] == MT_INIT_GoUp) &&
+            (motorPosCmdData[i].isEmpty() == true)){
+        mtState[i] = MT_IDLE;
+        bool bState = true;
+        for(int k=0; k<MOTOR_CNT; k++){
+            bState = ((mtState[k]==MT_IDLE)&&bState);
+        }
+        if(bState == true)
+            udpServerOpen();
+    }
+
 
 }
 
@@ -1372,6 +1405,8 @@ void MainWindow::uiUpdateTimerSlot()
                 case MT_IDLE:   stateLineEdit[i]->setText("idle"); ;break;
                 case MT_GoDOWN: stateLineEdit[i]->setText("mvD");break;
                 case MT_GoUP:   stateLineEdit[i]->setText("mvU");break;
+                case MT_INIT_GoDOWN: stateLineEdit[i]->setText("initMvD");break;
+                case MT_INIT_GoUp: stateLineEdit[i]->setText("initMvU");break;
             }
 
             absPosSlider[i]->setValue(motorAbsolutePosCur[i]);
@@ -1449,6 +1484,7 @@ void MainWindow::udpServerOpen()
     connect(udpSocket, SIGNAL(readyRead()),
             this, SLOT(readPendingDatagrams()));
     udpConnectionTime.start();
+    ui->pushButtonUdpOpenClose->setText("UDP Close");
 }
 
 void MainWindow::udpServerClose()
@@ -1458,6 +1494,8 @@ void MainWindow::udpServerClose()
                this, SLOT(stateChanged(QAbstractSocket::SocketState)));
     disconnect(udpSocket, SIGNAL(readyRead()),
                this, SLOT(readPendingDatagrams()));
+    ui->pushButtonUdpOpenClose->setText("UDP Open");
+    ui->plainTextEdit->appendPlainText("UDP closed");
 
 }
 
@@ -1466,10 +1504,19 @@ void MainWindow::on_pushButtonUdpOpenClose_clicked()
 {
     if(ui->pushButtonUdpOpenClose->text() == "UDP Open"){
         udpServerOpen();
-        ui->pushButtonUdpOpenClose->setText("UDP Close");
     }
     else{
         udpServerClose();
         ui->pushButtonUdpOpenClose->setText("UDP Open");
+    }
+}
+
+void MainWindow::on_pushButtonInitiate_clicked()
+{
+    udpServerClose();
+    on_pushButtonClear_clicked();
+
+    for(int i=0; i<MOTOR_CNT; i++){
+        mtState[i] = MT_INIT_GoDOWN;
     }
 }

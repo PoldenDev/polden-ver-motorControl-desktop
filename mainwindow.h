@@ -83,6 +83,8 @@ private slots:
 
     void on_pushButtonUdpOpenClose_clicked();
 
+    void on_pushButtonInitiate_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
