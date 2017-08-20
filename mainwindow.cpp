@@ -7,7 +7,7 @@
 #include <QNetworkDatagram>
 #include <QThread>
 #include <QDateTime>
-
+#include <QSettings>
 
 
 //#include <qwt_plot.h>
@@ -48,6 +48,24 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     on_pushButtonUdpOpenClose_clicked();
+
+    QSettings settings("Murinets", "MotorControl");
+    ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
+    ui->lineEdit_MaxHeightImp->setText(settings.value("maxHeightImp", 200000).toString());
+    on_lineEdit_MaxHeightImp_editingFinished();
+
+    FPGA_FREQ = settings.value("FPGA_FREQ", FPGA_FREQ_25).toInt();
+    if(FPGA_FREQ == FPGA_FREQ_24)
+        ui->radioButtonFpgaFreq24->setChecked(true);
+    else if(FPGA_FREQ == FPGA_FREQ_25)
+        ui->radioButtonFpgaFreq25->setChecked(true);
+    else{
+        ui->radioButtonFpgaFreq24->setChecked(false);
+        ui->radioButtonFpgaFreq25->setChecked(false);
+
+    }
+
+
     timer.setInterval(5);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
@@ -676,7 +694,7 @@ void MainWindow::terminatorState(int i, bool bEna)
             startPos = motorPosCmdData[i].last().pos;
 
         ds.pos = startPos+400;
-        for(int k=0; k<40; k++){
+        for(int k=0; k<4; k++){
             motorPosCmdData[i] << ds;
              ds.pos += 400;
         }
@@ -829,6 +847,7 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
     QString convertedString;
     int maxVal = ui->lineEditMaxVal->text().toInt();
 
+
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
     //if(motorStr)
     //foreach (QString motorStr, motorStrList) {
@@ -873,7 +892,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             if(pos <0){
                 qDebug("pos less 0! pos=%d", pos);
             }
-            int maxVal = ui->maxSteps->text().toInt();
+            int maxVal = ui->lineEdit_MaxHeightImp->text().toInt();
             int newPos = maxVal*(pos/1000.);
             ds.pos = newPos;
             int delta = newPos - getMotorAbsPos(mn);
@@ -981,14 +1000,15 @@ void MainWindow::readPendingDatagrams()
 //            if(dataProcess100msTimer.isActive() == false){
 //                dataProcess100msTimer.start();
 //            }
-            qDebug("start cmd");
+            //qDebug("start cmd");
+            ui->plainTextUDP->appendPlainText("start cmd");
         }
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
             for(int i=0; i<MOTOR_CNT; i++){
                 motorPosCmdData[i].clear();                
             }
-
+            ui->plainTextUDP->appendPlainText("stop cmd");
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
@@ -1387,7 +1407,7 @@ void MainWindow::uiUpdateTimerSlot()
     QString tabName = ui->tabWidget->tabText(curTabInd);
     if(tabName == "mainStat"){
         bool bOk = false;
-        int sliderMaxVal = ui->maxSteps->text().toInt(&bOk);
+        int sliderMaxVal = ui->lineEdit_MaxHeightImp->text().toInt(&bOk);
         for(int i=0; i<MOTOR_CNT; i++){
             if(bOk){
                 absPosSlider[i]->setMaximum(sliderMaxVal);
@@ -1401,8 +1421,11 @@ void MainWindow::uiUpdateTimerSlot()
                 case MT_INIT_GoUp: stateLineEdit[i]->setText("initMvU");break;
             }
 
+            int mmPerRot = ui->lineEdit_mmPerRot->text().toInt();
+            int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
+            int posMm = (motorAbsolutePosCur[i]/(float)impPerRot)*mmPerRot;
             absPosSlider[i]->setValue(motorAbsolutePosCur[i]);
-            absPosLineEdit[i]->setText(QString::number(motorAbsolutePosCur[i]));
+            absPosLineEdit[i]->setText(QString::number(posMm));
             termCheckBox[i]->setChecked(bTermState[i]);
             euqueLineEdit[i]->setText(QString::number(motorPosCmdData[i].length()));
 
@@ -1561,4 +1584,51 @@ void MainWindow::on_pushButtonTest_clicked()
     ds.pos=113200; motorPosCmdData[0] << ds;
     ds.pos=115399; motorPosCmdData[0] << ds;
     ds.pos=116200; motorPosCmdData[0] << ds;
+}
+
+void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
+{
+    int mmPerRot = ui->lineEdit_mmPerRot->text().toInt();
+    int maxHeightMm = ui->lineEdit_maxHeightMM->text().toInt();
+    int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
+    quint32 maxHeightImp = (maxHeightMm/mmPerRot)*impPerRot;
+    ui->lineEdit_MaxHeightImp->setText(QString::number(maxHeightImp));
+    QSettings settings("Murinets", "MotorControl");
+    settings.setValue("maxHeightImp", maxHeightImp);
+
+}
+
+void MainWindow::on_lineEdit_MaxHeightImp_editingFinished()
+{
+    int mmPerRot = ui->lineEdit_mmPerRot->text().toInt();
+    quint32 maxHeightImp = ui->lineEdit_MaxHeightImp->text().toInt();
+    int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
+    int maxHeigtMM = (maxHeightImp/impPerRot)*mmPerRot;
+    ui->lineEdit_maxHeightMM->setText(QString::number(maxHeigtMM));
+    QSettings settings("Murinets", "MotorControl");
+    settings.setValue("maxHeightImp", maxHeightImp);
+
+}
+
+void MainWindow::on_radioButtonFpgaFreq25_clicked()
+{
+    FPGA_FREQ = FPGA_FREQ_25;
+    QSettings settings("Murinets", "MotorControl");
+    settings.setValue("FPGA_FREQ", FPGA_FREQ_25);
+}
+
+void MainWindow::on_radioButtonFpgaFreq24_clicked()
+{
+    FPGA_FREQ = FPGA_FREQ_24;
+    QSettings settings("Murinets", "MotorControl");
+    settings.setValue("FPGA_FREQ", FPGA_FREQ_24);
+
+}
+
+void MainWindow::on_lineEdit_mmPerRot_editingFinished()
+{
+    QSettings settings("Murinets", "MotorControl");
+    settings.setValue("mmPerRot", ui->lineEdit_mmPerRot->text().toInt());
+    on_lineEdit_maxHeightMM_editingFinished();
+
 }

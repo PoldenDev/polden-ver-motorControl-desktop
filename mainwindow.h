@@ -89,6 +89,16 @@ private slots:
 
     void on_pushButtonTest_clicked();
 
+    void on_lineEdit_maxHeightMM_editingFinished();
+
+    void on_lineEdit_MaxHeightImp_editingFinished();
+
+    void on_radioButtonFpgaFreq25_clicked();
+
+    void on_radioButtonFpgaFreq24_clicked();
+
+    void on_lineEdit_mmPerRot_editingFinished();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
@@ -185,6 +195,7 @@ private:
     void udpServerClose();
 
     bool bFreeToWrite[MOTOR_CNT];
+    quint32 FPGA_FREQ;
 };
 
 

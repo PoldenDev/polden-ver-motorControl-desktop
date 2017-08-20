@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>840</width>
-    <height>820</height>
+    <width>816</width>
+    <height>739</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <widget class="QWidget" name="widget_4" native="true">
       <property name="maximumSize">
        <size>
-        <width>700</width>
+        <width>500</width>
         <height>16777215</height>
        </size>
       </property>
@@ -51,59 +51,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>min:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEditMinVal">
-         <property name="inputMask">
-          <string>999</string>
-         </property>
-         <property name="text">
-          <string>0</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>max</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEditMaxVal">
-         <property name="inputMask">
-          <string>99999</string>
-         </property>
-         <property name="text">
-          <string>20000</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>steps:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="maxSteps">
-         <property name="text">
-          <string>200000</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -908,6 +858,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
             <widget class="QSlider" name="timeShift_0">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -949,6 +905,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
             <widget class="QSlider" name="timeShift_1">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -971,6 +933,12 @@
            </item>
            <item>
             <widget class="QLineEdit" name="lineEditTimeShift_1">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -984,6 +952,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
             <widget class="QSlider" name="timeShift_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1006,6 +980,12 @@
            </item>
            <item>
             <widget class="QLineEdit" name="lineEditTimeShift_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -1019,6 +999,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
             <widget class="QSlider" name="timeShift_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1041,6 +1027,12 @@
            </item>
            <item>
             <widget class="QLineEdit" name="lineEditTimeShift_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -1054,6 +1046,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
             <widget class="QSlider" name="timeShift_4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1076,6 +1074,12 @@
            </item>
            <item>
             <widget class="QLineEdit" name="lineEditTimeShift_4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -1089,6 +1093,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
             <widget class="QSlider" name="timeShift_5">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1111,6 +1121,12 @@
            </item>
            <item>
             <widget class="QLineEdit" name="lineEditTimeShift_5">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -1124,6 +1140,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
             <widget class="QSlider" name="timeShift_6">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1146,6 +1168,12 @@
            </item>
            <item>
             <widget class="QLineEdit" name="lineEditTimeShift_6">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -1159,6 +1187,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_13">
            <item>
             <widget class="QSlider" name="timeShift_8">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1194,6 +1228,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_12">
            <item>
             <widget class="QSlider" name="timeShift_7">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1229,6 +1269,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_14">
            <item>
             <widget class="QSlider" name="timeShift_9">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimum">
               <number>-1999</number>
              </property>
@@ -1260,6 +1306,279 @@
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="tabSettings">
+       <attribute name="title">
+        <string>settings</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>211</width>
+          <height>141</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Механика</string>
+        </property>
+        <widget class="QLabel" name="label_8">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>47</width>
+           <height>13</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>имп/об</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_ImpPerRot">
+         <property name="geometry">
+          <rect>
+           <x>110</x>
+           <y>20</y>
+           <width>81</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="text">
+          <string>4000</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>47</width>
+           <height>13</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>мм/об</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_mmPerRot">
+         <property name="geometry">
+          <rect>
+           <x>110</x>
+           <y>50</y>
+           <width>81</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="text">
+          <string>10</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_maxHeightMM">
+         <property name="geometry">
+          <rect>
+           <x>110</x>
+           <y>80</y>
+           <width>81</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="text">
+          <string>100</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_10">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>80</y>
+           <width>91</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>макс высота, мм</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_MaxHeightImp">
+         <property name="geometry">
+          <rect>
+           <x>110</x>
+           <y>110</y>
+           <width>81</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="text">
+          <string>200000</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_11">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>110</y>
+           <width>91</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>макс высота, имп</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_6">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>20</y>
+          <width>141</width>
+          <height>101</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>ЭБУ</string>
+        </property>
+        <widget class="QRadioButton" name="radioButtonFpgaFreq24">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>20</y>
+           <width>91</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>24 МГц (v1.0)</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButtonFpgaFreq25">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>50</y>
+           <width>91</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>25 МГц (v1.1)</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_7">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>170</y>
+          <width>141</width>
+          <height>101</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>UDP</string>
+        </property>
+        <widget class="QLineEdit" name="lineEditMinVal">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>20</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="inputMask">
+          <string>9</string>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>20</y>
+           <width>20</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>min:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>60</y>
+           <width>20</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>max</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditMaxVal">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>60</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="text">
+          <string>1000</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <zorder>lineEditMinVal</zorder>
+        <zorder>label</zorder>
+        <zorder>label_2</zorder>
+        <zorder>lineEditMaxVal</zorder>
+        <zorder>lineEditMinVal</zorder>
+        <zorder>label</zorder>
+        <zorder>label_2</zorder>
+        <zorder>lineEditMaxVal</zorder>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1343,13 +1662,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushBUttonToIdle">
-         <property name="text">
-          <string>to idle</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="goToTerm">
          <property name="text">
           <string>go term</string>
@@ -1370,10 +1682,30 @@
          </property>
         </widget>
        </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget_29" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_20">
        <item>
-        <widget class="QCheckBox" name="checkBoxCycle">
+        <widget class="QPushButton" name="pushButtonPosReset">
          <property name="text">
-          <string>cycle</string>
+          <string>pos reset</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushBUttonToIdle">
+         <property name="text">
+          <string>to idle</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonClear">
+         <property name="text">
+          <string>clear queue</string>
          </property>
         </widget>
        </item>
@@ -1385,16 +1717,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonPosReset">
+        <widget class="QCheckBox" name="checkBoxCycle">
          <property name="text">
-          <string>pos reset</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonClear">
-         <property name="text">
-          <string>clear queue</string>
+          <string>cycle</string>
          </property>
         </widget>
        </item>
@@ -1406,7 +1731,7 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>50</height>
+        <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -1440,9 +1765,15 @@
        </item>
        <item>
         <widget class="QPlainTextEdit" name="plainTextUDP">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximumSize">
           <size>
-           <width>200</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>
@@ -1591,7 +1922,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>840</width>
+     <width>816</width>
      <height>21</height>
     </rect>
    </property>
