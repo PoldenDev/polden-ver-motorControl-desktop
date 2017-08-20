@@ -87,6 +87,8 @@ private slots:
 
     void on_pushButtonGoZero_clicked();
 
+    void on_pushButtonTest_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
@@ -139,7 +141,7 @@ private:
 
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;
-    QQueue<QString> motorPosCmdStrings;
+    //QQueue<QString> motorPosCmdStrings;
 
     //int absolutePos[MOTOR_CNT];
 
@@ -181,6 +183,8 @@ private:
 
     void udpServerOpen();
     void udpServerClose();
+
+    bool bFreeToWrite[MOTOR_CNT];
 };
 
 

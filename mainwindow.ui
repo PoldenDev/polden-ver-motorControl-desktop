@@ -1364,6 +1364,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonTest">
+         <property name="text">
+          <string>test</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBoxCycle">
          <property name="text">
           <string>cycle</string>

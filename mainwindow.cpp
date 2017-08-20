@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     on_pushButtonUdpOpenClose_clicked();
-    timer.setInterval(50);
+    timer.setInterval(5);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
+        bFreeToWrite[i] = false;
     }
 
     for(int i=0; i<MOTOR_CNT; i++){
@@ -484,16 +485,16 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
             int msec = QTime::currentTime().msecsSinceStartOfDay();
             //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
             lastMsec = msec;
-            qDebug("steps=%d div=%d dir=%d", steps, div, dir);
+            //qDebug("pos=%d steps=%d div=%d dir=%d", pos, steps, div, dir);
         }
         quint64 dSend = serial.write(ba);
 
-        if(dSend != ba.length()){
-            qDebug("dSend != length()!!");
+        if(dSend != 5){
+            qDebug("dSend %d !!!!!", dSend);
         }
-        if(serial.flush() == false){
+        //if(serial.flush() == false){
             //qDebug("dataFlushed");
-        }
+        //}
         motorAbsolutePosCur[mi] += delta;
         if( motorAbsolutePosCur[mi] < 0){
             //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
@@ -557,8 +558,7 @@ void MainWindow::handleReadyRead()
     bytesOnIter = str.length();
     //qDebug("enter bytesRecv %d", str.length());
     QMap<char, char> tempStor;
-    for (int i=0; i<str.length(); i++) {
-        char b = str[i];
+    foreach (char b, str) {
         char n = (b>>6)&0x3;
 //        if(tempStor.contains(n))
 //            qDebug("in this pack already contains!");
@@ -571,15 +571,17 @@ void MainWindow::handleReadyRead()
         switch((b>>6)&0x3){
         case 0x0:
             for(int i=0; i<5; i++){
+                bFreeToWrite[i] = ((b&(1<<i)) == 0);
                 if((b&(1<<i)) == 0){
-                    freeToWrite(i);
+                    //freeToWrite(i);
                 }
             }
             break;
         case 0x1:
             for(int i=0; i<5; i++){
+                bFreeToWrite[5+i] = ((b&(1<<i)) == 0);
                 if((b&(1<<i)) == 0){
-                    freeToWrite(5+i);
+                    //freeToWrite(5+i);
                 }
             }
             break;
@@ -835,13 +837,15 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
         vs = QString("%1").arg(convVal, 3, 'g', -1, '0');
-        parseCmdMotorStr(i, vs);
+        //if((i==0)||(i==1)){
+            parseCmdMotorStr(i, vs);
+        //}
         convertedString += "p" + vs;
 
     }
     convertedString += "\r\n";
 
-    motorPosCmdStrings << convertedString;
+    //motorPosCmdStrings << convertedString;
 }
 
 DivPosDataStr ds;
@@ -1100,50 +1104,15 @@ void MainWindow::on_pushButtonClear_clicked()
 
 void MainWindow::sendOnTimer()
 {
-    if(serial.isOpen() && !motorPosCmdStrings.isEmpty()){
-        QString wrStr = motorPosCmdStrings.dequeue();
-        //serial.write(wrStr.toLatin1());
-    }
-
-//    if(mtstr[curMotorSendIdx].contrStringQueue.isEmpty() == false){
-//       // qDebug() << QTime::currentTime().msecsSinceStartOfDay() << "send "
-//       //          << curMotorSendIdx << " " << mtstr[curMotorSendIdx].contrStringQueue.size();
-//        if(serial.isOpen()){
-//            QString wrStr = mtstr[curMotorSendIdx].contrStringQueue.dequeue();
-//            serial.write(wrStr.toLatin1());
-//        }
-
-//    }
-//    curMotorSendIdx++;
-//    if(curMotorSendIdx >= MOTOR_CNT){
-//        curMotorSendIdx = 0;
-//    }
-
-    if(serial.isOpen()){
-        for(int i=0; i<10; i++){
-//            if(motorPosCmdData[i].isEmpty() == false){
-//                DivPosDataStr ds;
-//                ds = motorPosCmdData[i].dequeue();
-//                if(i==9){
-//                    int t = 1000*ds.steps*((float)ds.div/24000000);
-//                    qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
-
-//                }
-//                if(ds.div < 0x100)
-//                    ds.div = 0x100;
-
-                //if(ds.steps > 0)
-                //    sendDivPos(i, ds.div, ds.steps, ds.dir);
-//            }
-        }
+    if(serial.isOpen() && (bFreeToWrite[curMotorSendIdx] == true)){
         //QString wrStr = motorPosCmdStrings.dequeue();
         //serial.write(wrStr.toLatin1());
+        freeToWrite(curMotorSendIdx);
+
     }
-//   qDebug("deq %d %d %d %d %d", motorPosCmdData[0].length(),
-//                                motorPosCmdData[1].length(),
-//                                motorPosCmdData[2].length(),
-//                                motorPosCmdData[3].length(),
-//                                motorPosCmdData[4].length());
+    curMotorSendIdx++;
+    if(curMotorSendIdx >= MOTOR_CNT)
+        curMotorSendIdx = 0;
 }
 
 
@@ -1566,4 +1535,30 @@ void MainWindow::on_pushButtonGoZero_clicked()
     }
 
 
+}
+
+void MainWindow::on_pushButtonTest_clicked()
+{
+    DivPosDataStr ds;
+    ds.pos=600; motorPosCmdData[0] << ds;
+    ds.pos=2800; motorPosCmdData[0] << ds;
+    ds.pos=6200; motorPosCmdData[0] << ds;
+    ds.pos=10800; motorPosCmdData[0] << ds;
+    ds.pos=16400; motorPosCmdData[0] << ds;
+    ds.pos=22800; motorPosCmdData[0] << ds;
+    ds.pos=30000; motorPosCmdData[0] << ds;
+    ds.pos=37600; motorPosCmdData[0] << ds;
+    ds.pos=45600; motorPosCmdData[0] << ds;
+    ds.pos=53799; motorPosCmdData[0] << ds;
+    ds.pos=62200; motorPosCmdData[0] << ds;
+    ds.pos=70400; motorPosCmdData[0] << ds;
+    ds.pos=78400; motorPosCmdData[0] << ds;
+    ds.pos=86000; motorPosCmdData[0] << ds;
+    ds.pos=93200; motorPosCmdData[0] << ds;
+    ds.pos=99600; motorPosCmdData[0] << ds;
+    ds.pos=105200; motorPosCmdData[0] << ds;
+    ds.pos=109800; motorPosCmdData[0] << ds;
+    ds.pos=113200; motorPosCmdData[0] << ds;
+    ds.pos=115399; motorPosCmdData[0] << ds;
+    ds.pos=116200; motorPosCmdData[0] << ds;
 }
