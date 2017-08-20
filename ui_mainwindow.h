@@ -27,6 +27,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolBar>
@@ -45,7 +46,7 @@ public:
     QComboBox *comComboBox;
     QPushButton *pushButtonComOpen;
     QPushButton *pushButton_refreshCom;
-    QLabel *label_3;
+    QSpacerItem *horizontalSpacer;
     QPushButton *pushButtonUdpOpenClose;
     QTabWidget *tabWidget;
     QWidget *tabMainStat;
@@ -283,10 +284,9 @@ public:
 
         horizontalLayout_3->addWidget(pushButton_refreshCom);
 
-        label_3 = new QLabel(widget_4);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_3->addWidget(label_3);
+        horizontalLayout_3->addItem(horizontalSpacer);
 
         pushButtonUdpOpenClose = new QPushButton(widget_4);
         pushButtonUdpOpenClose->setObjectName(QStringLiteral("pushButtonUdpOpenClose"));
@@ -1475,7 +1475,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(2);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1486,7 +1486,6 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", Q_NULLPTR));
         pushButtonComOpen->setText(QApplication::translate("MainWindow", "open", Q_NULLPTR));
         pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
-        label_3->setText(QApplication::translate("MainWindow", "steps:", Q_NULLPTR));
         pushButtonUdpOpenClose->setText(QApplication::translate("MainWindow", "UDP Open", Q_NULLPTR));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "USB", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "\320\237\320\260\320\272\320\265\321\202\320\276\320\262", Q_NULLPTR));
