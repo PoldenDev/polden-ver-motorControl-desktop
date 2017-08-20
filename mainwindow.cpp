@@ -754,6 +754,7 @@ void MainWindow::freeToWrite(int i)
 //            else{
                 if(sendDivPos(i, ds, ds.pos) == true){
                     motorPosCmdData[i].dequeue();
+                    bFreeToWrite[curMotorSendIdx] = false;
                 }
                 //motorPosCmdData[i].dequeue();
 //            }
@@ -1549,23 +1550,24 @@ void MainWindow::on_pushButtonInitiate_clicked()
 
 void MainWindow::on_pushButtonGoZero_clicked()
 {
-    DivPosDataStr ds;
+    DivPosDataStr ds;  
     int startPos =0;
+    for(int mi=0; mi<MOTOR_CNT; mi++){
+        if(motorPosCmdData[mi].length() == 0)
+            startPos = getMotorAbsPos(mi);
+        else
+            startPos = motorPosCmdData[mi].last().pos;
 
-    if(motorPosCmdData[0].length() == 0)
-        startPos = getMotorAbsPos(0);
-    else
-        startPos = motorPosCmdData[0].last().pos;
-
-    int iters = startPos/400;
-    ds.pos = startPos;
-    for(int i=0; i<iters; i++){
-        ds.pos -=400;
-        motorPosCmdData[0] << ds;
-    }
-    if(ds.pos > 0){
-        ds.pos = 0;
-        motorPosCmdData[0] << ds;
+        int iters = startPos/400;
+        ds.pos = startPos;
+        for(int i=0; i<iters; i++){
+            ds.pos -=400;
+            motorPosCmdData[mi] << ds;
+        }
+        if(ds.pos > 0){
+            ds.pos = 0;
+            motorPosCmdData[mi] << ds;
+        }
     }
 
 

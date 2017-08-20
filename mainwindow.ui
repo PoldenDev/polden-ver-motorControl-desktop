@@ -79,7 +79,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabMainStat">
        <attribute name="title">
@@ -1576,14 +1576,6 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <zorder>lineEditMinVal</zorder>
-        <zorder>label</zorder>
-        <zorder>label_2</zorder>
-        <zorder>lineEditMaxVal</zorder>
-        <zorder>lineEditMinVal</zorder>
-        <zorder>label</zorder>
-        <zorder>label_2</zorder>
-        <zorder>lineEditMaxVal</zorder>
        </widget>
        <widget class="QGroupBox" name="groupBox_8">
         <property name="geometry">
@@ -1624,43 +1616,6 @@
          </property>
         </widget>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>все</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QWidget" name="qwtWdgH1" native="true">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QWidget" name="widget_7" native="true">
-             <widget class="QWidget" name="formLayoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>150</y>
-                <width>160</width>
-                <height>80</height>
-               </rect>
-              </property>
-              <layout class="QFormLayout" name="formLayout"/>
-             </widget>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="qwtWdgH2" native="true">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QWidget" name="widget_8" native="true"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
       </widget>
      </widget>
     </item>

@@ -15,7 +15,6 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -199,16 +198,6 @@ public:
     QGroupBox *groupBox_8;
     QLabel *label_13;
     QLabel *labelCompileTime;
-    QWidget *tab;
-    QVBoxLayout *verticalLayout;
-    QWidget *qwtWdgH1;
-    QHBoxLayout *horizontalLayout_2;
-    QWidget *widget_7;
-    QWidget *formLayoutWidget;
-    QFormLayout *formLayout;
-    QWidget *qwtWdgH2;
-    QHBoxLayout *horizontalLayout_5;
-    QWidget *widget_8;
     QWidget *widget_27;
     QHBoxLayout *horizontalLayout_18;
     QPushButton *pushButtonInitiate;
@@ -1193,14 +1182,6 @@ public:
         lineEditMaxVal->setObjectName(QStringLiteral("lineEditMaxVal"));
         lineEditMaxVal->setGeometry(QRect(50, 60, 71, 20));
         lineEditMaxVal->setAlignment(Qt::AlignCenter);
-        lineEditMinVal->raise();
-        label->raise();
-        label_2->raise();
-        lineEditMaxVal->raise();
-        lineEditMinVal->raise();
-        label->raise();
-        label_2->raise();
-        lineEditMaxVal->raise();
         groupBox_8 = new QGroupBox(tabSettings);
         groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
         groupBox_8->setGeometry(QRect(240, 190, 151, 51));
@@ -1211,49 +1192,6 @@ public:
         labelCompileTime->setObjectName(QStringLiteral("labelCompileTime"));
         labelCompileTime->setGeometry(QRect(80, 20, 101, 16));
         tabWidget->addTab(tabSettings, QString());
-        tab = new QWidget();
-        tab->setObjectName(QStringLiteral("tab"));
-        verticalLayout = new QVBoxLayout(tab);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        qwtWdgH1 = new QWidget(tab);
-        qwtWdgH1->setObjectName(QStringLiteral("qwtWdgH1"));
-        horizontalLayout_2 = new QHBoxLayout(qwtWdgH1);
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        widget_7 = new QWidget(qwtWdgH1);
-        widget_7->setObjectName(QStringLiteral("widget_7"));
-        formLayoutWidget = new QWidget(widget_7);
-        formLayoutWidget->setObjectName(QStringLiteral("formLayoutWidget"));
-        formLayoutWidget->setGeometry(QRect(80, 150, 160, 80));
-        formLayout = new QFormLayout(formLayoutWidget);
-        formLayout->setSpacing(6);
-        formLayout->setContentsMargins(11, 11, 11, 11);
-        formLayout->setObjectName(QStringLiteral("formLayout"));
-        formLayout->setContentsMargins(0, 0, 0, 0);
-
-        horizontalLayout_2->addWidget(widget_7);
-
-
-        verticalLayout->addWidget(qwtWdgH1);
-
-        qwtWdgH2 = new QWidget(tab);
-        qwtWdgH2->setObjectName(QStringLiteral("qwtWdgH2"));
-        horizontalLayout_5 = new QHBoxLayout(qwtWdgH2);
-        horizontalLayout_5->setSpacing(6);
-        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
-        widget_8 = new QWidget(qwtWdgH2);
-        widget_8->setObjectName(QStringLiteral("widget_8"));
-
-        horizontalLayout_5->addWidget(widget_8);
-
-
-        verticalLayout->addWidget(qwtWdgH2);
-
-        tabWidget->addTab(tab, QString());
 
         verticalLayout_2->addWidget(tabWidget);
 
@@ -1475,7 +1413,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1533,7 +1471,6 @@ public:
         label_13->setText(QApplication::translate("MainWindow", "compile time:", Q_NULLPTR));
         labelCompileTime->setText(QApplication::translate("MainWindow", "TextLabel", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
         pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
         pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
