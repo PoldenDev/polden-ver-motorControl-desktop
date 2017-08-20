@@ -705,7 +705,7 @@ void MainWindow::terminatorState(int i, bool bEna)
             startPos = motorPosCmdData[i].last().pos;
 
         ds.pos = startPos+400;
-        for(int k=0; k<4; k++){
+        for(int k=0; k<40; k++){
             motorPosCmdData[i] << ds;
              ds.pos += 400;
         }
