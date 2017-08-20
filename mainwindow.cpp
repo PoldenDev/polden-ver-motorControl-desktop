@@ -1015,6 +1015,10 @@ void MainWindow::readPendingDatagrams()
             //qDebug("start cmd");
             ui->plainTextUDP->appendPlainText("start cmd");
         }
+        else if(dataStr.compare("init\r\n") == 0){
+            on_pushButtonInitiate_clicked();
+            ui->plainTextUDP->appendPlainText("init cmd");
+        }
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
             for(int i=0; i<MOTOR_CNT; i++){
