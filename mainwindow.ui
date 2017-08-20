@@ -73,7 +73,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabMainStat">
        <attribute name="title">
@@ -1578,6 +1578,45 @@
         <zorder>label</zorder>
         <zorder>label_2</zorder>
         <zorder>lineEditMaxVal</zorder>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_8">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>190</y>
+          <width>151</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>About</string>
+        </property>
+        <widget class="QLabel" name="label_13">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>71</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>compile time:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="labelCompileTime">
+         <property name="geometry">
+          <rect>
+           <x>80</x>
+           <y>20</y>
+           <width>101</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab">

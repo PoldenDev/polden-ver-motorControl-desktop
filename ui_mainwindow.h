@@ -195,6 +195,9 @@ public:
     QLabel *label;
     QLabel *label_2;
     QLineEdit *lineEditMaxVal;
+    QGroupBox *groupBox_8;
+    QLabel *label_13;
+    QLabel *labelCompileTime;
     QWidget *tab;
     QVBoxLayout *verticalLayout;
     QWidget *qwtWdgH1;
@@ -1198,6 +1201,15 @@ public:
         label->raise();
         label_2->raise();
         lineEditMaxVal->raise();
+        groupBox_8 = new QGroupBox(tabSettings);
+        groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
+        groupBox_8->setGeometry(QRect(240, 190, 151, 51));
+        label_13 = new QLabel(groupBox_8);
+        label_13->setObjectName(QStringLiteral("label_13"));
+        label_13->setGeometry(QRect(10, 20, 71, 16));
+        labelCompileTime = new QLabel(groupBox_8);
+        labelCompileTime->setObjectName(QStringLiteral("labelCompileTime"));
+        labelCompileTime->setGeometry(QRect(80, 20, 101, 16));
         tabWidget->addTab(tabSettings, QString());
         tab = new QWidget();
         tab->setObjectName(QStringLiteral("tab"));
@@ -1463,7 +1475,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1518,6 +1530,9 @@ public:
         label_2->setText(QApplication::translate("MainWindow", "max", Q_NULLPTR));
         lineEditMaxVal->setInputMask(QString());
         lineEditMaxVal->setText(QApplication::translate("MainWindow", "1000", Q_NULLPTR));
+        groupBox_8->setTitle(QApplication::translate("MainWindow", "About", Q_NULLPTR));
+        label_13->setText(QApplication::translate("MainWindow", "compile time:", Q_NULLPTR));
+        labelCompileTime->setText(QApplication::translate("MainWindow", "TextLabel", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "\320\262\321\201\320\265", Q_NULLPTR));
         pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));

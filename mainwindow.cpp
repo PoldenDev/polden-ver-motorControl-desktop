@@ -208,8 +208,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&uiUpdateTimer, SIGNAL(timeout()), this, SLOT(uiUpdateTimerSlot()));
     uiUpdateTimer.start();
 
+    QString build = QString("%1 ")
+    .arg(QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")).toString("yyyy-MM-dd"))
+    .arg(QString("%1%20%3%4%5%6").arg(__TIME__[0])
+    .arg(__TIME__[1])
+    .arg(__TIME__[3])
+    .arg(__TIME__[4])
+    .arg(__TIME__[6])
+    .arg(__TIME__[7]));
+
+    ui->labelCompileTime->setText(build);
 
 }
+
 void MainWindow::createPlot(QString name)
 {
 //    QwtPlot *d_plot = new QwtPlot(this);
