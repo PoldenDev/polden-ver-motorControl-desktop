@@ -187,6 +187,8 @@ public:
     QLabel *label_10;
     QLineEdit *lineEdit_MaxHeightImp;
     QLabel *label_11;
+    QLabel *label_12;
+    QLineEdit *lineEdit_vmax_mmsec;
     QGroupBox *groupBox_6;
     QRadioButton *radioButtonFpgaFreq24;
     QRadioButton *radioButtonFpgaFreq25;
@@ -1126,7 +1128,7 @@ public:
         tabSettings->setObjectName(QStringLiteral("tabSettings"));
         groupBox_5 = new QGroupBox(tabSettings);
         groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
-        groupBox_5->setGeometry(QRect(20, 20, 211, 141));
+        groupBox_5->setGeometry(QRect(20, 20, 211, 171));
         label_8 = new QLabel(groupBox_5);
         label_8->setObjectName(QStringLiteral("label_8"));
         label_8->setGeometry(QRect(10, 20, 47, 13));
@@ -1155,6 +1157,13 @@ public:
         label_11 = new QLabel(groupBox_5);
         label_11->setObjectName(QStringLiteral("label_11"));
         label_11->setGeometry(QRect(10, 110, 91, 16));
+        label_12 = new QLabel(groupBox_5);
+        label_12->setObjectName(QStringLiteral("label_12"));
+        label_12->setGeometry(QRect(10, 140, 91, 16));
+        lineEdit_vmax_mmsec = new QLineEdit(groupBox_5);
+        lineEdit_vmax_mmsec->setObjectName(QStringLiteral("lineEdit_vmax_mmsec"));
+        lineEdit_vmax_mmsec->setGeometry(QRect(110, 140, 81, 20));
+        lineEdit_vmax_mmsec->setAlignment(Qt::AlignCenter);
         groupBox_6 = new QGroupBox(tabSettings);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
         groupBox_6->setGeometry(QRect(260, 20, 141, 101));
@@ -1167,7 +1176,7 @@ public:
         radioButtonFpgaFreq25->setChecked(true);
         groupBox_7 = new QGroupBox(tabSettings);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
-        groupBox_7->setGeometry(QRect(20, 170, 141, 101));
+        groupBox_7->setGeometry(QRect(20, 200, 141, 101));
         lineEditMinVal = new QLineEdit(groupBox_7);
         lineEditMinVal->setObjectName(QStringLiteral("lineEditMinVal"));
         lineEditMinVal->setGeometry(QRect(50, 20, 71, 20));
@@ -1302,6 +1311,7 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(plainTextUDP->sizePolicy().hasHeightForWidth());
         plainTextUDP->setSizePolicy(sizePolicy2);
+        plainTextUDP->setMinimumSize(QSize(0, 0));
         plainTextUDP->setMaximumSize(QSize(16777215, 16777215));
         plainTextUDP->setReadOnly(true);
 
@@ -1457,6 +1467,7 @@ public:
         lineEdit_MaxHeightImp->setInputMask(QString());
         lineEdit_MaxHeightImp->setText(QApplication::translate("MainWindow", "200000", Q_NULLPTR));
         label_11->setText(QApplication::translate("MainWindow", "\320\274\320\260\320\272\321\201 \320\262\321\213\321\201\320\276\321\202\320\260, \320\270\320\274\320\277", Q_NULLPTR));
+        label_12->setText(QApplication::translate("MainWindow", "Vmax, \320\274\320\274/\321\201", Q_NULLPTR));
         groupBox_6->setTitle(QApplication::translate("MainWindow", "\320\255\320\221\320\243", Q_NULLPTR));
         radioButtonFpgaFreq24->setText(QApplication::translate("MainWindow", "24 \320\234\320\223\321\206 (v1.0)", Q_NULLPTR));
         radioButtonFpgaFreq25->setText(QApplication::translate("MainWindow", "25 \320\234\320\223\321\206 (v1.1)", Q_NULLPTR));

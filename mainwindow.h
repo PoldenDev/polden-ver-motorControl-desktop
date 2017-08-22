@@ -99,6 +99,8 @@ private slots:
 
     void on_lineEdit_mmPerRot_editingFinished();
 
+    void on_lineEdit_vmax_mmsec_editingFinished();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;
@@ -196,6 +198,8 @@ private:
 
     bool bFreeToWrite[MOTOR_CNT];
     quint32 FPGA_FREQ;
+
+    int mmToImp(int mm);
 };
 
 

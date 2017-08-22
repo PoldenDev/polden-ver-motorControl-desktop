@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     }
 
+    ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec",5).toString());
+
 
     timer.setInterval(5);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
@@ -888,6 +890,9 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
         //QString midstr = cmdStr.mid(3, 3);
         //int pos = cmdStr.mid(3, 3).toInt();
         int pos = cmdStr.toInt();
+
+        //if(mn==3) ui->plainTextUDP->appendPlainText(cmdStr);
+
         //int pos = cmdStr.right(3).toInt();
         if((mn>=0)&&(mn<10)){
 //            int lastPos = 0;
@@ -908,16 +913,23 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             int newPos = maxVal*(pos/1000.);
             ds.pos = newPos;
             int delta = newPos - getMotorAbsPos(mn);
-            if(motorPosCmdData[mn].length() == 0){                
+            if(motorPosCmdData[mn].length() == 0){
+                //ui->plainTextUDP->appendPlainText("add pts!");
                 //qDebug("mn %d d %d", mn, delta);
+
+                int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
+                int maxImpPerDelta = mmToImp(vmaxMmsec)/10;
+                //qDebug("%d", maxImpPerDelta);
+
                 int n=1;
-                for(; abs(delta)>2000; n*=2){
+                for(; abs(delta)>maxImpPerDelta; n*=2){
                     delta/=2;
                 }
                 ds.pos = getMotorAbsPos(mn);
                 ds.absMsec = QTime::currentTime().msecsSinceStartOfDay();
+                ds.absMsec += 100;
                 for(int i=0; i<n; i++){
-                    ds.absMsec += 100;
+                    //ds.absMsec += 100;
                     ds.pos = ds.pos+delta;
                     motorPosCmdData[mn].append(ds);                    
                 }
@@ -1647,5 +1659,19 @@ void MainWindow::on_lineEdit_mmPerRot_editingFinished()
     QSettings settings("Murinets", "MotorControl");
     settings.setValue("mmPerRot", ui->lineEdit_mmPerRot->text().toInt());
     on_lineEdit_maxHeightMM_editingFinished();
+}
 
+void MainWindow::on_lineEdit_vmax_mmsec_editingFinished()
+{
+    QSettings settings("Murinets", "MotorControl");
+    settings.setValue("vmax_mmsec", ui->lineEdit_vmax_mmsec->text().toInt());
+}
+
+
+int MainWindow::mmToImp(int mm)
+{
+    int mmPerRot = ui->lineEdit_mmPerRot->text().toInt();
+    int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
+    int impPerMm = impPerRot/mmPerRot;
+    return mm*impPerMm;
 }

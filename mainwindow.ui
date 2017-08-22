@@ -1323,7 +1323,7 @@
           <x>20</x>
           <y>20</y>
           <width>211</width>
-          <height>141</height>
+          <height>171</height>
          </rect>
         </property>
         <property name="title">
@@ -1457,6 +1457,32 @@
           <string>макс высота, имп</string>
          </property>
         </widget>
+        <widget class="QLabel" name="label_12">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>140</y>
+           <width>91</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Vmax, мм/с</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_vmax_mmsec">
+         <property name="geometry">
+          <rect>
+           <x>110</x>
+           <y>140</y>
+           <width>81</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
        </widget>
        <widget class="QGroupBox" name="groupBox_6">
         <property name="geometry">
@@ -1504,7 +1530,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>170</y>
+          <y>200</y>
           <width>141</width>
           <height>101</height>
          </rect>
@@ -1770,6 +1796,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="maximumSize">
           <size>
