@@ -200,6 +200,8 @@ private:
     quint32 FPGA_FREQ;
 
     int mmToImp(int mm);
+    void parseFPGAMsg(QByteArray ba);
+    bool speedTrig;
 };
 
 

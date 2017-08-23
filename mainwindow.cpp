@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec",5).toString());
 
 
-    timer.setInterval(5);
+    timer.setInterval(25);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
@@ -352,10 +352,10 @@ void MainWindow::on_pushButtonComOpen_clicked()
                 }
                 //qDebug("%s port opened", qUtf8Printable(comName));
                 ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
-                connect(&serial, SIGNAL(readyRead()),
-                        this, SLOT(handleReadyRead()));
-                connect(&serial, SIGNAL(bytesWritten(qint64)),
-                        this, SLOT(handleSerialDataWritten(qint64)));
+//                connect(&serial, SIGNAL(readyRead()),
+//                        this, SLOT(handleReadyRead()));
+//                connect(&serial, SIGNAL(bytesWritten(qint64)),
+//                        this, SLOT(handleSerialDataWritten(qint64)));
                 ui->pushButtonComOpen->setText("close");
                 comExchanges = 0;
                 usbConnectionTime.start();
@@ -560,6 +560,56 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
 
 }
 
+void MainWindow::parseFPGAMsg(QByteArray ba)
+{
+    bytesOnIter = ba.length();
+    //qDebug("enter bytesRecv %d", str.length());
+    QMap<char, char> tempStor;
+    foreach (char b, ba) {
+        char n = (b>>6)&0x3;
+//        if(tempStor.contains(n))
+//            qDebug("in this pack already contains!");
+        tempStor[n] = b/*|tempStor[n]*/;
+    }
+
+
+
+    foreach (char b, tempStor){
+        switch((b>>6)&0x3){
+        case 0x0:
+            for(int i=0; i<5; i++){
+                bFreeToWrite[i] = ((b&(1<<i)) == 0);
+                if((b&(1<<i)) == 0){
+                    freeToWrite(i);
+                }
+            }
+            break;
+        case 0x1:
+            for(int i=0; i<5; i++){
+                bFreeToWrite[5+i] = ((b&(1<<i)) == 0);
+                if((b&(1<<i)) == 0){
+                    freeToWrite(5+i);
+                }
+            }
+            break;
+        case 0x2:
+            //qDebug("%02x 1 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                terminatorState(i, b&(1<<i));
+            }
+
+            break;
+        case 0x3:
+            //qDebug("%02x 2 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                terminatorState(5+i, b&(1<<i));
+            }
+            break;
+        }
+    }
+
+}
+
 void MainWindow::handleReadyRead()
 {
     comExchanges++;
@@ -586,51 +636,6 @@ void MainWindow::handleReadyRead()
     //processUartRecvExchange(cmd);
 
 
-    bytesOnIter = str.length();
-    //qDebug("enter bytesRecv %d", str.length());
-    QMap<char, char> tempStor;
-    foreach (char b, str) {
-        char n = (b>>6)&0x3;
-//        if(tempStor.contains(n))
-//            qDebug("in this pack already contains!");
-        tempStor[n] = b/*|tempStor[n]*/;
-    }
-
-
-
-    foreach (char b, tempStor){
-        switch((b>>6)&0x3){
-        case 0x0:
-            for(int i=0; i<5; i++){
-                bFreeToWrite[i] = ((b&(1<<i)) == 0);
-                if((b&(1<<i)) == 0){
-                    //freeToWrite(i);
-                }
-            }
-            break;
-        case 0x1:
-            for(int i=0; i<5; i++){
-                bFreeToWrite[5+i] = ((b&(1<<i)) == 0);
-                if((b&(1<<i)) == 0){
-                    //freeToWrite(5+i);
-                }
-            }
-            break;
-        case 0x2:
-            //qDebug("%02x 1 %02x", b, (b&0x1f));
-            for(int i=0; i<5; i++){
-                terminatorState(i, b&(1<<i));
-            }
-
-            break;
-        case 0x3:
-            //qDebug("%02x 2 %02x", b, (b&0x1f));
-            for(int i=0; i<5; i++){
-                terminatorState(5+i, b&(1<<i));
-            }
-            break;
-        }
-    }
 
 
 
@@ -734,7 +739,19 @@ void MainWindow::freeToWrite(int i)
     case MT_GoDOWN:
     case MT_INIT_GoDOWN:
         DivPosDataStr ds;
-        ds.pos = getMotorAbsPos(i)-500;
+        if(i==0){
+            if(speedTrig){
+                ds.pos = getMotorAbsPos(i)-500;
+                speedTrig = false;
+            }
+            else{
+                ds.pos = getMotorAbsPos(i)-10;
+                speedTrig = true;
+            }
+        }
+        else{
+            ds.pos = getMotorAbsPos(i)-500;
+        }
         sendDivPos(i, ds, ds.pos);
 
         break;
@@ -1152,15 +1169,38 @@ void MainWindow::on_pushButtonClear_clicked()
 
 void MainWindow::sendOnTimer()
 {
-    if(serial.isOpen() && (bFreeToWrite[curMotorSendIdx] == true)){
-        //QString wrStr = motorPosCmdStrings.dequeue();
-        //serial.write(wrStr.toLatin1());
-        freeToWrite(curMotorSendIdx);
+//    if(serial.isOpen() && (bFreeToWrite[curMotorSendIdx] == true)){
+//        //QString wrStr = motorPosCmdStrings.dequeue();
+//        //serial.write(wrStr.toLatin1());
+//        freeToWrite(curMotorSendIdx);
 
+//    }
+//    curMotorSendIdx++;
+//    if(curMotorSendIdx >= MOTOR_CNT)
+//        curMotorSendIdx = 0;
+
+
+    if(serial.isOpen() == false)
+        return;
+    QTime tt;
+    tt.start();
+    char c = 0xff;
+    serial.write(&c, 1);
+
+    int bytesToRecv = 4;
+    char dArr[4];
+    while(bytesToRecv>0){
+        //qDebug("try to recv %d bytes", bytesToRecv);
+        if(serial.waitForReadyRead(50) ==false){
+            qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
+            return;
+        }
+        int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
+        bytesToRecv -= dRecvd;
     }
-    curMotorSendIdx++;
-    if(curMotorSendIdx >= MOTOR_CNT)
-        curMotorSendIdx = 0;
+    //qDebug("data recvd in %d ms", tt.elapsed());
+
+    parseFPGAMsg(QByteArray(dArr, 4));
 }
 
 
@@ -1357,33 +1397,33 @@ void MainWindow::on_pushMoveDown_clicked()
 void MainWindow::on_pushTestData_clicked()
 {
 
-//    DivPosDataStr ds;
-//    ds.pos = 1;
-//    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
-    //ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
+    DivPosDataStr ds;
+    ds.pos = 1;
+    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
 
-//    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
 
-//    ds.steps = 33599; ds.div = 71; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 32801; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 33599; ds.div = 71; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 32801; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
 
-//    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 18399; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 13601; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
-//    ds.steps = 3200; ds.div = 750; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 18399; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 13601; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+    ds.steps = 3200; ds.div = 750; ds.dir = 1; motorPosCmdData[0] << ds;
 
 }
 
@@ -1613,6 +1653,8 @@ void MainWindow::on_pushButtonTest_clicked()
     ds.pos=113200; motorPosCmdData[0] << ds;
     ds.pos=115399; motorPosCmdData[0] << ds;
     ds.pos=116200; motorPosCmdData[0] << ds;
+
+
 }
 
 void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
