@@ -883,9 +883,9 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
         vs = QString("%1").arg(convVal, 3, 'g', -1, '0');
-        //if((i==0)||(i==1)){
+        if((i==3)){
             parseCmdMotorStr(i, vs);
-        //}
+        }
         convertedString += "p" + vs;
 
     }
@@ -925,8 +925,11 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             int maxVal = ui->lineEdit_MaxHeightImp->text().toInt();
             int newPos = maxVal*(pos/1000.);
             ds.pos = newPos;
-            int delta = newPos - getMotorAbsPos(mn);
             if(motorPosCmdData[mn].length() == 0){
+                int delta = newPos - getMotorAbsPos(mn);
+                if(delta != 0)
+                    qDebug("%d st=%d div=%d, dir=%d", mn, delta, FPGA_FREQ/(delta*10), delta/abs(delta));
+
                 //ui->plainTextUDP->appendPlainText("add pts!");
                 //qDebug("mn %d d %d", mn, delta);
 
@@ -938,17 +941,24 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 for(; abs(delta)>maxImpPerDelta; n*=2){
                     delta/=2;
                 }
+                if(n>1)
+                    qDebug("add Pts %d", delta);
                 ds.pos = getMotorAbsPos(mn);
                 ds.absMsec = QTime::currentTime().msecsSinceStartOfDay();
                 ds.absMsec += 100;
                 for(int i=0; i<n; i++){
                     //ds.absMsec += 100;
+
                     ds.pos = ds.pos+delta;
                     motorPosCmdData[mn].append(ds);                    
                 }
 
             }
-            else{
+            else{                
+                int delta = newPos - motorPosCmdData[mn].last().pos;
+                if(delta != 0)
+                    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
+
                 ds.absMsec = motorPosCmdData[mn].last().absMsec + 100;
                 motorPosCmdData[mn].append(ds);
             }
