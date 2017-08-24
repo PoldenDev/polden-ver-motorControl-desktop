@@ -201,7 +201,7 @@ private:
 
     int mmToImp(int mm);
     void parseFPGAMsg(QByteArray ba);
-    bool speedTrig;
+    bool speedTrig[MOTOR_CNT];
 };
 
 

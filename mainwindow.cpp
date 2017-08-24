@@ -739,19 +739,15 @@ void MainWindow::freeToWrite(int i)
     case MT_GoDOWN:
     case MT_INIT_GoDOWN:
         DivPosDataStr ds;
-        if(i==0){
-            if(speedTrig){
-                ds.pos = getMotorAbsPos(i)-500;
-                speedTrig = false;
-            }
-            else{
-                ds.pos = getMotorAbsPos(i)-10;
-                speedTrig = true;
-            }
+        if(speedTrig[i]){
+            ds.pos = getMotorAbsPos(i)-500;
+            speedTrig[i] = false;
         }
         else{
-            ds.pos = getMotorAbsPos(i)-500;
+            ds.pos = getMotorAbsPos(i)-10;
+            speedTrig[i] = true;
         }
+        ds.pos = getMotorAbsPos(i)-500;
         sendDivPos(i, ds, ds.pos);
 
         break;
