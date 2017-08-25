@@ -484,9 +484,9 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
     if(steps > 0){
         //calc speed
         quint32 div = FPGA_FREQ/ (steps*10);
-        if(div > 0x7fff){
+        if(div > 0x1fff){
             qDebug() << "maxSpeed err on" << mi;
-            div = 0x7fff;
+            div = 0x1fff;
         }
 
         quint64 temp = 0;
@@ -498,8 +498,8 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
 
         ba.resize(5);
 
-        if(div > 0x7fff){
-            qDebug("mi %d div exceed 0x7fff!", mi);
+        if(div > 0x1fff){
+            qDebug("mi %d div exceed 0x1fff!", mi);
         }
         if(steps > 0x7fff){
             qDebug("mi %d steps exceed 0x7fff!", mi);
@@ -612,7 +612,7 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
 
 void MainWindow::handleReadyRead()
 {
-    comExchanges++;
+
     QByteArray str = serial.readAll();
 
 //    uartBuff += str;
@@ -883,9 +883,9 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
         vs = QString("%1").arg(convVal, 3, 'g', -1, '0');
-        if((i==3)){
+        //if((i==3)){
             parseCmdMotorStr(i, vs);
-        }
+        //}
         convertedString += "p" + vs;
 
     }
@@ -927,8 +927,8 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             ds.pos = newPos;
             if(motorPosCmdData[mn].length() == 0){
                 int delta = newPos - getMotorAbsPos(mn);
-                if(delta != 0)
-                    qDebug("%d st=%d div=%d, dir=%d", mn, delta, FPGA_FREQ/(delta*10), delta/abs(delta));
+                //if(delta != 0)
+                //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, FPGA_FREQ/(delta*10), delta/abs(delta));
 
                 //ui->plainTextUDP->appendPlainText("add pts!");
                 //qDebug("mn %d d %d", mn, delta);
@@ -956,8 +956,8 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
             }
             else{                
                 int delta = newPos - motorPosCmdData[mn].last().pos;
-                if(delta != 0)
-                    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
+                //if(delta != 0)
+                //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
 
                 ds.absMsec = motorPosCmdData[mn].last().absMsec + 100;
                 motorPosCmdData[mn].append(ds);
@@ -1206,6 +1206,7 @@ void MainWindow::sendOnTimer()
     }
     //qDebug("data recvd in %d ms", tt.elapsed());
 
+    comExchanges++;
     parseFPGAMsg(QByteArray(dArr, 4));
 }
 
@@ -1638,29 +1639,33 @@ void MainWindow::on_pushButtonGoZero_clicked()
 void MainWindow::on_pushButtonTest_clicked()
 {
     DivPosDataStr ds;
-    ds.pos=600; motorPosCmdData[0] << ds;
-    ds.pos=2800; motorPosCmdData[0] << ds;
-    ds.pos=6200; motorPosCmdData[0] << ds;
-    ds.pos=10800; motorPosCmdData[0] << ds;
-    ds.pos=16400; motorPosCmdData[0] << ds;
-    ds.pos=22800; motorPosCmdData[0] << ds;
-    ds.pos=30000; motorPosCmdData[0] << ds;
-    ds.pos=37600; motorPosCmdData[0] << ds;
-    ds.pos=45600; motorPosCmdData[0] << ds;
-    ds.pos=53799; motorPosCmdData[0] << ds;
-    ds.pos=62200; motorPosCmdData[0] << ds;
-    ds.pos=70400; motorPosCmdData[0] << ds;
-    ds.pos=78400; motorPosCmdData[0] << ds;
-    ds.pos=86000; motorPosCmdData[0] << ds;
-    ds.pos=93200; motorPosCmdData[0] << ds;
-    ds.pos=99600; motorPosCmdData[0] << ds;
-    ds.pos=105200; motorPosCmdData[0] << ds;
-    ds.pos=109800; motorPosCmdData[0] << ds;
-    ds.pos=113200; motorPosCmdData[0] << ds;
-    ds.pos=115399; motorPosCmdData[0] << ds;
-    ds.pos=116200; motorPosCmdData[0] << ds;
+//    ds.pos=600; motorPosCmdData[0] << ds;
+//    ds.pos=2800; motorPosCmdData[0] << ds;
+//    ds.pos=6200; motorPosCmdData[0] << ds;
+//    ds.pos=10800; motorPosCmdData[0] << ds;
+//    ds.pos=16400; motorPosCmdData[0] << ds;
+//    ds.pos=22800; motorPosCmdData[0] << ds;
+//    ds.pos=30000; motorPosCmdData[0] << ds;
+//    ds.pos=37600; motorPosCmdData[0] << ds;
+//    ds.pos=45600; motorPosCmdData[0] << ds;
+//    ds.pos=53799; motorPosCmdData[0] << ds;
+//    ds.pos=62200; motorPosCmdData[0] << ds;
+//    ds.pos=70400; motorPosCmdData[0] << ds;
+//    ds.pos=78400; motorPosCmdData[0] << ds;
+//    ds.pos=86000; motorPosCmdData[0] << ds;
+//    ds.pos=93200; motorPosCmdData[0] << ds;
+//    ds.pos=99600; motorPosCmdData[0] << ds;
+//    ds.pos=105200; motorPosCmdData[0] << ds;
+//    ds.pos=109800; motorPosCmdData[0] << ds;
+//    ds.pos=113200; motorPosCmdData[0] << ds;
+//    ds.pos=115399; motorPosCmdData[0] << ds;
+//    ds.pos=116200; motorPosCmdData[0] << ds;
 
-
+    ds.pos=1; motorPosCmdData[0] << ds;
+    ds.pos=3; motorPosCmdData[0] << ds;
+    ds.pos=-1; motorPosCmdData[0] << ds;
+    ds.pos=1; motorPosCmdData[0] << ds;
+    ds.pos=-1; motorPosCmdData[0] << ds;
 }
 
 void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
