@@ -862,10 +862,20 @@ void MainWindow::handleSerialDataWritten(qint64 bytes)
 
 void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
 {        
+
+    static QTime lastDebTime = QTime::currentTime();
+    if((QTime::currentTime().msecsSinceStartOfDay() - lastDebTime.msecsSinceStartOfDay()) > 1000){
+        lastDebTime = QTime::currentTime();
+        qDebug() << "  ";
+        qDebug() << "  ";
+    }
+
+
     foreach (QString cmdStr, cmdMultiMotorStrList) {        
         //convertPosModeToVelMode(cmdStr);        
         parseCmdMultiMotorStr(cmdStr);
-        //qDebug() << "--- "<< cmdStr;
+
+        qDebug() << QTime::currentTime().toString("hh:mm:ss") << "--- "<< cmdStr;
     }
 }
 
@@ -942,7 +952,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                     delta/=2;
                 }
                 if(n>1)
-                    qDebug("add Pts %d", delta);
+                    qDebug("%d add %d Pts %d", mn, n, delta);
                 ds.pos = getMotorAbsPos(mn);
                 ds.absMsec = QTime::currentTime().msecsSinceStartOfDay();
                 ds.absMsec += 100;
