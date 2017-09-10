@@ -101,6 +101,8 @@ private slots:
 
     void on_lineEdit_vmax_mmsec_editingFinished();
 
+    void on_pushButtonStartDeb_clicked();
+
 private:
     void setPos(int pos);
     Ui::MainWindow *ui;

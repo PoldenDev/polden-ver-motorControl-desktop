@@ -482,7 +482,15 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
 
     int curMsec = QTime::currentTime().msecsSinceStartOfDay();
     if(steps > 0){
-        //calc speed
+        if(ui->checkBoxDebugComPrint->isChecked()){
+            QString str = "COM:";
+            for(int i=0; i<mi; i++){
+                str.append("     ");
+            }
+            str.append(QString("%1").arg(pos));
+            ui->plainTextUDP->appendPlainText(str);
+        }
+        //calc speed1
         quint32 div = FPGA_FREQ/ (steps*10);
         if(div > 0x7fff){
             qDebug() << "maxSpeed err on" << mi;
@@ -852,7 +860,11 @@ void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
     foreach (QString cmdStr, cmdMultiMotorStrList) {        
         //convertPosModeToVelMode(cmdStr);        
         parseCmdMultiMotorStr(cmdStr);
-        //qDebug() << "--- "<< cmdStr;
+        if(ui->checkBoxDebugUDPPrint->isChecked()){
+            //qDebug() << "--- "<< cmdStr;
+            cmdStr.remove(cmdStr.length()-2, 2);
+            ui->plainTextUDP->appendPlainText(QString("UDP: %1").arg(cmdStr));
+        }
     }
 }
 
@@ -1675,3 +1687,4 @@ int MainWindow::mmToImp(int mm)
     int impPerMm = impPerRot/mmPerRot;
     return mm*impPerMm;
 }
+

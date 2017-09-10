@@ -200,27 +200,6 @@ public:
     QGroupBox *groupBox_8;
     QLabel *label_13;
     QLabel *labelCompileTime;
-    QWidget *widget_27;
-    QHBoxLayout *horizontalLayout_18;
-    QPushButton *pushButtonInitiate;
-    QWidget *widget_6;
-    QHBoxLayout *horizontalLayout_4;
-    QPushButton *pushMoveDown;
-    QPushButton *pushMoveUp;
-    QPushButton *goToTerm;
-    QPushButton *pushButtonGoZero;
-    QPushButton *pushButtonTest;
-    QWidget *widget_29;
-    QHBoxLayout *horizontalLayout_20;
-    QPushButton *pushButtonPosReset;
-    QPushButton *pushBUttonToIdle;
-    QPushButton *pushButtonClear;
-    QPushButton *pushButtonGotoPEriodState;
-    QCheckBox *checkBoxCycle;
-    QWidget *widget;
-    QHBoxLayout *horizontalLayout;
-    QPlainTextEdit *plainTextEdit;
-    QPlainTextEdit *plainTextUDP;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
     QWidget *widget_5;
@@ -237,6 +216,29 @@ public:
     QCheckBox *term8;
     QCheckBox *term9;
     QCheckBox *term10;
+    QWidget *widget_27;
+    QHBoxLayout *horizontalLayout_18;
+    QPushButton *pushButtonInitiate;
+    QWidget *widget_6;
+    QHBoxLayout *horizontalLayout_4;
+    QPushButton *pushMoveDown;
+    QPushButton *pushMoveUp;
+    QPushButton *goToTerm;
+    QPushButton *pushButtonGoZero;
+    QPushButton *pushButtonTest;
+    QWidget *widget_29;
+    QHBoxLayout *horizontalLayout_20;
+    QPushButton *pushButtonPosReset;
+    QPushButton *pushBUttonToIdle;
+    QPushButton *pushButtonClear;
+    QPushButton *pushButtonGotoPEriodState;
+    QCheckBox *checkBoxDebugUDPPrint;
+    QCheckBox *checkBoxDebugComPrint;
+    QCheckBox *checkBoxCycle;
+    QWidget *widget;
+    QHBoxLayout *horizontalLayout;
+    QPlainTextEdit *plainTextEdit;
+    QPlainTextEdit *plainTextUDP;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -1200,125 +1202,9 @@ public:
         labelCompileTime = new QLabel(groupBox_8);
         labelCompileTime->setObjectName(QStringLiteral("labelCompileTime"));
         labelCompileTime->setGeometry(QRect(80, 20, 101, 16));
-        tabWidget->addTab(tabSettings, QString());
-
-        verticalLayout_2->addWidget(tabWidget);
-
-        widget_27 = new QWidget(centralWidget);
-        widget_27->setObjectName(QStringLiteral("widget_27"));
-        widget_27->setMaximumSize(QSize(16777215, 16777215));
-        horizontalLayout_18 = new QHBoxLayout(widget_27);
-        horizontalLayout_18->setSpacing(6);
-        horizontalLayout_18->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_18->setObjectName(QStringLiteral("horizontalLayout_18"));
-        pushButtonInitiate = new QPushButton(widget_27);
-        pushButtonInitiate->setObjectName(QStringLiteral("pushButtonInitiate"));
-        pushButtonInitiate->setMaximumSize(QSize(200, 16777215));
-
-        horizontalLayout_18->addWidget(pushButtonInitiate);
-
-
-        verticalLayout_2->addWidget(widget_27);
-
-        widget_6 = new QWidget(centralWidget);
-        widget_6->setObjectName(QStringLiteral("widget_6"));
-        horizontalLayout_4 = new QHBoxLayout(widget_6);
-        horizontalLayout_4->setSpacing(6);
-        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        pushMoveDown = new QPushButton(widget_6);
-        pushMoveDown->setObjectName(QStringLiteral("pushMoveDown"));
-
-        horizontalLayout_4->addWidget(pushMoveDown);
-
-        pushMoveUp = new QPushButton(widget_6);
-        pushMoveUp->setObjectName(QStringLiteral("pushMoveUp"));
-
-        horizontalLayout_4->addWidget(pushMoveUp);
-
-        goToTerm = new QPushButton(widget_6);
-        goToTerm->setObjectName(QStringLiteral("goToTerm"));
-
-        horizontalLayout_4->addWidget(goToTerm);
-
-        pushButtonGoZero = new QPushButton(widget_6);
-        pushButtonGoZero->setObjectName(QStringLiteral("pushButtonGoZero"));
-
-        horizontalLayout_4->addWidget(pushButtonGoZero);
-
-        pushButtonTest = new QPushButton(widget_6);
-        pushButtonTest->setObjectName(QStringLiteral("pushButtonTest"));
-
-        horizontalLayout_4->addWidget(pushButtonTest);
-
-
-        verticalLayout_2->addWidget(widget_6);
-
-        widget_29 = new QWidget(centralWidget);
-        widget_29->setObjectName(QStringLiteral("widget_29"));
-        horizontalLayout_20 = new QHBoxLayout(widget_29);
-        horizontalLayout_20->setSpacing(6);
-        horizontalLayout_20->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_20->setObjectName(QStringLiteral("horizontalLayout_20"));
-        pushButtonPosReset = new QPushButton(widget_29);
-        pushButtonPosReset->setObjectName(QStringLiteral("pushButtonPosReset"));
-
-        horizontalLayout_20->addWidget(pushButtonPosReset);
-
-        pushBUttonToIdle = new QPushButton(widget_29);
-        pushBUttonToIdle->setObjectName(QStringLiteral("pushBUttonToIdle"));
-
-        horizontalLayout_20->addWidget(pushBUttonToIdle);
-
-        pushButtonClear = new QPushButton(widget_29);
-        pushButtonClear->setObjectName(QStringLiteral("pushButtonClear"));
-
-        horizontalLayout_20->addWidget(pushButtonClear);
-
-        pushButtonGotoPEriodState = new QPushButton(widget_29);
-        pushButtonGotoPEriodState->setObjectName(QStringLiteral("pushButtonGotoPEriodState"));
-
-        horizontalLayout_20->addWidget(pushButtonGotoPEriodState);
-
-        checkBoxCycle = new QCheckBox(widget_29);
-        checkBoxCycle->setObjectName(QStringLiteral("checkBoxCycle"));
-
-        horizontalLayout_20->addWidget(checkBoxCycle);
-
-
-        verticalLayout_2->addWidget(widget_29);
-
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setMinimumSize(QSize(0, 0));
-        widget->setMaximumSize(QSize(16777215, 150));
-        horizontalLayout = new QHBoxLayout(widget);
-        horizontalLayout->setSpacing(6);
-        horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, -1, 0, 0);
-        plainTextEdit = new QPlainTextEdit(widget);
-        plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
-        plainTextEdit->setMinimumSize(QSize(0, 0));
-        plainTextEdit->setReadOnly(true);
-
-        horizontalLayout->addWidget(plainTextEdit);
-
-        plainTextUDP = new QPlainTextEdit(widget);
-        plainTextUDP->setObjectName(QStringLiteral("plainTextUDP"));
-        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(plainTextUDP->sizePolicy().hasHeightForWidth());
-        plainTextUDP->setSizePolicy(sizePolicy2);
-        plainTextUDP->setMinimumSize(QSize(0, 0));
-        plainTextUDP->setMaximumSize(QSize(16777215, 16777215));
-        plainTextUDP->setReadOnly(true);
-
-        horizontalLayout->addWidget(plainTextUDP);
-
-        groupBox = new QGroupBox(widget);
+        groupBox = new QGroupBox(tabSettings);
         groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setGeometry(QRect(470, 150, 213, 141));
         groupBox->setAlignment(Qt::AlignCenter);
         groupBox->setFlat(false);
         verticalLayout_4 = new QVBoxLayout(groupBox);
@@ -1403,8 +1289,132 @@ public:
 
         verticalLayout_4->addWidget(widget_9);
 
+        tabWidget->addTab(tabSettings, QString());
 
-        horizontalLayout->addWidget(groupBox);
+        verticalLayout_2->addWidget(tabWidget);
+
+        widget_27 = new QWidget(centralWidget);
+        widget_27->setObjectName(QStringLiteral("widget_27"));
+        widget_27->setMaximumSize(QSize(16777215, 16777215));
+        horizontalLayout_18 = new QHBoxLayout(widget_27);
+        horizontalLayout_18->setSpacing(6);
+        horizontalLayout_18->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_18->setObjectName(QStringLiteral("horizontalLayout_18"));
+        pushButtonInitiate = new QPushButton(widget_27);
+        pushButtonInitiate->setObjectName(QStringLiteral("pushButtonInitiate"));
+        pushButtonInitiate->setMaximumSize(QSize(200, 16777215));
+
+        horizontalLayout_18->addWidget(pushButtonInitiate);
+
+
+        verticalLayout_2->addWidget(widget_27);
+
+        widget_6 = new QWidget(centralWidget);
+        widget_6->setObjectName(QStringLiteral("widget_6"));
+        horizontalLayout_4 = new QHBoxLayout(widget_6);
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        pushMoveDown = new QPushButton(widget_6);
+        pushMoveDown->setObjectName(QStringLiteral("pushMoveDown"));
+
+        horizontalLayout_4->addWidget(pushMoveDown);
+
+        pushMoveUp = new QPushButton(widget_6);
+        pushMoveUp->setObjectName(QStringLiteral("pushMoveUp"));
+
+        horizontalLayout_4->addWidget(pushMoveUp);
+
+        goToTerm = new QPushButton(widget_6);
+        goToTerm->setObjectName(QStringLiteral("goToTerm"));
+
+        horizontalLayout_4->addWidget(goToTerm);
+
+        pushButtonGoZero = new QPushButton(widget_6);
+        pushButtonGoZero->setObjectName(QStringLiteral("pushButtonGoZero"));
+
+        horizontalLayout_4->addWidget(pushButtonGoZero);
+
+        pushButtonTest = new QPushButton(widget_6);
+        pushButtonTest->setObjectName(QStringLiteral("pushButtonTest"));
+
+        horizontalLayout_4->addWidget(pushButtonTest);
+
+
+        verticalLayout_2->addWidget(widget_6);
+
+        widget_29 = new QWidget(centralWidget);
+        widget_29->setObjectName(QStringLiteral("widget_29"));
+        horizontalLayout_20 = new QHBoxLayout(widget_29);
+        horizontalLayout_20->setSpacing(6);
+        horizontalLayout_20->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_20->setObjectName(QStringLiteral("horizontalLayout_20"));
+        pushButtonPosReset = new QPushButton(widget_29);
+        pushButtonPosReset->setObjectName(QStringLiteral("pushButtonPosReset"));
+
+        horizontalLayout_20->addWidget(pushButtonPosReset);
+
+        pushBUttonToIdle = new QPushButton(widget_29);
+        pushBUttonToIdle->setObjectName(QStringLiteral("pushBUttonToIdle"));
+
+        horizontalLayout_20->addWidget(pushBUttonToIdle);
+
+        pushButtonClear = new QPushButton(widget_29);
+        pushButtonClear->setObjectName(QStringLiteral("pushButtonClear"));
+
+        horizontalLayout_20->addWidget(pushButtonClear);
+
+        pushButtonGotoPEriodState = new QPushButton(widget_29);
+        pushButtonGotoPEriodState->setObjectName(QStringLiteral("pushButtonGotoPEriodState"));
+
+        horizontalLayout_20->addWidget(pushButtonGotoPEriodState);
+
+        checkBoxDebugUDPPrint = new QCheckBox(widget_29);
+        checkBoxDebugUDPPrint->setObjectName(QStringLiteral("checkBoxDebugUDPPrint"));
+
+        horizontalLayout_20->addWidget(checkBoxDebugUDPPrint);
+
+        checkBoxDebugComPrint = new QCheckBox(widget_29);
+        checkBoxDebugComPrint->setObjectName(QStringLiteral("checkBoxDebugComPrint"));
+
+        horizontalLayout_20->addWidget(checkBoxDebugComPrint);
+
+        checkBoxCycle = new QCheckBox(widget_29);
+        checkBoxCycle->setObjectName(QStringLiteral("checkBoxCycle"));
+
+        horizontalLayout_20->addWidget(checkBoxCycle);
+
+
+        verticalLayout_2->addWidget(widget_29);
+
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setMinimumSize(QSize(0, 0));
+        widget->setMaximumSize(QSize(16777215, 150));
+        horizontalLayout = new QHBoxLayout(widget);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, -1, 0, 0);
+        plainTextEdit = new QPlainTextEdit(widget);
+        plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
+        plainTextEdit->setMinimumSize(QSize(0, 0));
+        plainTextEdit->setReadOnly(true);
+
+        horizontalLayout->addWidget(plainTextEdit);
+
+        plainTextUDP = new QPlainTextEdit(widget);
+        plainTextUDP->setObjectName(QStringLiteral("plainTextUDP"));
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(plainTextUDP->sizePolicy().hasHeightForWidth());
+        plainTextUDP->setSizePolicy(sizePolicy2);
+        plainTextUDP->setMinimumSize(QSize(0, 0));
+        plainTextUDP->setMaximumSize(QSize(16777215, 16777215));
+        plainTextUDP->setReadOnly(true);
+
+        horizontalLayout->addWidget(plainTextUDP);
 
 
         verticalLayout_2->addWidget(widget);
@@ -1481,18 +1491,6 @@ public:
         groupBox_8->setTitle(QApplication::translate("MainWindow", "About", Q_NULLPTR));
         label_13->setText(QApplication::translate("MainWindow", "compile time:", Q_NULLPTR));
         labelCompileTime->setText(QApplication::translate("MainWindow", "TextLabel", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
-        pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
-        pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
-        pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
-        goToTerm->setText(QApplication::translate("MainWindow", "go term", Q_NULLPTR));
-        pushButtonGoZero->setText(QApplication::translate("MainWindow", "go zero", Q_NULLPTR));
-        pushButtonTest->setText(QApplication::translate("MainWindow", "test", Q_NULLPTR));
-        pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
-        pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
-        pushButtonClear->setText(QApplication::translate("MainWindow", "clear queue", Q_NULLPTR));
-        pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
-        checkBoxCycle->setText(QApplication::translate("MainWindow", "cycle", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("MainWindow", "\320\232\320\276\320\275\321\206\320\265\320\262\320\270\320\272\320\270", Q_NULLPTR));
         term1->setText(QApplication::translate("MainWindow", "1", Q_NULLPTR));
         term2->setText(QApplication::translate("MainWindow", "2", Q_NULLPTR));
@@ -1504,6 +1502,20 @@ public:
         term8->setText(QApplication::translate("MainWindow", "8", Q_NULLPTR));
         term9->setText(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         term10->setText(QApplication::translate("MainWindow", "10", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
+        pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
+        pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
+        pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));
+        goToTerm->setText(QApplication::translate("MainWindow", "go term", Q_NULLPTR));
+        pushButtonGoZero->setText(QApplication::translate("MainWindow", "go zero", Q_NULLPTR));
+        pushButtonTest->setText(QApplication::translate("MainWindow", "test", Q_NULLPTR));
+        pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
+        pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
+        pushButtonClear->setText(QApplication::translate("MainWindow", "clear queue", Q_NULLPTR));
+        pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
+        checkBoxDebugUDPPrint->setText(QApplication::translate("MainWindow", "debugUdpPrint", Q_NULLPTR));
+        checkBoxDebugComPrint->setText(QApplication::translate("MainWindow", "debugComPrint", Q_NULLPTR));
+        checkBoxCycle->setText(QApplication::translate("MainWindow", "cycle", Q_NULLPTR));
     } // retranslateUi
 
 };
