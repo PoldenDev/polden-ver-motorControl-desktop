@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec",5).toString());
 
 
-    timer.setInterval(5);
+    timer.setInterval(95);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
@@ -340,6 +340,7 @@ void MainWindow::dataProcess100msTimeOut()
 void MainWindow::on_pushButtonComOpen_clicked()
 {
    serial.setBaudRate(115200);
+   serial.setStopBits(QSerialPort::TwoStop);
     if(ui->pushButtonComOpen->text() == "open"){
         if(serial.isOpen() == false){
             QString comName = ui->comComboBox->currentText();
@@ -1164,15 +1165,24 @@ void MainWindow::on_pushButtonClear_clicked()
 
 void MainWindow::sendOnTimer()
 {
-    if(serial.isOpen() && (bFreeToWrite[curMotorSendIdx] == true)){
-        //QString wrStr = motorPosCmdStrings.dequeue();
-        //serial.write(wrStr.toLatin1());
-        freeToWrite(curMotorSendIdx);
+    if(serial.isOpen()){
+        for(int i=0; i<MOTOR_CNT; i++){
+            if((bFreeToWrite[i] == true)){
+                //QString wrStr = motorPosCmdStrings.dequeue();
+                //serial.write(wrStr.toLatin1());
+                freeToWrite(i);
+            }
 
+        }
+//        if((bFreeToWrite[curMotorSendIdx] == true)){
+//            //QString wrStr = motorPosCmdStrings.dequeue();
+//            //serial.write(wrStr.toLatin1());
+//            freeToWrite(curMotorSendIdx);
+//        }
+//        curMotorSendIdx++;
+//        if(curMotorSendIdx >= MOTOR_CNT)
+//            curMotorSendIdx = 0;
     }
-    curMotorSendIdx++;
-    if(curMotorSendIdx >= MOTOR_CNT)
-        curMotorSendIdx = 0;
 }
 
 
