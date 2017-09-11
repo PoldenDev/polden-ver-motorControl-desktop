@@ -1208,7 +1208,8 @@ void MainWindow::sendOnTimer()
     while(bytesToRecv>0){
         //qDebug("try to recv %d bytes", bytesToRecv);
         if(serial.waitForReadyRead(50) ==false){
-            qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
+            //qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
+            ui->plainTextUDP->appendPlainText(QString("dataRecvTimeout on recvd %1 bytes").arg(4-bytesToRecv));
             return;
         }
         int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
