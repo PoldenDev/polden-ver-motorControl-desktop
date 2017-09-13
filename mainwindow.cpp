@@ -574,6 +574,26 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
 
 
 
+    //сначала обработаем концевики
+    foreach (char b, tempStor){
+        switch((b>>6)&0x3){
+        case 0x2:
+            //qDebug("%02x 1 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                terminatorState(i, b&(1<<i));
+            }
+
+            break;
+        case 0x3:
+            //qDebug("%02x 2 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                terminatorState(5+i, b&(1<<i));
+            }
+            break;
+        }
+    }
+
+     //затем обработаем буферы
     foreach (char b, tempStor){
         switch((b>>6)&0x3){
         case 0x0:
@@ -590,19 +610,6 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
                 if((b&(1<<i)) == 0){
                     freeToWrite(5+i);
                 }
-            }
-            break;
-        case 0x2:
-            //qDebug("%02x 1 %02x", b, (b&0x1f));
-            for(int i=0; i<5; i++){
-                terminatorState(i, b&(1<<i));
-            }
-
-            break;
-        case 0x3:
-            //qDebug("%02x 2 %02x", b, (b&0x1f));
-            for(int i=0; i<5; i++){
-                terminatorState(5+i, b&(1<<i));
             }
             break;
         }
@@ -1614,7 +1621,7 @@ void MainWindow::on_pushButtonUdpOpenClose_clicked()
 
 void MainWindow::on_pushButtonInitiate_clicked()
 {
-    udpServerClose();
+    //udpServerClose();
     on_pushButtonClear_clicked();
 
     for(int i=0; i<MOTOR_CNT; i++){
