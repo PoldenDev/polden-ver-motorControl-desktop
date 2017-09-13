@@ -794,8 +794,8 @@ void MainWindow::freeToWrite(int i)
         for(int k=0; k<MOTOR_CNT; k++){
             bState = ((mtState[k]==MT_IDLE)&&bState);
         }
-        if(bState == true)
-            udpServerOpen();
+//        if(bState == true)
+//            udpServerOpen();
     }
 
 
@@ -1575,24 +1575,26 @@ void MainWindow::uiUpdateTimerSlot()
 
 void MainWindow::udpServerOpen()
 {
-    udpSocket = new QUdpSocket(this);
-    connect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-            this, SLOT(stateChanged(QAbstractSocket::SocketState)));
+    if(udpSocket == NULL){
+        udpSocket = new QUdpSocket(this);
+        connect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+                this, SLOT(stateChanged(QAbstractSocket::SocketState)));
 
-    //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
-    if(udpSocket->bind(QHostAddress::Any, 8051) == true){
-        //qDebug("UDP bind OK");
-        ui->plainTextEdit->appendPlainText("UDP bind OK");
+        //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
+        if(udpSocket->bind(QHostAddress::Any, 8051) == true){
+            //qDebug("UDP bind OK");
+            ui->plainTextEdit->appendPlainText("UDP bind OK");
+        }
+        else{
+            ui->plainTextEdit->appendPlainText("UDP bind FAIL");
+
+        }
+
+        connect(udpSocket, SIGNAL(readyRead()),
+                this, SLOT(readPendingDatagrams()));
+        udpConnectionTime.start();
+        ui->pushButtonUdpOpenClose->setText("UDP Close");
     }
-    else{
-        ui->plainTextEdit->appendPlainText("UDP bind FAIL");
-
-    }
-
-    connect(udpSocket, SIGNAL(readyRead()),
-            this, SLOT(readPendingDatagrams()));
-    udpConnectionTime.start();
-    ui->pushButtonUdpOpenClose->setText("UDP Close");
 }
 
 void MainWindow::udpServerClose()
