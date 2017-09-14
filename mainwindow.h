@@ -176,6 +176,7 @@ private:
 
     void freeToWrite(int i);
     void terminatorState(int i, bool bEna);
+    void allFreeToWrite();
 
     QList<QLineEdit*> timeStatLE;
     QList<QSlider*> timeStatSlider;

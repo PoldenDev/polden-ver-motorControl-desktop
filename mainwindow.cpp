@@ -615,6 +615,14 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
         }
     }
 
+    int bAllFree = true;
+    for(int i=0; i<MOTOR_CNT; i++){
+        bAllFree &= bFreeToWrite[i];
+    }
+    if(bAllFree == true){
+        allFreeToWrite();
+    }
+
 }
 
 void MainWindow::handleReadyRead()
@@ -728,6 +736,39 @@ void MainWindow::terminatorState(int i, bool bEna)
     bTermState[i] = bEna;
 }
 
+void MainWindow::allFreeToWrite()
+{
+    for(int i=0; i<MOTOR_CNT; i++){
+        switch(mtState[i]){
+        case MT_IDLE:
+            if(motorPosCmdData[i].isEmpty() == false){
+                DivPosDataStr ds;
+                ds = motorPosCmdData[i].first();
+                int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+
+                //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+    //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
+    //                qDebug("not in zero and no term!");
+    //                ds.pos = -400;
+    //                sendDivPos(i, ds, ds.pos);
+    //            }
+    //            else{
+                    if(sendDivPos(i, ds, ds.pos) == true){
+                        motorPosCmdData[i].dequeue();
+                        bFreeToWrite[i] = false;
+                    }
+                    //motorPosCmdData[i].dequeue();
+    //            }
+            }
+            break;
+        default:
+            break;
+
+        }
+
+    }
+
+}
 
 void MainWindow::freeToWrite(int i)
 {
@@ -761,28 +802,26 @@ void MainWindow::freeToWrite(int i)
 
     case MT_IDLE:
     case MT_INIT_GoUp:
-        if(motorPosCmdData[i].isEmpty() == false){
-            DivPosDataStr ds;
-            ds = motorPosCmdData[i].first();
-            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+//        if(motorPosCmdData[i].isEmpty() == false){
+//            DivPosDataStr ds;
+//            ds = motorPosCmdData[i].first();
+//            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
 
 
-            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-//            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
-//                qDebug("not in zero and no term!");
-//                ds.pos = -400;
-//                sendDivPos(i, ds, ds.pos);
-//            }
-//            else{
-                if(sendDivPos(i, ds, ds.pos) == true){
-                    motorPosCmdData[i].dequeue();
-                    bFreeToWrite[curMotorSendIdx] = false;
-                }
-                //motorPosCmdData[i].dequeue();
-//            }
-
-
-        }
+//            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+////            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
+////                qDebug("not in zero and no term!");
+////                ds.pos = -400;
+////                sendDivPos(i, ds, ds.pos);
+////            }
+////            else{
+//                if(sendDivPos(i, ds, ds.pos) == true){
+//                    motorPosCmdData[i].dequeue();
+//                    bFreeToWrite[curMotorSendIdx] = false;
+//                }
+//                //motorPosCmdData[i].dequeue();
+////            }
+//        }
         break;
     }
 
