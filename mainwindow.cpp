@@ -535,27 +535,28 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
         return true;
     }
     else{
-        int shift = ds.absMsec - curMsec;
-        if(mi == 0){
-            //qDebug("%d", shift);
-        }
-        if( (abs(shift) <=100) ||
-             (shift <0) ){        //если проигрывание отстаёт
-            //lastCtrlTimeMsecs[mi] = curMsec;
-            if(mi==0){
-                //qDebug("%d", shift);
-                //static int lastMsecs = 0;
-                //int t = 1000*ds.steps*((float)ds.div/24000000);
-                //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
-                //int delta = curMsec -lastMsecs;
-                //lastMsecs = curMsec;
-                //qDebug("z %d %s", delta, delta <98 ? "!!": " ");
-            }
-            return true;
-        }
-        else{
-            return false;
-        }
+//        int shift = ds.absMsec - curMsec;
+//        if(mi == 0){
+//            //qDebug("%d", shift);
+//        }
+//        if( (abs(shift) <=100) ||
+//             (shift <0) ){        //если проигрывание отстаёт
+//            //lastCtrlTimeMsecs[mi] = curMsec;
+//            if(mi==0){
+//                //qDebug("%d", shift);
+//                //static int lastMsecs = 0;
+//                //int t = 1000*ds.steps*((float)ds.div/24000000);
+//                //qDebug("d=%x s=%d t=%d %c", ds.div, ds.steps, t, ds.div < 0xe4? '!' : ' ');
+//                //int delta = curMsec -lastMsecs;
+//                //lastMsecs = curMsec;
+//                //qDebug("z %d %s", delta, delta <98 ? "!!": " ");
+//            }
+//            return true;
+//        }
+//        else{
+//            return false;
+//        }
+        return true;
     }
 
 }
@@ -738,10 +739,50 @@ void MainWindow::terminatorState(int i, bool bEna)
 
 void MainWindow::allFreeToWrite()
 {
+    bool bAllMtStop = true;
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(mtState[i]==MT_IDLE){
+            int delta = motorPosCmdData[i].first().pos - getMotorAbsPos(i);
+            bAllMtStop &= (delta==0);
+        }
+        else{
+            bAllMtStop = false;
+            break;
+        }
+    }
+
+    if(bAllMtStop){
+        int absPosMsec = motorPosCmdData[0].first().absMsec;
+        for(int i=0; i<MOTOR_CNT; i++){
+            if(absPosMsec != motorPosCmdData[i].first().absMsec){
+                ui->plainTextUDP->appendPlainText("absPosMsec not equal at all");
+                break;
+            }
+        }
+        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+        int shift = absPosMsec - curMsec;
+
+        ui->plainTextUDP->appendPlainText(QString("shift %1").arg(shift));
+        if( (abs(shift) <=100) ||
+                (shift <0) ){        //если проигрывание отстаёт
+            for(int i=0; i<MOTOR_CNT; i++){
+                motorPosCmdData[i].removeFirst();  // то прибьём текущий шаг
+            }
+            ui->plainTextUDP->appendPlainText(QString("skip"));
+        }
+        else{ //если проигрывание опережает то не управляем двигателем
+            ui->plainTextUDP->appendPlainText(QString("wait"));
+            return;
+        }
+
+
+    }
+
     for(int i=0; i<MOTOR_CNT; i++){
         switch(mtState[i]){
         case MT_IDLE:
-            if(motorPosCmdData[i].isEmpty() == false){
+        case MT_INIT_GoUp:
+            if((motorPosCmdData[i].isEmpty() == false)){
                 DivPosDataStr ds;
                 ds = motorPosCmdData[i].first();
                 int curMsec = QTime::currentTime().msecsSinceStartOfDay();
