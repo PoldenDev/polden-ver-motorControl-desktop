@@ -616,9 +616,23 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
         }
     }
 
+    int size = motorPosCmdData[0].length();
+
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(size != motorPosCmdData[i].length()){
+            ui->plainTextUDP->appendPlainText("size not equal");
+            for(int k=0; k<MOTOR_CNT; k++){
+                ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
+            }
+
+        }
+
+    }
+
     bool bAllFree = true;
     for(int i=0; i<MOTOR_CNT; i++){
-        bAllFree &= bFreeToWrite[i];
+        bAllFree = (bAllFree&&bFreeToWrite[i]);
+
     }
 
     bool bAllMotorHasCmd = true;
@@ -762,7 +776,10 @@ void MainWindow::allFreeToWrite()
         int curMsec = QTime::currentTime().msecsSinceStartOfDay();
         for(int i=0; i<MOTOR_CNT; i++){
             if(absPosMsec != motorPosCmdData[i].first().absMsec){
-                ui->plainTextUDP->appendPlainText(QString("%1 absPosMsec not equal at all").arg(curMsec));
+                ui->plainTextUDP->appendPlainText(QString("%1 absPosMsec not equal at all on %2").arg(curMsec).arg(motorPosCmdData[i].length()));
+                for(int k=0; k<MOTOR_CNT; k++){
+                    ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
+                }
                 break;
             }
         }
@@ -959,8 +976,8 @@ void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
     static QTime lastDebTime = QTime::currentTime();
     if((QTime::currentTime().msecsSinceStartOfDay() - lastDebTime.msecsSinceStartOfDay()) > 1000){
         lastDebTime = QTime::currentTime();
-        qDebug() << "  ";
-        qDebug() << "  ";
+        //qDebug() << "  ";
+        //qDebug() << "  ";
     }
 
 
@@ -975,19 +992,29 @@ void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
 void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
 {
     QString convertedString;
-    int maxVal = ui->lineEditMaxVal->text().toInt();
-
-
+    int maxVal = ui->lineEditMaxVal->text().toInt();  
+    int msecsForStep = 0;
+    if(motorPosCmdData[0].isEmpty() == true){
+        msecsForStep = QTime::currentTime().msecsSinceStartOfDay();
+    }
+    else{
+        msecsForStep = motorPosCmdData[0].last().absMsec;
+    }
+    msecsForStep += 100;
+//last().absMsec + 100;
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
-    //if(motorStr)
+    if(motorStrList.length() != MOTOR_CNT){
+        ui->plainTextUDP->appendPlainText("motorStrList.length not equal MOTOR_CNT");
+        return;
+    }
     //foreach (QString motorStr, motorStrList) {
-    for(int i=0; i<motorStrList.length(); i++){
+    for(int i=0; i<MOTOR_CNT; i++){
         QString vs = motorStrList[i];        
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
         vs = QString("%1").arg(convVal, 3, 'g', -1, '0');
         //if((i==3)){
-            parseCmdMotorStr(i, vs);
+            parseCmdMotorStr(i, vs, msecsForStep);
         //}
         convertedString += "p" + vs;
 
@@ -998,7 +1025,7 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
 }
 
 DivPosDataStr ds;
-void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
+void MainWindow::parseCmdMotorStr(int mn, QString cmdStr, int msecsForStep)
 {
     //if(cmdStr[0] == 'S'){
     if(true){
@@ -1047,8 +1074,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 if(n>1)
                     qDebug("%d add %d Pts %d", mn, n, delta);
                 ds.pos = getMotorAbsPos(mn);
-                ds.absMsec = QTime::currentTime().msecsSinceStartOfDay();
-                ds.absMsec += 100;
+                ds.absMsec = msecsForStep; //curMsces + 100;
                 for(int i=0; i<n; i++){
                     //ds.absMsec += 100;
 
@@ -1062,7 +1088,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr)
                 //if(delta != 0)
                 //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
 
-                ds.absMsec = motorPosCmdData[mn].last().absMsec + 100;
+                ds.absMsec = msecsForStep;
                 motorPosCmdData[mn].append(ds);
             }
         }

@@ -144,7 +144,7 @@ private:
     int x, xUdpRecv;
     void createPlot(QString name);
 
-    void parseCmdMotorStr(int, QString);
+    void parseCmdMotorStr(int, QString, int msecsForStep);
     void parseCmdMultiMotorStr(QString);
     void parseCmdMultiMotorStrList(QStringList);
 
