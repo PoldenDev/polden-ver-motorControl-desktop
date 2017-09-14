@@ -616,11 +616,16 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
         }
     }
 
-    int bAllFree = true;
+    bool bAllFree = true;
     for(int i=0; i<MOTOR_CNT; i++){
         bAllFree &= bFreeToWrite[i];
     }
-    if(bAllFree == true){
+
+    bool bAllMotorHasCmd = true;
+    for(int i=0; i<MOTOR_CNT; i++){
+        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
+    }
+    if((bAllFree == true) && bAllMotorHasCmd){
         allFreeToWrite();
     }
 
@@ -737,6 +742,7 @@ void MainWindow::terminatorState(int i, bool bEna)
     bTermState[i] = bEna;
 }
 
+//motorPosCmdData not empty
 void MainWindow::allFreeToWrite()
 {
     bool bAllMtStop = true;
@@ -753,25 +759,25 @@ void MainWindow::allFreeToWrite()
 
     if(bAllMtStop){
         int absPosMsec = motorPosCmdData[0].first().absMsec;
+        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
         for(int i=0; i<MOTOR_CNT; i++){
             if(absPosMsec != motorPosCmdData[i].first().absMsec){
-                ui->plainTextUDP->appendPlainText("absPosMsec not equal at all");
+                ui->plainTextUDP->appendPlainText(QString("%1 absPosMsec not equal at all").arg(curMsec));
                 break;
             }
         }
-        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
         int shift = absPosMsec - curMsec;
 
-        ui->plainTextUDP->appendPlainText(QString("shift %1").arg(shift));
+        ui->plainTextUDP->appendPlainText(QString("%1 shift %2").arg(curMsec).arg(shift));
         if( (abs(shift) <=100) ||
                 (shift <0) ){        //если проигрывание отстаёт
             for(int i=0; i<MOTOR_CNT; i++){
                 motorPosCmdData[i].removeFirst();  // то прибьём текущий шаг
             }
-            ui->plainTextUDP->appendPlainText(QString("skip"));
+            ui->plainTextUDP->appendPlainText(QString("%1 skip").arg(curMsec));
         }
         else{ //если проигрывание опережает то не управляем двигателем
-            ui->plainTextUDP->appendPlainText(QString("wait"));
+            ui->plainTextUDP->appendPlainText(QString("%1 wait").arg(curMsec));
             return;
         }
 
@@ -782,25 +788,25 @@ void MainWindow::allFreeToWrite()
         switch(mtState[i]){
         case MT_IDLE:
         case MT_INIT_GoUp:
-            if((motorPosCmdData[i].isEmpty() == false)){
-                DivPosDataStr ds;
-                ds = motorPosCmdData[i].first();
-                int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+        {
+            DivPosDataStr ds;
+            ds = motorPosCmdData[i].first();
+            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
 
-                //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-    //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
-    //                qDebug("not in zero and no term!");
-    //                ds.pos = -400;
-    //                sendDivPos(i, ds, ds.pos);
-    //            }
-    //            else{
-                    if(sendDivPos(i, ds, ds.pos) == true){
-                        motorPosCmdData[i].dequeue();
-                        bFreeToWrite[i] = false;
-                    }
-                    //motorPosCmdData[i].dequeue();
-    //            }
+            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+            //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
+            //                qDebug("not in zero and no term!");
+            //                ds.pos = -400;
+            //                sendDivPos(i, ds, ds.pos);
+            //            }
+            //            else{
+            if(sendDivPos(i, ds, ds.pos) == true){
+                motorPosCmdData[i].dequeue();
+                bFreeToWrite[i] = false;
             }
+            //motorPosCmdData[i].dequeue();
+            //            }
+        }
             break;
         default:
             break;
