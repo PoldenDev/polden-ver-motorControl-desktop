@@ -771,9 +771,9 @@ void MainWindow::allFreeToWrite()
         ui->plainTextUDP->appendPlainText(QString("%1 shift %2").arg(curMsec).arg(shift));
         if( (abs(shift) <=100) ||
                 (shift <0) ){        //если проигрывание отстаёт
-            for(int i=0; i<MOTOR_CNT; i++){
-                motorPosCmdData[i].removeFirst();  // то прибьём текущий шаг
-            }
+//            for(int i=0; i<MOTOR_CNT; i++){
+//                motorPosCmdData[i].removeFirst();  // то прибьём текущий шаг
+//            }
             ui->plainTextUDP->appendPlainText(QString("%1 skip").arg(curMsec));
         }
         else{ //если проигрывание опережает то не управляем двигателем
