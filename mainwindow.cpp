@@ -157,6 +157,13 @@ MainWindow::MainWindow(QWidget *parent) :
     absPosSlider.append(ui->SliderPos8);
     absPosSlider.append(ui->SliderPos9);
 
+    for(int i=0; i<absPosSlider.length(); i++){
+        QSlider *sl = absPosSlider[i];
+        connect(sl, &QSlider::sliderReleased,
+                [this, i](){ handleSliderReleased(i, absPosSlider[i]->pos().rx());});
+
+    }
+
     absPosLineEdit.append(ui->lineEditPos0);
     absPosLineEdit.append(ui->lineEditPos1);
     absPosLineEdit.append(ui->lineEditPos2);
@@ -1534,6 +1541,7 @@ void MainWindow::on_pushMoveDown_clicked()
 void MainWindow::on_pushTestData_clicked()
 {
 
+    int startLength = motorPosCmdData[0].length();
     DivPosDataStr ds;
     ds.pos = 1;
     ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
@@ -1561,6 +1569,14 @@ void MainWindow::on_pushTestData_clicked()
     ds.steps = 13601; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
     ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
     ds.steps = 3200; ds.div = 750; ds.dir = 1; motorPosCmdData[0] << ds;
+
+
+    for(int i=0; i<MOTOR_CNT; i++){
+        ds = motorPosCmdData[i].last();
+        for(int j=0; j<(motorPosCmdData[i].length() - startLength); j++){
+            motorPosCmdData[i] << ds;
+        }
+    }
 
 }
 
@@ -1629,7 +1645,8 @@ void MainWindow::uiUpdateTimerSlot()
             int mmPerRot = ui->lineEdit_mmPerRot->text().toInt();
             int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
             int posMm = (motorAbsolutePosCur[i]/(float)impPerRot)*mmPerRot;
-            absPosSlider[i]->setValue(motorAbsolutePosCur[i]);
+            if(ui->checkBoxSliderPosCtrl->isChecked()==false)
+                absPosSlider[i]->setValue(motorAbsolutePosCur[i]);
             absPosLineEdit[i]->setText(QString::number(posMm));
             termCheckBox[i]->setChecked(bTermState[i]);
             euqueLineEdit[i]->setText(QString::number(motorPosCmdData[i].length()));
@@ -1770,34 +1787,73 @@ void MainWindow::on_pushButtonGoZero_clicked()
 
 void MainWindow::on_pushButtonTest_clicked()
 {
+    int startLength = motorPosCmdData[0].length();
     DivPosDataStr ds;
-//    ds.pos=600; motorPosCmdData[0] << ds;
-//    ds.pos=2800; motorPosCmdData[0] << ds;
-//    ds.pos=6200; motorPosCmdData[0] << ds;
-//    ds.pos=10800; motorPosCmdData[0] << ds;
-//    ds.pos=16400; motorPosCmdData[0] << ds;
-//    ds.pos=22800; motorPosCmdData[0] << ds;
-//    ds.pos=30000; motorPosCmdData[0] << ds;
-//    ds.pos=37600; motorPosCmdData[0] << ds;
-//    ds.pos=45600; motorPosCmdData[0] << ds;
-//    ds.pos=53799; motorPosCmdData[0] << ds;
-//    ds.pos=62200; motorPosCmdData[0] << ds;
-//    ds.pos=70400; motorPosCmdData[0] << ds;
-//    ds.pos=78400; motorPosCmdData[0] << ds;
-//    ds.pos=86000; motorPosCmdData[0] << ds;
-//    ds.pos=93200; motorPosCmdData[0] << ds;
-//    ds.pos=99600; motorPosCmdData[0] << ds;
-//    ds.pos=105200; motorPosCmdData[0] << ds;
-//    ds.pos=109800; motorPosCmdData[0] << ds;
-//    ds.pos=113200; motorPosCmdData[0] << ds;
-//    ds.pos=115399; motorPosCmdData[0] << ds;
-//    ds.pos=116200; motorPosCmdData[0] << ds;
+    for(int i=0; i<1; i++){
+        ds.pos=600; motorPosCmdData[i] << ds;
+        ds.pos=2800; motorPosCmdData[i] << ds;
+        ds.pos=6200; motorPosCmdData[i] << ds;
+        ds.pos=10800; motorPosCmdData[i] << ds;
+        ds.pos=16400; motorPosCmdData[i] << ds;
+        ds.pos=22800; motorPosCmdData[i] << ds;
+        ds.pos=30000; motorPosCmdData[i] << ds;
+        ds.pos=37600; motorPosCmdData[i] << ds;
+        ds.pos=45600; motorPosCmdData[i] << ds;
+        ds.pos=53799; motorPosCmdData[i] << ds;
+        ds.pos=62200; motorPosCmdData[i] << ds;
+        ds.pos=70400; motorPosCmdData[i] << ds;
+        ds.pos=78400; motorPosCmdData[i] << ds;
+        ds.pos=86000; motorPosCmdData[i] << ds;
+        ds.pos=93200; motorPosCmdData[i] << ds;
+        ds.pos=99600; motorPosCmdData[i] << ds;
+        ds.pos=105200; motorPosCmdData[i] << ds;
+        ds.pos=109800; motorPosCmdData[i] << ds;
+        ds.pos=113200; motorPosCmdData[i] << ds;
+        ds.pos=115399; motorPosCmdData[i] << ds;
+        ds.pos=116200; motorPosCmdData[i] << ds;
 
-    ds.pos=1; motorPosCmdData[0] << ds;
-    ds.pos=3; motorPosCmdData[0] << ds;
-    ds.pos=-1; motorPosCmdData[0] << ds;
-    ds.pos=1; motorPosCmdData[0] << ds;
-    ds.pos=-1; motorPosCmdData[0] << ds;
+
+        ds.pos=116200; motorPosCmdData[i] << ds;
+        ds.pos=115399; motorPosCmdData[i] << ds;
+        ds.pos=113200; motorPosCmdData[i] << ds;
+        ds.pos=109800; motorPosCmdData[i] << ds;
+        ds.pos=105200; motorPosCmdData[i] << ds;
+        ds.pos=99600; motorPosCmdData[i] << ds;
+        ds.pos=93200; motorPosCmdData[i] << ds;
+        ds.pos=86000; motorPosCmdData[i] << ds;
+        ds.pos=78400; motorPosCmdData[i] << ds;
+        ds.pos=70400; motorPosCmdData[i] << ds;
+        ds.pos=62200; motorPosCmdData[i] << ds;
+        ds.pos=53799; motorPosCmdData[i] << ds;
+        ds.pos=45600; motorPosCmdData[i] << ds;
+        ds.pos=37600; motorPosCmdData[i] << ds;
+        ds.pos=30000; motorPosCmdData[i] << ds;
+        ds.pos=22800; motorPosCmdData[i] << ds;
+        ds.pos=16400; motorPosCmdData[i] << ds;
+        ds.pos=10800; motorPosCmdData[i] << ds;
+        ds.pos=6200; motorPosCmdData[i] << ds;
+        ds.pos=2800; motorPosCmdData[i] << ds;
+        ds.pos=600; motorPosCmdData[i] << ds;
+    }
+
+
+//    ds.pos=1; motorPosCmdData[0] << ds;
+//    ds.pos=3; motorPosCmdData[0] << ds;
+//    ds.pos=-1; motorPosCmdData[0] << ds;
+//    ds.pos=1; motorPosCmdData[0] << ds;
+//    ds.pos=-1; motorPosCmdData[0] << ds;
+    int ll = motorPosCmdData[0].length() ;
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(motorPosCmdData[i].isEmpty()){
+            ds.pos=0; ds.div=0xfff;
+        }
+        else{
+            ds = motorPosCmdData[i].last();
+        }
+        for(int j=0; j<(ll - startLength); j++){
+            motorPosCmdData[i] << ds;
+        }
+    }
 }
 
 void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
@@ -1859,4 +1915,12 @@ int MainWindow::mmToImp(int mm)
     int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
     int impPerMm = impPerRot/mmPerRot;
     return mm*impPerMm;
+}
+
+void MainWindow::handleSliderReleased(int id, int newPos)
+{
+    qDebug() << id << newPos;
+
+
+
 }

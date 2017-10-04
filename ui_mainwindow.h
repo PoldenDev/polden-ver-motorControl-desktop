@@ -135,6 +135,7 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_6;
     QLineEdit *lineEditDataGramCnt;
+    QCheckBox *checkBoxSliderPosCtrl;
     QWidget *tabTimeStat;
     QHBoxLayout *horizontalLayout_8;
     QWidget *widget_10;
@@ -818,6 +819,9 @@ public:
 
         verticalLayout_3->addWidget(widget_26);
 
+        checkBoxSliderPosCtrl = new QCheckBox(tabMainStat);
+        checkBoxSliderPosCtrl->setObjectName(QStringLiteral("checkBoxSliderPosCtrl"));
+        checkBoxSliderPosCtrl->setGeometry(QRect(600, 280, 70, 17));
         tabWidget->addTab(tabMainStat, QString());
         tabTimeStat = new QWidget();
         tabTimeStat->setObjectName(QStringLiteral("tabTimeStat"));
@@ -1462,6 +1466,7 @@ public:
         groupBox_4->setTitle(QApplication::translate("MainWindow", "UDP", Q_NULLPTR));
         label_7->setText(QApplication::translate("MainWindow", "state", Q_NULLPTR));
         label_6->setText(QApplication::translate("MainWindow", "\320\224\320\263\321\200\320\274", Q_NULLPTR));
+        checkBoxSliderPosCtrl->setText(QApplication::translate("MainWindow", "sliderPosCtrl", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabMainStat), QApplication::translate("MainWindow", "mainStat", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabTimeStat), QApplication::translate("MainWindow", "timeStat", Q_NULLPTR));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "\320\234\320\265\321\205\320\260\320\275\320\270\320\272\320\260", Q_NULLPTR));

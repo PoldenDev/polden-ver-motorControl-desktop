@@ -10,7 +10,7 @@
 #include <QSlider>
 #include <QMap>
 #include <QSettings>
-#include <qwt_plot_marker.h>
+//#include <qwt_plot_marker.h>
 #include <QLineEdit>
 #include <QSlider>
 #include <QTime>
@@ -203,6 +203,8 @@ private:
     int mmToImp(int mm);
     void parseFPGAMsg(QByteArray ba);
     bool speedTrig[MOTOR_CNT];
+
+    void handleSliderReleased(int id, int newPos);
 };
 
 
