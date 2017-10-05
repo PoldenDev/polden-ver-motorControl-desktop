@@ -625,16 +625,16 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
 
     int size = motorPosCmdData[0].length();
 
-    for(int i=0; i<MOTOR_CNT; i++){
-        if(size != motorPosCmdData[i].length()){
-            ui->plainTextUDP->appendPlainText("size not equal");
-            for(int k=0; k<MOTOR_CNT; k++){
-                ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
-            }
+//    for(int i=0; i<MOTOR_CNT; i++){
+//        if(size != motorPosCmdData[i].length()){
+//            ui->plainTextUDP->appendPlainText("size not equal");
+//            for(int k=0; k<MOTOR_CNT; k++){
+//                ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
+//            }
 
-        }
+//        }
 
-    }
+//    }
 
     bool bAllFree = true;
     for(int i=0; i<MOTOR_CNT; i++){
@@ -646,6 +646,7 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
     for(int i=0; i<MOTOR_CNT; i++){
         bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
     }
+    bAllMotorHasCmd = true; // ***
     if((bAllFree == true) && bAllMotorHasCmd){
         allFreeToWrite();
     }
@@ -768,7 +769,7 @@ void MainWindow::allFreeToWrite()
 {
     bool bAllMtStop = true;
     for(int i=0; i<MOTOR_CNT; i++){
-        if(mtState[i]==MT_IDLE){
+        if((mtState[i]==MT_IDLE) && (motorPosCmdData[i].isEmpty() == false)){
             int delta = motorPosCmdData[i].first().pos - getMotorAbsPos(i);
             bAllMtStop &= (delta==0);
         }
@@ -813,23 +814,25 @@ void MainWindow::allFreeToWrite()
         case MT_IDLE:
         case MT_INIT_GoUp:
         {
-            DivPosDataStr ds;
-            ds = motorPosCmdData[i].first();
-            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+            if(motorPosCmdData[i].isEmpty() == false){
+                DivPosDataStr ds;
+                ds = motorPosCmdData[i].first();
+                int curMsec = QTime::currentTime().msecsSinceStartOfDay();
 
-            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-            //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
-            //                qDebug("not in zero and no term!");
-            //                ds.pos = -400;
-            //                sendDivPos(i, ds, ds.pos);
-            //            }
-            //            else{
-            if(sendDivPos(i, ds, ds.pos) == true){
-                motorPosCmdData[i].dequeue();
-                bFreeToWrite[i] = false;
+                //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+                //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
+                //                qDebug("not in zero and no term!");
+                //                ds.pos = -400;
+                //                sendDivPos(i, ds, ds.pos);
+                //            }
+                //            else{
+                if(sendDivPos(i, ds, ds.pos) == true){
+                    motorPosCmdData[i].dequeue();
+                    bFreeToWrite[i] = false;
+                }
+                //motorPosCmdData[i].dequeue();
+                //            }
             }
-            //motorPosCmdData[i].dequeue();
-            //            }
         }
             break;
         default:
@@ -1789,51 +1792,124 @@ void MainWindow::on_pushButtonTest_clicked()
 {
     int startLength = motorPosCmdData[0].length();
     DivPosDataStr ds;
-    for(int i=0; i<1; i++){
-        ds.pos=600; motorPosCmdData[i] << ds;
-        ds.pos=2800; motorPosCmdData[i] << ds;
-        ds.pos=6200; motorPosCmdData[i] << ds;
-        ds.pos=10800; motorPosCmdData[i] << ds;
-        ds.pos=16400; motorPosCmdData[i] << ds;
-        ds.pos=22800; motorPosCmdData[i] << ds;
-        ds.pos=30000; motorPosCmdData[i] << ds;
-        ds.pos=37600; motorPosCmdData[i] << ds;
-        ds.pos=45600; motorPosCmdData[i] << ds;
-        ds.pos=53799; motorPosCmdData[i] << ds;
-        ds.pos=62200; motorPosCmdData[i] << ds;
-        ds.pos=70400; motorPosCmdData[i] << ds;
-        ds.pos=78400; motorPosCmdData[i] << ds;
-        ds.pos=86000; motorPosCmdData[i] << ds;
-        ds.pos=93200; motorPosCmdData[i] << ds;
-        ds.pos=99600; motorPosCmdData[i] << ds;
-        ds.pos=105200; motorPosCmdData[i] << ds;
-        ds.pos=109800; motorPosCmdData[i] << ds;
-        ds.pos=113200; motorPosCmdData[i] << ds;
-        ds.pos=115399; motorPosCmdData[i] << ds;
-        ds.pos=116200; motorPosCmdData[i] << ds;
+    ds.dir = 1;
+    for(int i=0; i<MOTOR_CNT; i++){
+        for(int j=0; j<10; j++){
+            if(i == 0){
+                for(int k=0; k<0; k++){
+                    ds.pos=0; motorPosCmdData[i] << ds;
+                }
+            }
+            else if(i == 1){
+                for(int k=0; k<10; k++){
+                    ds.pos=0; motorPosCmdData[i] << ds;
+                }
+            }
+            else if(i == 2){
+                for(int k=0; k<20; k++){
+                    ds.pos=0; motorPosCmdData[i] << ds;
+                }
+            }
+            ds.pos=600; motorPosCmdData[i] << ds;
+            ds.pos=1200; motorPosCmdData[i] << ds;
+            ds.pos=2800; motorPosCmdData[i] << ds;
+            ds.pos=4500; motorPosCmdData[i] << ds;
+            ds.pos=6200; motorPosCmdData[i] << ds;
+            ds.pos=8500; motorPosCmdData[i] << ds;
+            ds.pos=10800; motorPosCmdData[i] << ds;
+            ds.pos=13600; motorPosCmdData[i] << ds;
+            ds.pos=16400; motorPosCmdData[i] << ds;
+            ds.pos=19600; motorPosCmdData[i] << ds;
+            ds.pos=22800; motorPosCmdData[i] << ds;
+            ds.pos=26400; motorPosCmdData[i] << ds;
+            ds.pos=30000; motorPosCmdData[i] << ds;
+            ds.pos=33800; motorPosCmdData[i] << ds;
+            ds.pos=37600; motorPosCmdData[i] << ds;
+            ds.pos=41600; motorPosCmdData[i] << ds;
+            ds.pos=45600; motorPosCmdData[i] << ds;
+            ds.pos=49500; motorPosCmdData[i] << ds;
+            ds.pos=53799; motorPosCmdData[i] << ds;
+            ds.pos=58000; motorPosCmdData[i] << ds;
+            ds.pos=62200; motorPosCmdData[i] << ds;
+            ds.pos=66300; motorPosCmdData[i] << ds;
+            ds.pos=70400; motorPosCmdData[i] << ds;
+            ds.pos=74400; motorPosCmdData[i] << ds;
+            ds.pos=78400; motorPosCmdData[i] << ds;
+            ds.pos=82200; motorPosCmdData[i] << ds;
+            ds.pos=86000; motorPosCmdData[i] << ds;
+            ds.pos=89600; motorPosCmdData[i] << ds;
+            ds.pos=93200; motorPosCmdData[i] << ds;
+            ds.pos=96400; motorPosCmdData[i] << ds;
+            ds.pos=99600; motorPosCmdData[i] << ds;
+            ds.pos=102400; motorPosCmdData[i] << ds;
+            ds.pos=105200; motorPosCmdData[i] << ds;
+            ds.pos=107500; motorPosCmdData[i] << ds;
+            ds.pos=109800; motorPosCmdData[i] << ds;
+            ds.pos=111500; motorPosCmdData[i] << ds;
+            ds.pos=113200; motorPosCmdData[i] << ds;
+            ds.pos=114300; motorPosCmdData[i] << ds;
+            ds.pos=115399; motorPosCmdData[i] << ds;
+            ds.pos=115800; motorPosCmdData[i] << ds;
+            ds.pos=116200; motorPosCmdData[i] << ds;
 
+            ds.pos=116200; motorPosCmdData[i] << ds;
+            ds.pos=115800; motorPosCmdData[i] << ds;
+            ds.pos=115399; motorPosCmdData[i] << ds;
+            ds.pos=114300; motorPosCmdData[i] << ds;
+            ds.pos=113200; motorPosCmdData[i] << ds;
+            ds.pos=111500; motorPosCmdData[i] << ds;
+            ds.pos=109800; motorPosCmdData[i] << ds;
+            ds.pos=107500; motorPosCmdData[i] << ds;
+            ds.pos=105200; motorPosCmdData[i] << ds;
+            ds.pos=102400; motorPosCmdData[i] << ds;
+            ds.pos=99600; motorPosCmdData[i] << ds;
+            ds.pos=96400; motorPosCmdData[i] << ds;
+            ds.pos=93200; motorPosCmdData[i] << ds;
+            ds.pos=89600; motorPosCmdData[i] << ds;
+            ds.pos=86000; motorPosCmdData[i] << ds;
+            ds.pos=82200; motorPosCmdData[i] << ds;
+            ds.pos=78400; motorPosCmdData[i] << ds;
+            ds.pos=74400; motorPosCmdData[i] << ds;
+            ds.pos=70400; motorPosCmdData[i] << ds;
+            ds.pos=66300; motorPosCmdData[i] << ds;
+            ds.pos=62200; motorPosCmdData[i] << ds;
+            ds.pos=58000; motorPosCmdData[i] << ds;
+            ds.pos=53799; motorPosCmdData[i] << ds;
+            ds.pos=49500; motorPosCmdData[i] << ds;
+            ds.pos=45600; motorPosCmdData[i] << ds;
+            ds.pos=41600; motorPosCmdData[i] << ds;
+            ds.pos=37600; motorPosCmdData[i] << ds;
+            ds.pos=33800; motorPosCmdData[i] << ds;
+            ds.pos=30000; motorPosCmdData[i] << ds;
+            ds.pos=26400; motorPosCmdData[i] << ds;
+            ds.pos=22800; motorPosCmdData[i] << ds;
+            ds.pos=19600; motorPosCmdData[i] << ds;
+            ds.pos=16400; motorPosCmdData[i] << ds;
+            ds.pos=13600; motorPosCmdData[i] << ds;
+            ds.pos=10800; motorPosCmdData[i] << ds;
+            ds.pos=8500; motorPosCmdData[i] << ds;
+            ds.pos=6200; motorPosCmdData[i] << ds;
+            ds.pos=4500; motorPosCmdData[i] << ds;
+            ds.pos=2800; motorPosCmdData[i] << ds;
+            ds.pos=1200; motorPosCmdData[i] << ds;
+            ds.pos=600; motorPosCmdData[i] << ds;
 
-        ds.pos=116200; motorPosCmdData[i] << ds;
-        ds.pos=115399; motorPosCmdData[i] << ds;
-        ds.pos=113200; motorPosCmdData[i] << ds;
-        ds.pos=109800; motorPosCmdData[i] << ds;
-        ds.pos=105200; motorPosCmdData[i] << ds;
-        ds.pos=99600; motorPosCmdData[i] << ds;
-        ds.pos=93200; motorPosCmdData[i] << ds;
-        ds.pos=86000; motorPosCmdData[i] << ds;
-        ds.pos=78400; motorPosCmdData[i] << ds;
-        ds.pos=70400; motorPosCmdData[i] << ds;
-        ds.pos=62200; motorPosCmdData[i] << ds;
-        ds.pos=53799; motorPosCmdData[i] << ds;
-        ds.pos=45600; motorPosCmdData[i] << ds;
-        ds.pos=37600; motorPosCmdData[i] << ds;
-        ds.pos=30000; motorPosCmdData[i] << ds;
-        ds.pos=22800; motorPosCmdData[i] << ds;
-        ds.pos=16400; motorPosCmdData[i] << ds;
-        ds.pos=10800; motorPosCmdData[i] << ds;
-        ds.pos=6200; motorPosCmdData[i] << ds;
-        ds.pos=2800; motorPosCmdData[i] << ds;
-        ds.pos=600; motorPosCmdData[i] << ds;
+            if(i == 0){
+                for(int k=0; k<20; k++){
+                    ds.pos=0; motorPosCmdData[i] << ds;
+                }
+            }
+            else if(i == 1){
+                for(int k=0; k<10; k++){
+                    ds.pos=0; motorPosCmdData[i] << ds;
+                }
+            }
+            else if(i == 2){
+                for(int k=0; k<0; k++){
+                    ds.pos=0; motorPosCmdData[i] << ds;
+                }
+            }
+        }
     }
 
 
@@ -1843,7 +1919,7 @@ void MainWindow::on_pushButtonTest_clicked()
 //    ds.pos=1; motorPosCmdData[0] << ds;
 //    ds.pos=-1; motorPosCmdData[0] << ds;
     int ll = motorPosCmdData[0].length() ;
-    for(int i=0; i<MOTOR_CNT; i++){
+    for(int i=1; i<MOTOR_CNT; i++){
         if(motorPosCmdData[i].isEmpty()){
             ds.pos=0; ds.div=0xfff;
         }
