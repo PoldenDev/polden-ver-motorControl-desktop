@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QDateTime>
 #include <QSettings>
+#include <QWidget>
 
 
 //#include <qwt_plot.h>
@@ -29,6 +30,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    motorCount(0),
     speed(100),
     udpSocket(NULL),    
     cmdNum(0),
@@ -42,14 +44,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    motorCount = settings.value("motorCount", 0).toInt();
+    ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
 
-    on_pushButton_refreshCom_clicked();
+
 
     on_pushButtonUdpOpenClose_clicked();
 
-    QSettings settings("Murinets", "MotorControl");
     ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
     ui->lineEdit_MaxHeightImp->setText(settings.value("maxHeightImp", 200000).toString());
     on_lineEdit_MaxHeightImp_editingFinished();
@@ -228,6 +231,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->labelCompileTime->setText(build);
 
+    createDebugSerialPortInterface();
+    on_pushButton_refreshCom_clicked();
+
 }
 
 void MainWindow::createPlot(QString name)
@@ -354,8 +360,9 @@ void MainWindow::on_pushButtonComOpen_clicked()
                 //UartThread.requestToStart(comName);
                 serial.setPortName(comName);
                 if (!serial.open(QIODevice::ReadWrite)) {
-                    qDebug("%s port open FAIL", qUtf8Printable(comName));
-                    return;
+                    //qDebug("%s port open FAIL", qUtf8Printable(comName));
+                    ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL %2").arg(qUtf8Printable(comName)).arg(serial.error()));
+                    return;                    
                 }
                 //qDebug("%s port opened", qUtf8Printable(comName));
                 ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
@@ -373,7 +380,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
         serial.close();
         //udpSocket->close();
         //qDebug("com port closed");
-        ui->plainTextEdit->appendPlainText(QString("com port closed"));
+        ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(serial.portName()));
         ui->pushButtonComOpen->setText("open");        
         //contrStringQueue.clear();
     }
@@ -1274,6 +1281,10 @@ void MainWindow::readPendingDatagrams()
 void MainWindow::on_pushButton_refreshCom_clicked()
 {
     ui->comComboBox->clear();
+    foreach (QComboBox *cb, debPortCmbBxList) {
+        cb->clear();
+    }
+
     const auto serialPortInfos = QSerialPortInfo::availablePorts();
     const QString blankString = QObject::tr("N/A");
       QString description;
@@ -1293,8 +1304,10 @@ void MainWindow::on_pushButton_refreshCom_clicked()
                << QObject::tr("Product Identifier: ") << (serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString) << endl
                << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
            ui->comComboBox->addItem(serialPortInfo.portName());
+           foreach (QComboBox *cb, debPortCmbBxList) {
+               cb->addItem(serialPortInfo.portName());
+           }
     }
-
 }
 
 void MainWindow::on_pushButtonClear_clicked()
@@ -1920,7 +1933,138 @@ int MainWindow::mmToImp(int mm)
 void MainWindow::handleSliderReleased(int id, int newPos)
 {
     qDebug() << id << newPos;
+}
 
 
+void MainWindow::createDebugSerialPortInterface()
+{
+    foreach (QGroupBox *gb, debPortGbList) {
+        delete gb;
+    }
 
+    debPortCmbBxList.clear();
+    debPortpbList.clear();
+    debSerialPortList.clear();
+    debPortGbList.clear();
+    debPortStatusLeList.clear();
+
+    QLayout *hblo = ui->tabDebugPort->layout();
+    if(hblo == NULL){
+        hblo = new QHBoxLayout;
+    }
+    for(int i=0; i<motorCount; i++){
+        QGroupBox *gb = new QGroupBox(QString("Port %1").arg(i));
+        //gb->setAlignment(Qt::AlignHCenter);
+        QVBoxLayout *vblo = new QVBoxLayout(gb);
+        QComboBox *cb = new QComboBox(gb);
+        vblo->addWidget(cb);
+        QPushButton *pb = new QPushButton("open", gb);
+        vblo->addWidget(pb);
+//        QLineEdit *le = new QLineEdit(this);
+//        vblo->addWidget(le);
+
+        vblo->setAlignment(Qt::AlignTop);
+
+        gb->setLayout(vblo);
+        hblo->addWidget(gb);
+
+        QSerialPort *sp = new QSerialPort(gb);
+        connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleErrorOccured(i, error);});
+        connect(pb, &QPushButton::clicked, [=](){ pushDebugComPortOpen(i);});
+
+        debPortCmbBxList.append(cb);
+        debPortpbList.append(pb);
+        debSerialPortList.append(sp);
+        debPortGbList.append(gb);
+        //debPortStatusLeList.append(le);
+    }
+
+    //ui->tabWidget->ind
+    //QWidget *tw = ui->tabWidget->widget(3);
+    //ui->widgetComPorts->setLayout(hblo);
+    ui->tabDebugPort->setLayout(hblo);
+
+    //cmb->
+    //wdg->add
+    //ui->widgetComPorts->
+    on_pushButton_refreshCom_clicked();
+
+}
+
+void MainWindow::pushDebugComPortOpen(int id)
+{
+    QSerialPort &sp = *debSerialPortList[id];
+    QPushButton &pb = *debPortpbList[id];
+    QComboBox &cb = *debPortCmbBxList[id];
+
+    sp.setBaudRate(38400);
+     if(pb.text() == "open"){
+         if(sp.isOpen() == false){
+             QString comName = cb.currentText();
+             if(comName.length() > 0){
+                 //UartThread.requestToStart(comName);
+                 sp.setPortName(comName);
+                 if (!sp.open(QIODevice::ReadWrite)) {
+                     //qDebug("%s port open FAIL", qUtf8Printable(comName));
+                     ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL").arg(qUtf8Printable(comName)));
+                     return;
+                 }
+                 else{
+                     cb.setDisabled(true);
+                     ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
+     //                connect(&serial, SIGNAL(readyRead()),
+     //                        this, SLOT(handleReadyRead()));
+     //                connect(&serial, SIGNAL(bytesWritten(qint64)),
+     //                        this, SLOT(handleSerialDataWritten(qint64)));
+                     pb.setText("close");
+                 }
+             }
+         }
+     }
+     else{
+         sp.close();
+         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(sp.portName()));
+         pb.setText("open");
+         cb.setDisabled(false);
+     }
+
+}
+
+void MainWindow::on_lineEditMotorCount_editingFinished()
+{
+    motorCount = ui->lineEditMotorCount->text().toInt();
+    settings.setValue("motorCount", motorCount);
+    ui->plainTextEdit->appendPlainText(QString("new motor count %1").arg(ui->lineEditMotorCount->text()));
+    createDebugSerialPortInterface();
+}
+
+void MainWindow::handleErrorOccured(int id, QSerialPort::SerialPortError error)
+{
+    if(error != QSerialPort::NoError){
+        QString errorStr;
+        switch(error){
+            case QSerialPort::DeviceNotFoundError: errorStr = "DeviceNotFoundError"; break;
+            case QSerialPort::PermissionError: errorStr = "PermissionError"; break;
+            case QSerialPort::OpenError: errorStr = "OpenError"; break;
+            case QSerialPort::ParityError: errorStr = "ParityError"; break;
+            case QSerialPort::FramingError: errorStr = "FramingError"; break;
+            case QSerialPort::BreakConditionError: errorStr = "BreakConditionError"; break;
+            case QSerialPort::WriteError: errorStr = "WriteError"; break;
+            case QSerialPort::ReadError: errorStr = "ReadError"; break;
+            case QSerialPort::ResourceError: errorStr = "ResourceError"; break;
+            case QSerialPort::UnsupportedOperationError: errorStr = "UnsupportedOperationError"; break;
+            case QSerialPort::TimeoutError: errorStr = "TimeoutError"; break;
+            case QSerialPort::NotOpenError: errorStr = "NotOpenError"; break;
+            default:
+            case QSerialPort::UnknownError: errorStr = "UnknownError"; break;
+
+        }
+
+        QString msg = QString("%1 error: %2").arg(qUtf8Printable(debSerialPortList[id]->portName())).arg(errorStr);
+        ui->plainTextEdit->appendPlainText(msg);
+        //qDebug() <<"!!!!!!!" << id <<error;
+        if(error == QSerialPort::ResourceError){
+            //pushButtonComOpen_clicked(id);
+        }
+    }
 }

@@ -193,6 +193,8 @@ public:
     QGroupBox *groupBox_6;
     QRadioButton *radioButtonFpgaFreq24;
     QRadioButton *radioButtonFpgaFreq25;
+    QLabel *label_3;
+    QLineEdit *lineEditMotorCount;
     QGroupBox *groupBox_7;
     QLineEdit *lineEditMinVal;
     QLabel *label;
@@ -217,6 +219,8 @@ public:
     QCheckBox *term8;
     QCheckBox *term9;
     QCheckBox *term10;
+    QWidget *tabDebugPort;
+    QWidget *widgetComPorts;
     QWidget *widget_27;
     QHBoxLayout *horizontalLayout_18;
     QPushButton *pushButtonInitiate;
@@ -1172,14 +1176,21 @@ public:
         lineEdit_vmax_mmsec->setAlignment(Qt::AlignCenter);
         groupBox_6 = new QGroupBox(tabSettings);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        groupBox_6->setGeometry(QRect(260, 20, 141, 101));
+        groupBox_6->setGeometry(QRect(260, 20, 151, 91));
         radioButtonFpgaFreq24 = new QRadioButton(groupBox_6);
         radioButtonFpgaFreq24->setObjectName(QStringLiteral("radioButtonFpgaFreq24"));
-        radioButtonFpgaFreq24->setGeometry(QRect(20, 20, 91, 17));
+        radioButtonFpgaFreq24->setGeometry(QRect(10, 50, 91, 17));
         radioButtonFpgaFreq25 = new QRadioButton(groupBox_6);
         radioButtonFpgaFreq25->setObjectName(QStringLiteral("radioButtonFpgaFreq25"));
-        radioButtonFpgaFreq25->setGeometry(QRect(20, 50, 91, 17));
+        radioButtonFpgaFreq25->setGeometry(QRect(10, 70, 91, 17));
         radioButtonFpgaFreq25->setChecked(true);
+        label_3 = new QLabel(groupBox_6);
+        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setGeometry(QRect(10, 20, 91, 16));
+        lineEditMotorCount = new QLineEdit(groupBox_6);
+        lineEditMotorCount->setObjectName(QStringLiteral("lineEditMotorCount"));
+        lineEditMotorCount->setGeometry(QRect(100, 20, 41, 20));
+        lineEditMotorCount->setAlignment(Qt::AlignCenter);
         groupBox_7 = new QGroupBox(tabSettings);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
         groupBox_7->setGeometry(QRect(20, 200, 141, 101));
@@ -1294,6 +1305,12 @@ public:
         verticalLayout_4->addWidget(widget_9);
 
         tabWidget->addTab(tabSettings, QString());
+        tabDebugPort = new QWidget();
+        tabDebugPort->setObjectName(QStringLiteral("tabDebugPort"));
+        widgetComPorts = new QWidget(tabDebugPort);
+        widgetComPorts->setObjectName(QStringLiteral("widgetComPorts"));
+        widgetComPorts->setGeometry(QRect(80, 70, 671, 201));
+        tabWidget->addTab(tabDebugPort, QString());
 
         verticalLayout_2->addWidget(tabWidget);
 
@@ -1437,7 +1454,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1486,6 +1503,8 @@ public:
         groupBox_6->setTitle(QApplication::translate("MainWindow", "\320\255\320\221\320\243", Q_NULLPTR));
         radioButtonFpgaFreq24->setText(QApplication::translate("MainWindow", "24 \320\234\320\223\321\206 (v1.0)", Q_NULLPTR));
         radioButtonFpgaFreq25->setText(QApplication::translate("MainWindow", "25 \320\234\320\223\321\206 (v1.1)", Q_NULLPTR));
+        label_3->setText(QApplication::translate("MainWindow", "\320\232\320\276\320\273-\320\262\320\276 \320\274\320\276\321\202\320\276\321\200\320\276\320\262:", Q_NULLPTR));
+        lineEditMotorCount->setInputMask(QApplication::translate("MainWindow", "90", Q_NULLPTR));
         groupBox_7->setTitle(QApplication::translate("MainWindow", "UDP", Q_NULLPTR));
         lineEditMinVal->setInputMask(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
@@ -1508,6 +1527,7 @@ public:
         term9->setText(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         term10->setText(QApplication::translate("MainWindow", "10", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tabDebugPort), QApplication::translate("MainWindow", "debugPort", Q_NULLPTR));
         pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
         pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));

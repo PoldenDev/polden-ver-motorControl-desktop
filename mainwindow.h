@@ -16,6 +16,9 @@
 #include <QTime>
 #include <QCheckBox>
 //#include <uartthread.h>
+#include <QComboBox>
+#include <QPushButton>
+#include <QGroupBox>
 
 
 //#include <qwt_plot_curve.h>
@@ -90,18 +93,16 @@ private slots:
     void on_pushButtonTest_clicked();
 
     void on_lineEdit_maxHeightMM_editingFinished();
-
     void on_lineEdit_MaxHeightImp_editingFinished();
-
     void on_radioButtonFpgaFreq25_clicked();
-
     void on_radioButtonFpgaFreq24_clicked();
-
     void on_lineEdit_mmPerRot_editingFinished();
-
     void on_lineEdit_vmax_mmsec_editingFinished();
 
+    void on_lineEditMotorCount_editingFinished();
+
 private:
+    quint32 motorCount;
     void setPos(int pos);
     Ui::MainWindow *ui;
     QSerialPort serial;
@@ -205,6 +206,17 @@ private:
     bool speedTrig[MOTOR_CNT];
 
     void handleSliderReleased(int id, int newPos);
+
+    void createDebugSerialPortInterface();
+
+    QList<QComboBox*> debPortCmbBxList;
+    QList<QPushButton*> debPortpbList;
+    QList<QSerialPort*> debSerialPortList;
+    QList<QGroupBox*> debPortGbList;
+    QList<QLineEdit*> debPortStatusLeList;
+    void pushDebugComPortOpen(int id);
+    void handleErrorOccured(int id, QSerialPort::SerialPortError error);
+
 };
 
 
