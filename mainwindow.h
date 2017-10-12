@@ -100,6 +100,7 @@ private slots:
     void on_lineEdit_vmax_mmsec_editingFinished();
 
     void on_lineEditMotorCount_editingFinished();
+    void checkDebugComTimerHandle();
 
 private:
     quint32 motorCount;
@@ -216,6 +217,8 @@ private:
     QList<QLineEdit*> debPortStatusLeList;
     void pushDebugComPortOpen(int id);
     void handleErrorOccured(int id, QSerialPort::SerialPortError error);
+    void handleReadyRead(int id);
+    QTimer checkDebugComTimer;
 
 };
 

@@ -364,15 +364,18 @@ void MainWindow::on_pushButtonComOpen_clicked()
                     ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL %2").arg(qUtf8Printable(comName)).arg(serial.error()));
                     return;                    
                 }
-                //qDebug("%s port opened", qUtf8Printable(comName));
-                ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
-//                connect(&serial, SIGNAL(readyRead()),
-//                        this, SLOT(handleReadyRead()));
-//                connect(&serial, SIGNAL(bytesWritten(qint64)),
-//                        this, SLOT(handleSerialDataWritten(qint64)));
-                ui->pushButtonComOpen->setText("close");
-                comExchanges = 0;
-                usbConnectionTime.start();
+                else{
+                    ui->comComboBox->setDisabled(true);
+                    //qDebug("%s port opened", qUtf8Printable(comName));
+                    ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
+    //                connect(&serial, SIGNAL(readyRead()),
+    //                        this, SLOT(handleReadyRead()));
+    //                connect(&serial, SIGNAL(bytesWritten(qint64)),
+    //                        this, SLOT(handleSerialDataWritten(qint64)));
+                    ui->pushButtonComOpen->setText("close");
+                    comExchanges = 0;
+                    usbConnectionTime.start();
+                }
             }
         }
     }
@@ -383,6 +386,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(serial.portName()));
         ui->pushButtonComOpen->setText("open");        
         //contrStringQueue.clear();
+        ui->comComboBox->setDisabled(false);
     }
 
 }
@@ -2014,6 +2018,7 @@ void MainWindow::handleSliderReleased(int id, int newPos)
 
 void MainWindow::createDebugSerialPortInterface()
 {
+    checkDebugComTimer.stop();
     foreach (QGroupBox *gb, debPortGbList) {
         delete gb;
     }
@@ -2047,6 +2052,7 @@ void MainWindow::createDebugSerialPortInterface()
         QSerialPort *sp = new QSerialPort(gb);
         connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleErrorOccured(i, error);});
         connect(pb, &QPushButton::clicked, [=](){ pushDebugComPortOpen(i);});
+        connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
 
         debPortCmbBxList.append(cb);
         debPortpbList.append(pb);
@@ -2065,6 +2071,11 @@ void MainWindow::createDebugSerialPortInterface()
     //ui->widgetComPorts->
     on_pushButton_refreshCom_clicked();
 
+
+    connect(&checkDebugComTimer, SIGNAL(timeout()), this, SLOT(checkDebugComTimerHandle()));
+    checkDebugComTimer.setSingleShot(false);
+    checkDebugComTimer.setInterval(500);
+    checkDebugComTimer.start();
 }
 
 void MainWindow::pushDebugComPortOpen(int id)
@@ -2143,4 +2154,30 @@ void MainWindow::handleErrorOccured(int id, QSerialPort::SerialPortError error)
             //pushButtonComOpen_clicked(id);
         }
     }
+}
+
+void MainWindow::handleReadyRead(int id)
+{
+    QByteArray ba = debSerialPortList[id]->readAll();
+    qDebug() << id << ba;
+    ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
+
+}
+
+void MainWindow::checkDebugComTimerHandle()
+{
+    QByteArray reqBase = QByteArrayLiteral("\x01\x03\x00");
+    //const quint8 req1Str[] {0x01, 0x03, 0x00, 0xFD, 0x00, 0x01, 0x15, 0xfa};
+    QByteArray req1 = reqBase + QByteArrayLiteral("\xFD\x00\x01\x15\xfa");
+    QByteArray reqReqErrTrace = reqBase + QByteArrayLiteral("\x10\x00\x0A\xC4\x08");
+    //req1 << 0x01 << 0x03 << 0x00 << 0xFD << 0x00 << 0x01 << 0x15 << 0xfa;
+
+    foreach (QSerialPort *sp, debSerialPortList) {
+        if(sp->isOpen()){
+            sp->write(reqReqErrTrace);
+
+        }
+
+    }
+
 }
