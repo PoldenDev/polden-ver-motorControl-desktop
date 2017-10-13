@@ -79,7 +79,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabMainStat">
        <attribute name="title">
@@ -1503,7 +1503,7 @@
           <x>260</x>
           <y>20</y>
           <width>151</width>
-          <height>91</height>
+          <height>121</height>
          </rect>
         </property>
         <property name="title">
@@ -1513,7 +1513,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>50</y>
+           <y>70</y>
            <width>91</width>
            <height>17</height>
           </rect>
@@ -1526,7 +1526,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>70</y>
+           <y>90</y>
            <width>91</width>
            <height>17</height>
           </rect>
@@ -1565,6 +1565,22 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="checkBoxDirInverse">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>121</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>инверсия dir</string>
          </property>
         </widget>
        </widget>

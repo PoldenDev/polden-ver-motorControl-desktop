@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
+    ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
 
 
 
@@ -314,6 +315,8 @@ MainWindow::~MainWindow()
 {
     settings.setValue("maxPosValue", ui->lineEditMaxVal->text().toInt());
     settings.setValue("minPosValue", ui->lineEditMinVal->text().toInt());
+    settings.setValue("dirInverse", ui->checkBoxDirInverse->isChecked());
+
     delete ui;
 }
 
@@ -496,6 +499,9 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
 {
     int delta = pos - getMotorAbsPos(mi);
     quint32 dir = delta > 0? 1: 0;
+    if(ui->checkBoxDirInverse->isChecked())
+        dir = delta > 0? 0: 1;
+
     quint32 steps = abs(delta);
 
     int curMsec = QTime::currentTime().msecsSinceStartOfDay();
@@ -1006,7 +1012,7 @@ void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
         //convertPosModeToVelMode(cmdStr);        
         parseCmdMultiMotorStr(cmdStr);
 
-        qDebug() << QTime::currentTime().toString("hh:mm:ss") << "--- "<< cmdStr;
+        //qDebug() << QTime::currentTime().toString("hh:mm:ss") << "--- "<< cmdStr;
     }
 }
 
@@ -1024,12 +1030,12 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
     msecsForStep += 100;
 //last().absMsec + 100;
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
-    if(motorStrList.length() != MOTOR_CNT){
-        ui->plainTextUDP->appendPlainText("motorStrList.length not equal MOTOR_CNT");
-        return;
-    }
+//    if(motorStrList.length() != MOTOR_CNT){
+//        ui->plainTextUDP->appendPlainText("motorStrList.length not equal MOTOR_CNT");
+//        return;
+//    }
     //foreach (QString motorStr, motorStrList) {
-    for(int i=0; i<MOTOR_CNT; i++){
+    for(int i=0; i<motorStrList.length(); i++){
         QString vs = motorStrList[i];        
         float ip = vs.toInt()/1000.;
         int convVal = ip*maxVal;
@@ -1214,6 +1220,9 @@ void MainWindow::readPendingDatagrams()
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
             //qDebug()<<dataStr;
+            QString showStr = QString("%1 %2").arg(QTime::currentTime().toString("mm:ss:zzz"))
+                                                    .arg(dataStr);
+            ui->plainTextUDP->appendPlainText(showStr);
             //QString  contrStr =  dataStr.left(13);
 //            QString debStr;
 //            foreach (QString posStr, list1) {
@@ -1361,10 +1370,12 @@ void MainWindow::sendOnTimer()
         int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
         bytesToRecv -= dRecvd;
     }
-    //qDebug("data recvd in %d ms", tt.elapsed());
+
 
     comExchanges++;
     parseFPGAMsg(QByteArray(dArr, 4));
+    qDebug("%d data recvd in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
+           tt.elapsed());
 }
 
 

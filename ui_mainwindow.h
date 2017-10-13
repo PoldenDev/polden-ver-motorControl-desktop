@@ -195,6 +195,7 @@ public:
     QRadioButton *radioButtonFpgaFreq25;
     QLabel *label_3;
     QLineEdit *lineEditMotorCount;
+    QCheckBox *checkBoxDirInverse;
     QGroupBox *groupBox_7;
     QLineEdit *lineEditMinVal;
     QLabel *label;
@@ -1176,13 +1177,13 @@ public:
         lineEdit_vmax_mmsec->setAlignment(Qt::AlignCenter);
         groupBox_6 = new QGroupBox(tabSettings);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        groupBox_6->setGeometry(QRect(260, 20, 151, 91));
+        groupBox_6->setGeometry(QRect(260, 20, 151, 121));
         radioButtonFpgaFreq24 = new QRadioButton(groupBox_6);
         radioButtonFpgaFreq24->setObjectName(QStringLiteral("radioButtonFpgaFreq24"));
-        radioButtonFpgaFreq24->setGeometry(QRect(10, 50, 91, 17));
+        radioButtonFpgaFreq24->setGeometry(QRect(10, 70, 91, 17));
         radioButtonFpgaFreq25 = new QRadioButton(groupBox_6);
         radioButtonFpgaFreq25->setObjectName(QStringLiteral("radioButtonFpgaFreq25"));
-        radioButtonFpgaFreq25->setGeometry(QRect(10, 70, 91, 17));
+        radioButtonFpgaFreq25->setGeometry(QRect(10, 90, 91, 17));
         radioButtonFpgaFreq25->setChecked(true);
         label_3 = new QLabel(groupBox_6);
         label_3->setObjectName(QStringLiteral("label_3"));
@@ -1191,6 +1192,10 @@ public:
         lineEditMotorCount->setObjectName(QStringLiteral("lineEditMotorCount"));
         lineEditMotorCount->setGeometry(QRect(100, 20, 41, 20));
         lineEditMotorCount->setAlignment(Qt::AlignCenter);
+        checkBoxDirInverse = new QCheckBox(groupBox_6);
+        checkBoxDirInverse->setObjectName(QStringLiteral("checkBoxDirInverse"));
+        checkBoxDirInverse->setGeometry(QRect(10, 50, 121, 17));
+        checkBoxDirInverse->setLayoutDirection(Qt::LeftToRight);
         groupBox_7 = new QGroupBox(tabSettings);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
         groupBox_7->setGeometry(QRect(20, 200, 141, 101));
@@ -1454,7 +1459,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1505,6 +1510,7 @@ public:
         radioButtonFpgaFreq25->setText(QApplication::translate("MainWindow", "25 \320\234\320\223\321\206 (v1.1)", Q_NULLPTR));
         label_3->setText(QApplication::translate("MainWindow", "\320\232\320\276\320\273-\320\262\320\276 \320\274\320\276\321\202\320\276\321\200\320\276\320\262:", Q_NULLPTR));
         lineEditMotorCount->setInputMask(QApplication::translate("MainWindow", "90", Q_NULLPTR));
+        checkBoxDirInverse->setText(QApplication::translate("MainWindow", "\320\270\320\275\320\262\320\265\321\200\321\201\320\270\321\217 dir", Q_NULLPTR));
         groupBox_7->setTitle(QApplication::translate("MainWindow", "UDP", Q_NULLPTR));
         lineEditMinVal->setInputMask(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
