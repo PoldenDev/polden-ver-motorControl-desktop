@@ -232,6 +232,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->labelCompileTime->setText(build);
 
+    paletteGrey = new QPalette();
+    paletteGrey->setColor(QPalette::Base,Qt::lightGray);
+    paletteRed = new QPalette();
+    paletteRed->setColor(QPalette::Base,Qt::red);
+    paletteGreen = new QPalette();
+    paletteGreen->setColor(QPalette::Base,Qt::green);
+
+
     createDebugSerialPortInterface();
     on_pushButton_refreshCom_clicked();
 
@@ -1180,7 +1188,7 @@ void MainWindow::readPendingDatagrams()
 {
     QTime rpdEst;
     rpdEst.start();
-    //qDebug() << "0";
+    //qDebug("%d readPendingDatagrams", QTime::currentTime().msecsSinceStartOfDay()&0xfff );
     int gridLines = 0;
     int rb = 0;
     while (udpSocket->hasPendingDatagrams()) {
@@ -1291,6 +1299,11 @@ void MainWindow::readPendingDatagrams()
     }
     //qDebug() << "readPendingDatagrams time" << rpdEst.elapsed() << " gl " << gridLines;
     //qDebug("readPendingDatagrams rb %d gl %04d time %d", rb, gridLines, rpdEst.elapsed());
+//    qDebug("%d rPDms recvd in %d ms: %d %d %d", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
+//           rpdEst.elapsed(),
+//           motorPosCmdData[0].length(),
+//           motorPosCmdData[1].length(),
+//           motorPosCmdData[2].length());
 }
 
 
@@ -1353,6 +1366,8 @@ void MainWindow::sendOnTimer()
 
     if(serial.isOpen() == false)
         return;
+    //qDebug("%d sendOnTimer", QTime::currentTime().msecsSinceStartOfDay()&0xfff );
+
     QTime tt;
     tt.start();
     char c = 0xff;
@@ -1374,8 +1389,8 @@ void MainWindow::sendOnTimer()
 
     comExchanges++;
     parseFPGAMsg(QByteArray(dArr, 4));
-    qDebug("%d data recvd in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
-           tt.elapsed());
+//    qDebug("%d data recvd in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
+//           tt.elapsed());
 }
 
 
@@ -2052,8 +2067,12 @@ void MainWindow::createDebugSerialPortInterface()
         vblo->addWidget(cb);
         QPushButton *pb = new QPushButton("open", gb);
         vblo->addWidget(pb);
-//        QLineEdit *le = new QLineEdit(this);
-//        vblo->addWidget(le);
+        QLineEdit *le = new QLineEdit(this);
+        le->setReadOnly(true);
+        le->setAlignment(Qt::AlignHCenter);
+        le->setText("N/A");
+        le->setPalette(*paletteGrey);
+        vblo->addWidget(le);
 
         vblo->setAlignment(Qt::AlignTop);
 
@@ -2069,7 +2088,7 @@ void MainWindow::createDebugSerialPortInterface()
         debPortpbList.append(pb);
         debSerialPortList.append(sp);
         debPortGbList.append(gb);
-        //debPortStatusLeList.append(le);
+        debPortStatusLeList.append(le);
     }
 
     //ui->tabWidget->ind
@@ -2170,8 +2189,8 @@ void MainWindow::handleErrorOccured(int id, QSerialPort::SerialPortError error)
 void MainWindow::handleReadyRead(int id)
 {
     QByteArray ba = debSerialPortList[id]->readAll();
-    qDebug() << id << ba;
-    ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
+    //qDebug() << id << ba;
+    parseLeadShineMsg(id, ba);
 
 }
 
@@ -2190,5 +2209,64 @@ void MainWindow::checkDebugComTimerHandle()
         }
 
     }
+}
 
+void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
+{
+    quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-1);
+    quint8 crc16Recvd = ba[ba.length()-1];
+    if(crc16 != crc16Recvd){
+        ui->plainTextEdit->appendPlainText(QString("debResp%1: recv CRC err").arg(id));
+        ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
+        ui->plainTextEdit->appendPlainText(QString("debResp%1: CRC %2").arg(id).arg(crc16));
+        return;
+    }
+
+    if((ba.length()==25)&&(ba[0] == 0x01)&&(ba[1] == 0x03)&&(ba[2] == 0x14)){
+        //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
+        if((ba[4]&0x50) == 0){
+            debPortStatusLeList[id]->setPalette(*paletteGreen);
+            //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
+            debPortStatusLeList[id]->setText("OK");
+
+        }
+        else{
+            debPortStatusLeList[id]->setPalette(*paletteRed);
+            if(ba[4]&0x10){ //encErr
+                debPortStatusLeList[id]->setText("enc err");
+            }
+            if(ba[4]&0x40){ //posErr
+                debPortStatusLeList[id]->setText("pos err");
+            }
+        }
+    }
+    else{
+        ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
+    }
+}
+
+#include <QtEndian>
+quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
+{
+    //Вычисляет контрольную сумму CRC16 для ModBus и выдаёт её с нужным порядком байтов
+    quint8 tmp[len];
+    for(int a=0;a<len;a++)
+    {
+        tmp[a]= buf[a];
+    }
+      unsigned int crc = 0xFFFF;
+      for (int pos = 0; pos < len; pos++)
+      {
+      crc ^= (unsigned int)tmp[pos];    // XOR byte into least sig. byte of crc
+
+      for (int i = 8; i != 0; i--) {    // Loop over each bit
+        if ((crc & 0x0001) != 0) {      // If the LSB is set
+          crc >>= 1;                    // Shift right and XOR 0xA001
+          crc ^= 0xA001;
+        }
+        else                            // Else LSB is not set
+          crc >>= 1;                    // Just shift right
+        }
+      }
+      return (quint16)crc;
 }

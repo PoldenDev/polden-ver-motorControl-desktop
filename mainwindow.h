@@ -219,6 +219,10 @@ private:
     void handleErrorOccured(int id, QSerialPort::SerialPortError error);
     void handleReadyRead(int id);
     QTimer checkDebugComTimer;
+    void parseLeadShineMsg(int id, QByteArray &ba);
+    quint16 CRC16_ModBusRTU(QByteArray buf, quint16 len);
+
+    QPalette *paletteGrey, *paletteRed, *paletteGreen;
 
 };
 
