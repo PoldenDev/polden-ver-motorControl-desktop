@@ -1542,7 +1542,7 @@ void MainWindow::on_pushMoveUp_clicked()
 {
     DivPosDataStr ds;
 
-    for(int i=0; i<10; i++){
+    for(int i=0; i<motorCount; i++){
         int startPos =0;
 
         if(motorPosCmdData[i].length() == 0)
