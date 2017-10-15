@@ -365,7 +365,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
    serial.setBaudRate(115200);
     if(ui->pushButtonComOpen->text() == "open"){
         if(serial.isOpen() == false){
-            QString comName = ui->comComboBox->currentText();
+            QString comName = (ui->comComboBox->currentData().toString());
             if(comName.length() > 0){
                 //UartThread.requestToStart(comName);
                 serial.setPortName(comName);
@@ -1318,6 +1318,7 @@ void MainWindow::on_pushButton_refreshCom_clicked()
       QString description;
       QString manufacturer;
       QString serialNumber;
+      int id = 0;
     for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
            description = serialPortInfo.description();
            manufacturer = serialPortInfo.manufacturer();
@@ -1331,10 +1332,31 @@ void MainWindow::on_pushButton_refreshCom_clicked()
                << QObject::tr("Vendor Identifier: ") << (serialPortInfo.hasVendorIdentifier() ? QByteArray::number(serialPortInfo.vendorIdentifier(), 16) : blankString) << endl
                << QObject::tr("Product Identifier: ") << (serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString) << endl
                << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
-           ui->comComboBox->addItem(serialPortInfo.portName());
+
+           QString cbItemName = QString("%1 (%2)").arg(serialPortInfo.portName()).arg(!description.isEmpty() ? description : blankString);
+           QString cbToolTipText = QString("Port: %1 <br>"
+                                           "Location: %2 <br>"
+                                           "Description: %3 <br>"
+                                           "Manufacturer: %4 <br>"
+                                           "Serial number: %5 <br>"
+                                           "Vendor Identifier: %6 <br>"
+                                           "Product Identifier: %7 <br>"
+                                           "Busy: %8").arg(serialPortInfo.portName())
+                                                            .arg(serialPortInfo.systemLocation())
+                                                           .arg(!description.isEmpty() ? description : blankString)
+                   .arg(!manufacturer.isEmpty() ? manufacturer : blankString)
+                   .arg(!serialNumber.isEmpty() ? serialNumber : blankString)
+                   .arg(serialPortInfo.hasVendorIdentifier() ? QByteArray::number(serialPortInfo.vendorIdentifier(), 16) : blankString)
+                   .arg(serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString)
+                   .arg(serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No"));
+
+           ui->comComboBox->addItem(cbItemName, serialPortInfo.portName());
+           ui->comComboBox->setItemData(id, cbToolTipText, Qt::ToolTipRole);
            foreach (QComboBox *cb, debPortCmbBxList) {
-               cb->addItem(serialPortInfo.portName());
+               cb->addItem(cbItemName, serialPortInfo.portName());
+               cb->setItemData(id, cbToolTipText, Qt::ToolTipRole);
            }
+           id++;
     }
 }
 
@@ -2210,7 +2232,7 @@ void MainWindow::pushDebugComPortOpen(int id)
     sp.setBaudRate(38400);
      if(pb.text() == "open"){
          if(sp.isOpen() == false){
-             QString comName = cb.currentText();
+             QString comName = cb.currentData().toString();
              if(comName.length() > 0){
                  //UartThread.requestToStart(comName);
                  sp.setPortName(comName);
