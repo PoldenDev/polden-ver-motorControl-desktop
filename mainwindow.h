@@ -217,7 +217,8 @@ private:
     QList<QGroupBox*> debPortGbList;
     QList<QLineEdit*> debPortStatusLeList;
     void pushDebugComPortOpen(int id);
-    void handleErrorOccured(int id, QSerialPort::SerialPortError error);
+    void comPortClose(int id);
+    void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
     void handleReadyRead(int id);
     QTimer checkDebugComTimer;
     void parseLeadShineMsg(int id, QByteArray &ba);

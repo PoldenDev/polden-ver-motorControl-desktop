@@ -2173,7 +2173,7 @@ void MainWindow::createDebugSerialPortInterface()
         hblo->addWidget(gb);
 
         QSerialPort *sp = new QSerialPort(gb);
-        connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleErrorOccured(i, error);});
+        connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
         connect(pb, &QPushButton::clicked, [=](){ pushDebugComPortOpen(i);});
         connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
 
@@ -2240,6 +2240,22 @@ void MainWindow::pushDebugComPortOpen(int id)
 
 }
 
+void MainWindow::comPortClose(int id)
+{
+    QSerialPort &sp = *debSerialPortList[id];
+    QPushButton &pb = *debPortpbList[id];
+    QComboBox &cb = *debPortCmbBxList[id];
+    QLineEdit &le = *debPortStatusLeList[id];
+
+    cb.setEnabled(true);
+    pb.setText("open");
+    if(sp.isOpen() == true){
+        ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(sp.portName()));
+        sp.close();
+    }
+    le.setPalette(*paletteGrey);
+}
+
 void MainWindow::on_lineEditMotorCount_editingFinished()
 {
     motorCount = ui->lineEditMotorCount->text().toInt();
@@ -2249,7 +2265,7 @@ void MainWindow::on_lineEditMotorCount_editingFinished()
     createMainInterface();
 }
 
-void MainWindow::handleErrorOccured(int id, QSerialPort::SerialPortError error)
+void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError error)
 {
     if(error != QSerialPort::NoError){
         QString errorStr;
@@ -2274,8 +2290,10 @@ void MainWindow::handleErrorOccured(int id, QSerialPort::SerialPortError error)
         QString msg = QString("%1 error: %2").arg(qUtf8Printable(debSerialPortList[id]->portName())).arg(errorStr);
         ui->plainTextEdit->appendPlainText(msg);
         //qDebug() <<"!!!!!!!" << id <<error;
-        if(error == QSerialPort::ResourceError){
+        if((error == QSerialPort::ResourceError) ||
+           (error == QSerialPort::PermissionError)){
             //pushButtonComOpen_clicked(id);
+            comPortClose(id);
         }
     }
 }
