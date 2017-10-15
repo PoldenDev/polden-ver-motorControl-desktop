@@ -40,7 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     markerXPos(0),
     comExchanges(0),
     bytesOnIter(0),
-    dataGramCnt(0)
+    dataGramCnt(0),
+    paletteGrey(NULL),
+    paletteRed(NULL),
+    paletteGreen(NULL)
 {
     ui->setupUi(this);
 
@@ -125,8 +128,13 @@ MainWindow::MainWindow(QWidget *parent) :
         lastCtrlTimeMsecs[i] = 0;
     }
 
+
+
     ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
     ui->widget_11->layout()->setAlignment(Qt::AlignHCenter);
+
+    createDebugSerialPortInterface();
+    createMainInterface();
 
     timeStatSlider.append(ui->timeShift_0);
     timeStatSlider.append(ui->timeShift_1);
@@ -150,68 +158,68 @@ MainWindow::MainWindow(QWidget *parent) :
     timeStatLE.append(ui->lineEditTimeShift_8);
     timeStatLE.append(ui->lineEditTimeShift_9);
 
-    absPosSlider.append(ui->SliderPos0);
-    absPosSlider.append(ui->SliderPos1);
-    absPosSlider.append(ui->SliderPos2);
-    absPosSlider.append(ui->SliderPos3);
-    absPosSlider.append(ui->SliderPos4);
-    absPosSlider.append(ui->SliderPos5);
-    absPosSlider.append(ui->SliderPos6);
-    absPosSlider.append(ui->SliderPos7);
-    absPosSlider.append(ui->SliderPos8);
-    absPosSlider.append(ui->SliderPos9);
+//    absPosSlider.append(ui->SliderPos0);
+//    absPosSlider.append(ui->SliderPos1);
+//    absPosSlider.append(ui->SliderPos2);
+//    absPosSlider.append(ui->SliderPos3);
+//    absPosSlider.append(ui->SliderPos4);
+//    absPosSlider.append(ui->SliderPos5);
+//    absPosSlider.append(ui->SliderPos6);
+//    absPosSlider.append(ui->SliderPos7);
+//    absPosSlider.append(ui->SliderPos8);
+//    absPosSlider.append(ui->SliderPos9);
 
-    for(int i=0; i<absPosSlider.length(); i++){
-        QSlider *sl = absPosSlider[i];
-        connect(sl, &QSlider::sliderReleased,
-                [this, i](){ handleSliderReleased(i, absPosSlider[i]->pos().rx());});
+//    for(int i=0; i<absPosSlider.length(); i++){
+//        QSlider *sl = absPosSlider[i];
+//        connect(sl, &QSlider::sliderReleased,
+//                [this, i](){ handleSliderReleased(i, absPosSlider[i]->pos().rx());});
 
-    }
+//    }
 
-    absPosLineEdit.append(ui->lineEditPos0);
-    absPosLineEdit.append(ui->lineEditPos1);
-    absPosLineEdit.append(ui->lineEditPos2);
-    absPosLineEdit.append(ui->lineEditPos3);
-    absPosLineEdit.append(ui->lineEditPos4);
-    absPosLineEdit.append(ui->lineEditPos5);
-    absPosLineEdit.append(ui->lineEditPos6);
-    absPosLineEdit.append(ui->lineEditPos7);
-    absPosLineEdit.append(ui->lineEditPos8);
-    absPosLineEdit.append(ui->lineEditPos9);
+//    absPosLineEdit.append(ui->lineEditPos0);
+//    absPosLineEdit.append(ui->lineEditPos1);
+//    absPosLineEdit.append(ui->lineEditPos2);
+//    absPosLineEdit.append(ui->lineEditPos3);
+//    absPosLineEdit.append(ui->lineEditPos4);
+//    absPosLineEdit.append(ui->lineEditPos5);
+//    absPosLineEdit.append(ui->lineEditPos6);
+//    absPosLineEdit.append(ui->lineEditPos7);
+//    absPosLineEdit.append(ui->lineEditPos8);
+//    absPosLineEdit.append(ui->lineEditPos9);
 
-    stateLineEdit.append(ui->lineEditState0);
-    stateLineEdit.append(ui->lineEditState1);
-    stateLineEdit.append(ui->lineEditState2);
-    stateLineEdit.append(ui->lineEditState3);
-    stateLineEdit.append(ui->lineEditState4);
-    stateLineEdit.append(ui->lineEditState5);
-    stateLineEdit.append(ui->lineEditState6);
-    stateLineEdit.append(ui->lineEditState7);
-    stateLineEdit.append(ui->lineEditState8);
-    stateLineEdit.append(ui->lineEditState9);
+//    stateLineEdit.append(ui->lineEditState0);
+//    stateLineEdit.append(ui->lineEditState1);
+//    stateLineEdit.append(ui->lineEditState2);
+//    stateLineEdit.append(ui->lineEditState3);
+//    stateLineEdit.append(ui->lineEditState4);
+//    stateLineEdit.append(ui->lineEditState5);
+//    stateLineEdit.append(ui->lineEditState6);
+//    stateLineEdit.append(ui->lineEditState7);
+//    stateLineEdit.append(ui->lineEditState8);
+//    stateLineEdit.append(ui->lineEditState9);
 
-    termCheckBox.append(ui->checkBoxTerm0);
-    termCheckBox.append(ui->checkBoxTerm1);
-    termCheckBox.append(ui->checkBoxTerm2);
-    termCheckBox.append(ui->checkBoxTerm3);
-    termCheckBox.append(ui->checkBoxTerm4);
-    termCheckBox.append(ui->checkBoxTerm5);
-    termCheckBox.append(ui->checkBoxTerm6);
-    termCheckBox.append(ui->checkBoxTerm7);
-    termCheckBox.append(ui->checkBoxTerm8);
-    termCheckBox.append(ui->checkBoxTerm9);
+//    termCheckBox.append(ui->checkBoxTerm0);
+//    termCheckBox.append(ui->checkBoxTerm1);
+//    termCheckBox.append(ui->checkBoxTerm2);
+//    termCheckBox.append(ui->checkBoxTerm3);
+//    termCheckBox.append(ui->checkBoxTerm4);
+//    termCheckBox.append(ui->checkBoxTerm5);
+//    termCheckBox.append(ui->checkBoxTerm6);
+//    termCheckBox.append(ui->checkBoxTerm7);
+//    termCheckBox.append(ui->checkBoxTerm8);
+//    termCheckBox.append(ui->checkBoxTerm9);
 
 
-    euqueLineEdit.append(ui->lineEditEuqueCnt0);
-    euqueLineEdit.append(ui->lineEditEuqueCnt1);
-    euqueLineEdit.append(ui->lineEditEuqueCnt2);
-    euqueLineEdit.append(ui->lineEditEuqueCnt3);
-    euqueLineEdit.append(ui->lineEditEuqueCnt4);
-    euqueLineEdit.append(ui->lineEditEuqueCnt5);
-    euqueLineEdit.append(ui->lineEditEuqueCnt6);
-    euqueLineEdit.append(ui->lineEditEuqueCnt7);
-    euqueLineEdit.append(ui->lineEditEuqueCnt8);
-    euqueLineEdit.append(ui->lineEditEuqueCnt9);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt0);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt1);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt2);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt3);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt4);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt5);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt6);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt7);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt8);
+//    euqueLineEdit.append(ui->lineEditEuqueCnt9);
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
     }
@@ -232,15 +240,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->labelCompileTime->setText(build);
 
-    paletteGrey = new QPalette();
-    paletteGrey->setColor(QPalette::Base,Qt::lightGray);
-    paletteRed = new QPalette();
-    paletteRed->setColor(QPalette::Base,Qt::red);
-    paletteGreen = new QPalette();
-    paletteGreen->setColor(QPalette::Base,Qt::green);
-
-
-    createDebugSerialPortInterface();
     on_pushButton_refreshCom_clicked();
 
 }
@@ -1675,7 +1674,7 @@ void MainWindow::uiUpdateTimerSlot()
     if(tabName == "mainStat"){
         bool bOk = false;
         int sliderMaxVal = ui->lineEdit_MaxHeightImp->text().toInt(&bOk);
-        for(int i=0; i<MOTOR_CNT; i++){
+        for(int i=0; i<motorCount; i++){
             if(bOk){
                 absPosSlider[i]->setMaximum(sliderMaxVal);
                 absPosSlider[i]->setTickInterval(sliderMaxVal/5);
@@ -2041,9 +2040,103 @@ void MainWindow::handleSliderReleased(int id, int newPos)
     qDebug() << id << newPos;
 }
 
+void MainWindow::createMainInterface()
+{
+    foreach (QWidget *w, motorStatWidgetList) {
+        delete w;
+    }
+    motorStatWidgetList.clear();
+    absPosSlider.clear();
+    absPosLineEdit.clear();
+    stateLineEdit.clear();
+    termCheckBox.clear();
+    euqueLineEdit.clear();
+
+
+    //QHBoxLayout *hblo = new QHBoxLayout(ui->groupBoxMain);
+
+    QLayout *lo = ui->groupBoxMain->layout();
+    if(lo == NULL){
+        lo = new QHBoxLayout();
+    }
+    else{
+
+        QHBoxLayout *hblo = ((QHBoxLayout*)lo);
+
+        for(int i=0; i<hblo->count(); i++){
+            delete hblo->takeAt(i);
+        }
+    }
+
+    //QWidget *mainWdg = new QWidget(ui->groupBoxMain);
+    //lo->addWidget(mainWdg);
+    //QHBoxLayout *hblo = new QHBoxLayout(mainWdg);
+    //lo->addWidget(mainWdg);
+
+    for(int i=0; i<motorCount; i++){
+        QWidget *wdg = new QWidget(ui->groupBoxMain);
+        QVBoxLayout *vblo = new QVBoxLayout(wdg);
+
+        QSlider *sl = new QSlider(wdg);
+        absPosSlider.append(sl);
+        connect(sl, &QSlider::sliderReleased,
+                [this, i](){ handleSliderReleased(i, absPosSlider[i]->pos().rx());});
+        vblo->addWidget(sl, 0, Qt::AlignHCenter);
+        QLineEdit *le = new QLineEdit(wdg);
+        le->setReadOnly(true);
+        le->setMaximumWidth(40);
+        le->setAlignment(Qt::AlignHCenter);
+        le->setAttribute(Qt::WA_TransparentForMouseEvents);
+        absPosLineEdit.append(le);
+        vblo->addWidget(le, 0, Qt::AlignHCenter);
+
+        le = new QLineEdit(wdg);
+        le->setReadOnly(true);
+        le->setMaximumWidth(40);
+        le->setAlignment(Qt::AlignHCenter);
+        le->setAttribute(Qt::WA_TransparentForMouseEvents);
+        stateLineEdit.append(le);
+        vblo->addWidget(le, 0, Qt::AlignHCenter);
+
+        QCheckBox *cb = new QCheckBox(wdg);
+        cb->setAttribute(Qt::WA_TransparentForMouseEvents);
+        cb->setFocusPolicy(Qt::NoFocus);
+        //cb->setChecked(true);
+        termCheckBox.append(cb);
+        vblo->addWidget(cb, 0, Qt::AlignHCenter);
+
+        le = new QLineEdit(wdg);
+        le->setReadOnly(true);
+        le->setMaximumWidth(40);
+        le->setAlignment(Qt::AlignHCenter);
+        le->setAttribute(Qt::WA_TransparentForMouseEvents);
+        euqueLineEdit.append(le);
+        vblo->addWidget(le, 0, Qt::AlignHCenter);
+        //vblo->setAlignment(Qt::AlignHCenter);
+        wdg->setLayout(vblo);
+        lo->addWidget(wdg);
+        //hblo->addStretch();
+        motorStatWidgetList.append(wdg);
+    }
+    ((QHBoxLayout*)lo)->addStretch(10);
+    ui->groupBoxMain->setLayout(lo);
+}
 
 void MainWindow::createDebugSerialPortInterface()
 {
+    if(paletteGrey == NULL){
+        paletteGrey = new QPalette();
+        paletteGrey->setColor(QPalette::Base,Qt::lightGray);
+    }
+    if(paletteRed == NULL){
+        paletteRed = new QPalette();
+        paletteRed->setColor(QPalette::Base,Qt::red);
+    }
+    if(paletteGreen == NULL){
+        paletteGreen = new QPalette();
+        paletteGreen->setColor(QPalette::Base,Qt::green);
+    }
+
     checkDebugComTimer.stop();
     foreach (QGroupBox *gb, debPortGbList) {
         delete gb;
@@ -2153,6 +2246,7 @@ void MainWindow::on_lineEditMotorCount_editingFinished()
     settings.setValue("motorCount", motorCount);
     ui->plainTextEdit->appendPlainText(QString("new motor count %1").arg(ui->lineEditMotorCount->text()));
     createDebugSerialPortInterface();
+    createMainInterface();
 }
 
 void MainWindow::handleErrorOccured(int id, QSerialPort::SerialPortError error)
@@ -2270,3 +2364,5 @@ quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
       }
       return (quint16)crc;
 }
+
+

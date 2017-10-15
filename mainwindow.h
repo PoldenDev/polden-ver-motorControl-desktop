@@ -209,6 +209,7 @@ private:
     void handleSliderReleased(int id, int newPos);
 
     void createDebugSerialPortInterface();
+    void createMainInterface();
 
     QList<QComboBox*> debPortCmbBxList;
     QList<QPushButton*> debPortpbList;
@@ -223,6 +224,9 @@ private:
     quint16 CRC16_ModBusRTU(QByteArray buf, quint16 len);
 
     QPalette *paletteGrey, *paletteRed, *paletteGreen;
+
+    QList<QWidget*> motorStatWidgetList;
+
 
 };
 
