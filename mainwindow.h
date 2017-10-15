@@ -70,12 +70,11 @@ private slots:
     void response(QString str);
 
 
-    void on_pushMoveDownState_clicked();
+    //void on_pushMoveDownState_clicked();
     void on_pushBUttonToIdle_clicked();
     void on_pushButtonGotoPEriodState_clicked();
     void on_pushButtonPosReset_clicked();
     void on_pushTestData_clicked();
-    void on_pushClearMap_clicked();
 
     void on_tabWidget_tabBarClicked(int index);
     void on_goToTerm_clicked();
@@ -87,7 +86,6 @@ private slots:
     void on_pushButtonUdpOpenClose_clicked();
 
     void on_pushButtonInitiate_clicked();
-
     void on_pushButtonGoZero_clicked();
 
     void on_pushButtonTest_clicked();
@@ -149,9 +147,6 @@ private:
     void parseCmdMotorStr(int, QString, int msecsForStep);
     void parseCmdMultiMotorStr(QString);
     void parseCmdMultiMotorStrList(QStringList);
-
-
-
 
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;

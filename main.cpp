@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
     for(int i=0; i<argc; i++){
         if(QString(argv[i]) == "--init"){
             qDebug("init");
-
         }
         else{
 

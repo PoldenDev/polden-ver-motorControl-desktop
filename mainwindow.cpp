@@ -229,12 +229,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QString build = QString("%1 ")
     .arg(QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")).toString("yyyy-MM-dd"))
-    .arg(QString("%1%20%3%4%5%6").arg(__TIME__[0])
+    /*.arg(QString("%1%20%3%4%5%6").arg(__TIME__[0])
     .arg(__TIME__[1])
     .arg(__TIME__[3])
     .arg(__TIME__[4])
     .arg(__TIME__[6])
-    .arg(__TIME__[7]));
+    .arg(__TIME__[7]))*/;
 
     ui->labelCompileTime->setText(build);
 
@@ -1344,15 +1344,15 @@ void MainWindow::on_pushButton_refreshCom_clicked()
            description = serialPortInfo.description();
            manufacturer = serialPortInfo.manufacturer();
            serialNumber = serialPortInfo.serialNumber();
-           qDebug() << endl
-               << QObject::tr("Port: ") << serialPortInfo.portName() << endl
-               << QObject::tr("Location: ") << serialPortInfo.systemLocation() << endl
-               << QObject::tr("Description: ") << (!description.isEmpty() ? description : blankString) << endl
-               << QObject::tr("Manufacturer: ") << (!manufacturer.isEmpty() ? manufacturer : blankString) << endl
-               << QObject::tr("Serial number: ") << (!serialNumber.isEmpty() ? serialNumber : blankString) << endl
-               << QObject::tr("Vendor Identifier: ") << (serialPortInfo.hasVendorIdentifier() ? QByteArray::number(serialPortInfo.vendorIdentifier(), 16) : blankString) << endl
-               << QObject::tr("Product Identifier: ") << (serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString) << endl
-               << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
+//           qDebug() << endl
+//               << QObject::tr("Port: ") << serialPortInfo.portName() << endl
+//               << QObject::tr("Location: ") << serialPortInfo.systemLocation() << endl
+//               << QObject::tr("Description: ") << (!description.isEmpty() ? description : blankString) << endl
+//               << QObject::tr("Manufacturer: ") << (!manufacturer.isEmpty() ? manufacturer : blankString) << endl
+//               << QObject::tr("Serial number: ") << (!serialNumber.isEmpty() ? serialNumber : blankString) << endl
+//               << QObject::tr("Vendor Identifier: ") << (serialPortInfo.hasVendorIdentifier() ? QByteArray::number(serialPortInfo.vendorIdentifier(), 16) : blankString) << endl
+//               << QObject::tr("Product Identifier: ") << (serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString) << endl
+//               << QObject::tr("Busy: ") << (serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) << endl;
 
            QString cbItemName = QString("%1 (%2)").arg(serialPortInfo.portName()).arg(!description.isEmpty() ? description : blankString);
            QString cbToolTipText = QString("Port: %1 <br>"
@@ -1530,15 +1530,15 @@ void MainWindow::response(QString str)
     ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
 }
 
-void MainWindow::on_pushMoveDownState_clicked()
-{
+//void MainWindow::on_pushMoveDownState_clicked()
+//{
 
 
 //    if(serial.isOpen()){
 //        QString str("Sd\r\n");
 //     serial.write(str.toLatin1());
 //    }
-}
+//}
 
 void MainWindow::on_pushBUttonToIdle_clicked()
 {
@@ -1664,12 +1664,6 @@ void MainWindow::on_pushTestData_clicked()
             motorPosCmdData[i] << ds;
         }
     }
-
-}
-
-void MainWindow::on_pushClearMap_clicked()
-{
-
 
 }
 
