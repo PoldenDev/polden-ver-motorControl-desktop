@@ -80,17 +80,6 @@ MainWindow::MainWindow(QWidget *parent) :
     dataProcess100msTimer.setInterval(90);
     connect(&dataProcess100msTimer, SIGNAL(timeout()), this, SLOT(dataProcess100msTimeOut()));
 
-//    slList.append(ui->verticalMotorPos10);
-//    slList.append(ui->verticalMotorPos9);
-//    slList.append(ui->verticalMotorPos8);
-//    slList.append(ui->verticalMotorPos7);
-//    slList.append(ui->verticalMotorPos6);
-//    slList.append(ui->verticalMotorPos5);
-//    slList.append(ui->verticalMotorPos4);
-//    slList.append(ui->verticalMotorPos3);
-//    slList.append(ui->verticalMotorPos2);
-//    slList.append(ui->verticalMotorPos1);
-
     connect(&waitForFifoFreeTimer, SIGNAL(timeout()), this, SLOT(waitForFifoFreeFifo()));
 
     //connect(&UartThread, SIGNAL(response(QString)), this, SLOT(response(QString)));
@@ -125,8 +114,6 @@ MainWindow::MainWindow(QWidget *parent) :
         motorAbsolutePosCur[i] = 0;
         lastCtrlTimeMsecs[i] = 0;
     }
-
-
 
     ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
     ui->widget_11->layout()->setAlignment(Qt::AlignHCenter);
@@ -174,50 +161,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //    }
 
-//    absPosLineEdit.append(ui->lineEditPos0);
-//    absPosLineEdit.append(ui->lineEditPos1);
-//    absPosLineEdit.append(ui->lineEditPos2);
-//    absPosLineEdit.append(ui->lineEditPos3);
-//    absPosLineEdit.append(ui->lineEditPos4);
-//    absPosLineEdit.append(ui->lineEditPos5);
-//    absPosLineEdit.append(ui->lineEditPos6);
-//    absPosLineEdit.append(ui->lineEditPos7);
-//    absPosLineEdit.append(ui->lineEditPos8);
-//    absPosLineEdit.append(ui->lineEditPos9);
-
-//    stateLineEdit.append(ui->lineEditState0);
-//    stateLineEdit.append(ui->lineEditState1);
-//    stateLineEdit.append(ui->lineEditState2);
-//    stateLineEdit.append(ui->lineEditState3);
-//    stateLineEdit.append(ui->lineEditState4);
-//    stateLineEdit.append(ui->lineEditState5);
-//    stateLineEdit.append(ui->lineEditState6);
-//    stateLineEdit.append(ui->lineEditState7);
-//    stateLineEdit.append(ui->lineEditState8);
-//    stateLineEdit.append(ui->lineEditState9);
-
-//    termCheckBox.append(ui->checkBoxTerm0);
-//    termCheckBox.append(ui->checkBoxTerm1);
-//    termCheckBox.append(ui->checkBoxTerm2);
-//    termCheckBox.append(ui->checkBoxTerm3);
-//    termCheckBox.append(ui->checkBoxTerm4);
-//    termCheckBox.append(ui->checkBoxTerm5);
-//    termCheckBox.append(ui->checkBoxTerm6);
-//    termCheckBox.append(ui->checkBoxTerm7);
-//    termCheckBox.append(ui->checkBoxTerm8);
-//    termCheckBox.append(ui->checkBoxTerm9);
-
-
-//    euqueLineEdit.append(ui->lineEditEuqueCnt0);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt1);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt2);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt3);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt4);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt5);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt6);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt7);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt8);
-//    euqueLineEdit.append(ui->lineEditEuqueCnt9);
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
     }
@@ -2087,7 +2030,7 @@ void MainWindow::createMainInterface()
     stateLineEdit.clear();
     termCheckBox.clear();
     euqueLineEdit.clear();
-
+    debPortStatusMainLeList.clear();
 
     //QHBoxLayout *hblo = new QHBoxLayout(ui->groupBoxMain);
 
@@ -2123,32 +2066,43 @@ void MainWindow::createMainInterface()
         le->setMaximumWidth(40);
         le->setAlignment(Qt::AlignHCenter);
         le->setAttribute(Qt::WA_TransparentForMouseEvents);
-        absPosLineEdit.append(le);
         vblo->addWidget(le, 0, Qt::AlignHCenter);
+        absPosLineEdit.append(le);
 
         le = new QLineEdit(wdg);
         le->setReadOnly(true);
         le->setMaximumWidth(40);
         le->setAlignment(Qt::AlignHCenter);
         le->setAttribute(Qt::WA_TransparentForMouseEvents);
-        stateLineEdit.append(le);
         vblo->addWidget(le, 0, Qt::AlignHCenter);
+        stateLineEdit.append(le);
 
         QCheckBox *cb = new QCheckBox(wdg);
         cb->setAttribute(Qt::WA_TransparentForMouseEvents);
         cb->setFocusPolicy(Qt::NoFocus);
         //cb->setChecked(true);
-        termCheckBox.append(cb);
         vblo->addWidget(cb, 0, Qt::AlignHCenter);
+        termCheckBox.append(cb);
 
         le = new QLineEdit(wdg);
         le->setReadOnly(true);
         le->setMaximumWidth(40);
         le->setAlignment(Qt::AlignHCenter);
         le->setAttribute(Qt::WA_TransparentForMouseEvents);
-        euqueLineEdit.append(le);
         vblo->addWidget(le, 0, Qt::AlignHCenter);
+        euqueLineEdit.append(le);
         //vblo->setAlignment(Qt::AlignHCenter);
+
+        le = new QLineEdit(wdg);
+        le->setReadOnly(true);
+        le->setAttribute(Qt::WA_TransparentForMouseEvents);
+        le->setMaximumWidth(40);
+        le->setAlignment(Qt::AlignHCenter);
+        le->setText("N/A");
+        le->setPalette(*paletteGrey);
+        vblo->addWidget(le, 0, Qt::AlignHCenter);
+        debPortStatusMainLeList.append(le);
+
         wdg->setLayout(vblo);
         lo->addWidget(wdg);
         //hblo->addStretch();
@@ -2198,6 +2152,7 @@ void MainWindow::createDebugSerialPortInterface()
         vblo->addWidget(pb);
         QLineEdit *le = new QLineEdit(this);
         le->setReadOnly(true);
+        le->setAttribute(Qt::WA_TransparentForMouseEvents);
         le->setAlignment(Qt::AlignHCenter);
         le->setText("N/A");
         le->setPalette(*paletteGrey);
@@ -2374,17 +2329,21 @@ void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
         //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
         if((ba[4]&0x50) == 0){
             debPortStatusLeList[id]->setPalette(*paletteGreen);
+            debPortStatusMainLeList[id]->setPalette(*paletteGreen);
             //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
             debPortStatusLeList[id]->setText("OK");
+            debPortStatusMainLeList[id]->setText("OK");
 
         }
         else{
             debPortStatusLeList[id]->setPalette(*paletteRed);
             if(ba[4]&0x10){ //encErr
                 debPortStatusLeList[id]->setText("enc err");
+                debPortStatusMainLeList[id]->setText("enc err");
             }
             if(ba[4]&0x40){ //posErr
                 debPortStatusLeList[id]->setText("pos err");
+                debPortStatusMainLeList[id]->setText("pos err");
             }
         }
     }
