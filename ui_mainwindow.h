@@ -209,6 +209,7 @@ public:
         horizontalLayout_3->setContentsMargins(0, 0, -1, 0);
         comComboBox = new QComboBox(widget_4);
         comComboBox->setObjectName(QStringLiteral("comComboBox"));
+        comComboBox->setMinimumSize(QSize(100, 0));
 
         horizontalLayout_3->addWidget(comComboBox);
 
@@ -377,10 +378,6 @@ public:
         checkBoxSliderPosCtrl->setObjectName(QStringLiteral("checkBoxSliderPosCtrl"));
         checkBoxSliderPosCtrl->setGeometry(QRect(600, 280, 70, 17));
         tabWidget->addTab(tabMainStat, QString());
-        groupBox_2->raise();
-        groupBoxMain->raise();
-        groupBox_4->raise();
-        checkBoxSliderPosCtrl->raise();
         tabTimeStat = new QWidget();
         tabTimeStat->setObjectName(QStringLiteral("tabTimeStat"));
         horizontalLayout_8 = new QHBoxLayout(tabTimeStat);
@@ -1012,7 +1009,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

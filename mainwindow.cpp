@@ -43,7 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dataGramCnt(0),
     paletteGrey(NULL),
     paletteRed(NULL),
-    paletteGreen(NULL)
+    paletteGreen(NULL),
+    lastUdpDatagrammRecvd(0)
 {
     ui->setupUi(this);
 
@@ -53,12 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
     ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
 
-
+    ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
+    ui->lineEdit_MaxHeightImp->setText(settings.value("maxHeightImp", 200000).toString());
+    ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec", 50).toString());
 
     on_pushButtonUdpOpenClose_clicked();
 
-    ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
-    ui->lineEdit_MaxHeightImp->setText(settings.value("maxHeightImp", 200000).toString());
     on_lineEdit_MaxHeightImp_editingFinished();
 
     FPGA_FREQ = settings.value("FPGA_FREQ", FPGA_FREQ_25).toInt();
@@ -71,9 +72,6 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->radioButtonFpgaFreq25->setChecked(false);
 
     }
-
-    ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec",5).toString());
-
 
     timer.setInterval(25);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
@@ -323,6 +321,7 @@ MainWindow::~MainWindow()
     settings.setValue("maxPosValue", ui->lineEditMaxVal->text().toInt());
     settings.setValue("minPosValue", ui->lineEditMinVal->text().toInt());
     settings.setValue("dirInverse", ui->checkBoxDirInverse->isChecked());
+    settings.setValue("vmax_mmsec", ui->lineEdit_vmax_mmsec->text().toInt());
 
     delete ui;
 }
@@ -1105,8 +1104,13 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr, int msecsForStep)
                 for(; abs(delta)>maxImpPerDelta; n*=2){
                     delta/=2;
                 }
-                if(n>1)
-                    qDebug("%d add %d Pts %d", mn, n, delta);
+                if(n>1){
+                    //qDebug("%d add %d Pts %d", mn, n, delta);
+                    ui->plainTextUDP->appendPlainText(QString("%1 add %2 Pts,delta=%3")
+                                                      .arg(mn)
+                                                      .arg(n)
+                                                      .arg(delta));
+                }
                 ds.pos = getMotorAbsPos(mn);
                 ds.absMsec = msecsForStep; //curMsces + 100;
                 for(int i=0; i<n; i++){
@@ -1227,8 +1231,25 @@ void MainWindow::readPendingDatagrams()
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
             //qDebug()<<dataStr;
-            QString showStr = QString("%1 %2").arg(QTime::currentTime().toString("mm:ss:zzz"))
-                                                    .arg(dataStr);
+            quint32 curMsecs = QTime::currentTime().msecsSinceStartOfDay();
+            quint32 udpDgRecvInterval = curMsecs - lastUdpDatagrammRecvd;
+            lastUdpDatagrammRecvd = curMsecs;
+            udpDgrmRecvdInterval.append(udpDgRecvInterval);
+            if(udpDgrmRecvdInterval.length() > 20){
+                udpDgrmRecvdInterval.removeFirst();
+                quint32 s=0;
+                foreach (quint32 recvInterval, udpDgrmRecvdInterval) {
+                    s+=recvInterval;
+                }
+                s/=20;
+                ui->statusBar->showMessage(QString("average UDP recv interval %1").arg(s), 5000);
+            }
+            QString showStr = QString("%1 %2 (%3)").arg(QTime::currentTime().toString("mm:ss:zzz"))
+                                                    .arg(dataStr).arg(udpDgRecvInterval);
+            int indOfCrLn = showStr.lastIndexOf("\r\n");
+            if(indOfCrLn != -1){
+                showStr.remove(indOfCrLn, 2);
+            }
             ui->plainTextUDP->appendPlainText(showStr);
             //QString  contrStr =  dataStr.left(13);
 //            QString debStr;
@@ -1318,8 +1339,8 @@ void MainWindow::on_pushButton_refreshCom_clicked()
       QString description;
       QString manufacturer;
       QString serialNumber;
-      int id = 0;
-    for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
+    for (int i=0; i< serialPortInfos.length(); i++){
+           const QSerialPortInfo &serialPortInfo = serialPortInfos[i];
            description = serialPortInfo.description();
            manufacturer = serialPortInfo.manufacturer();
            serialNumber = serialPortInfo.serialNumber();
@@ -1351,12 +1372,11 @@ void MainWindow::on_pushButton_refreshCom_clicked()
                    .arg(serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No"));
 
            ui->comComboBox->addItem(cbItemName, serialPortInfo.portName());
-           ui->comComboBox->setItemData(id, cbToolTipText, Qt::ToolTipRole);
+           ui->comComboBox->setItemData(i, cbToolTipText, Qt::ToolTipRole);
            foreach (QComboBox *cb, debPortCmbBxList) {
                cb->addItem(cbItemName, serialPortInfo.portName());
-               cb->setItemData(id, cbToolTipText, Qt::ToolTipRole);
+               cb->setItemData(i, cbToolTipText, Qt::ToolTipRole);
            }
-           id++;
     }
 }
 

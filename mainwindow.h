@@ -228,6 +228,9 @@ private:
 
     QList<QWidget*> motorStatWidgetList;
 
+    quint32 lastUdpDatagrammRecvd;
+    QList<quint32> udpDgrmRecvdInterval;
+
 
 };
 
