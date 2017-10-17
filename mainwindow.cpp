@@ -2337,6 +2337,7 @@ void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
         }
         else{
             debPortStatusLeList[id]->setPalette(*paletteRed);
+            debPortStatusMainLeList[id]->setPalette(*paletteRed);
             if(ba[4]&0x10){ //encErr
                 debPortStatusLeList[id]->setText("enc err");
                 debPortStatusMainLeList[id]->setText("enc err");
