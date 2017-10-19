@@ -2173,6 +2173,8 @@ void MainWindow::createDebugSerialPortInterface()
         debSerialPortList.append(sp);
         debPortGbList.append(gb);
         debPortStatusLeList.append(le);
+
+        motorRespRecvdList.append(new bool(false));
     }
 
     //ui->tabWidget->ind
@@ -2305,12 +2307,17 @@ void MainWindow::checkDebugComTimerHandle()
     QByteArray reqReqErrTrace = reqBase + QByteArrayLiteral("\x10\x00\x0A\xC4\x08");
     //req1 << 0x01 << 0x03 << 0x00 << 0xFD << 0x00 << 0x01 << 0x15 << 0xfa;
 
-    foreach (QSerialPort *sp, debSerialPortList) {
+    for(int i=0; i<debPortStatusLeList.length(); i++){
+        bool &bRespRecv = *(motorRespRecvdList[i]);
+        if(bRespRecv == false){
+            debPortStatusMainLeList[i]->setPalette(*paletteGrey);
+            debPortStatusLeList[i]->setPalette(*paletteGrey);
+        }
+        QSerialPort *sp = debSerialPortList[i];
         if(sp->isOpen()){
             sp->write(reqReqErrTrace);
-
         }
-
+        bRespRecv = false;
     }
 }
 
@@ -2326,6 +2333,9 @@ void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
     }
 
     if((ba.length()==25)&&(ba[0] == 0x01)&&(ba[1] == 0x03)&&(ba[2] == 0x14)){
+        bool &bRespRecv = *(motorRespRecvdList[id]);
+        bRespRecv = true;
+
         //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
         if((ba[4]&0x50) == 0){
             debPortStatusLeList[id]->setPalette(*paletteGreen);
