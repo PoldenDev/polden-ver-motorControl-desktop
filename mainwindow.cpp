@@ -2323,9 +2323,13 @@ void MainWindow::checkDebugComTimerHandle()
 
 void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
 {
-    quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-1);
-    quint8 crc16Recvd = ba[ba.length()-1];
-    if(crc16 != crc16Recvd){
+    quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-2);
+    QByteArray crc16ba;
+    crc16ba.append(crc16&0xff);
+    crc16ba.append((crc16>>8)&0xff);
+
+    //quint8 crc16Recvd = ba[ba.length()-1];
+    if(ba.endsWith(crc16ba) == false){
         ui->plainTextEdit->appendPlainText(QString("debResp%1: recv CRC err").arg(id));
         ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
         ui->plainTextEdit->appendPlainText(QString("debResp%1: CRC %2").arg(id).arg(crc16));
@@ -2367,15 +2371,10 @@ void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
 quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
 {
     //Вычисляет контрольную сумму CRC16 для ModBus и выдаёт её с нужным порядком байтов
-    quint8 tmp[len];
-    for(int a=0;a<len;a++)
-    {
-        tmp[a]= buf[a];
-    }
-      unsigned int crc = 0xFFFF;
+      quint16 crc = 0xFFFF;
       for (int pos = 0; pos < len; pos++)
       {
-      crc ^= (unsigned int)tmp[pos];    // XOR byte into least sig. byte of crc
+      crc ^= (quint16)buf[pos];    // XOR byte into least sig. byte of crc
 
       for (int i = 8; i != 0; i--) {    // Loop over each bit
         if ((crc & 0x0001) != 0) {      // If the LSB is set
@@ -2386,7 +2385,7 @@ quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
           crc >>= 1;                    // Just shift right
         }
       }
-      return (quint16)crc;
+      return crc;
 }
 
 
