@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     }
 
-    timer.setInterval(25);
+    timer.setInterval(10);
     connect(&timer, SIGNAL(timeout()), this, SLOT(sendOnTimer()));
     timer.start();
 
@@ -445,32 +445,32 @@ void MainWindow::setPos(int pos)
 
 
 int lastMsec = 0;
-bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
+void MainWindow::sendDivPos(int mi, DivPosDataStr &ds)
 {
     quint32 dir = ds.dir;
     quint32 steps = ds.steps;
+    quint32 div = FPGA_FREQ/ (steps*10); //calc speed
+    //qDebug() << div <<ds.div;
+    if(div > 0x1fff){
+        qDebug("mi %d div exceed 0x1fff!", mi);
+        div = 0x1fff;
+    }
+    if(steps > 0x7fff){
+        qDebug("mi %d steps exceed 0x7fff!", mi);
+        steps = 0x7fff;
+    }
 
-    if(steps > 0){
-        //calc speed
-        quint32 div = FPGA_FREQ/ (steps*10);
-        qDebug() << div <<ds.div;
+
+    quint64 temp = 0;
+    temp = mi&0xf;
+    temp |= ((div&0x7fff)<<4);
+    temp |= (((quint64)steps&0x7fff)<<19);
+    temp |= (((quint64)dir&0x1)<<34);
+    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
+
+    ba.resize(5);
 
 
-        quint64 temp = 0;
-        temp = mi&0xf;
-        temp |= ((div&0x7fff)<<4);
-        temp |= (((quint64)steps&0x7fff)<<19);
-        temp |= (((quint64)dir&0x1)<<34);
-        QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
-
-        ba.resize(5);
-
-        if(div > 0x1fff){
-            qDebug("mi %d div exceed 0x1fff!", mi);
-        }
-        if(steps > 0x7fff){
-            qDebug("mi %d steps exceed 0x7fff!", mi);
-        }
 
     //    //ba[0] = 0x09;
     //    ba[0] = mi&0xf;
@@ -479,29 +479,24 @@ bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
     //    ba[3] = 0x00;
     //    ba[4] = 0x00;
 
-        if(mi == 0){
-            int msec = QTime::currentTime().msecsSinceStartOfDay();
-            //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
-            lastMsec = msec;
-            //qDebug("pos=%d steps=%d div=%d dir=%d", pos, steps, div, dir);
-        }
-        quint64 dSend = serial.write(ba);
+    //if(mi == 0){
+        //int msec = QTime::currentTime().msecsSinceStartOfDay();
+        //qDebug("%d mi=%d st=%d", msec-lastMsec, mi, steps);
+        //lastMsec = msec;
+        //qDebug("pos=%d steps=%d div=%d dir=%d", pos, steps, div, dir);
+    //}
+    quint64 dSend = serial.write(ba);
 
-        if(dSend != 5){
-            qDebug("dSend %d !!!!!", dSend);
-        }
-        //if(serial.flush() == false){
-            //qDebug("dataFlushed");
-        //}
-        motorAbsolutePosCur[mi] += delta;
-        if( motorAbsolutePosCur[mi] < 0){
-            //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
-        }
-     //   if(mi==0)
-    //        serial.write(ba);
-        return true;
+    if(dSend != 5){
+        qDebug("dSend %d !!!!!", dSend);
     }
-    return true;
+    //if(serial.flush() == false){
+    //qDebug("dataFlushed");
+    //}
+    motorAbsolutePosCur[mi] += ds.dir? +ds.steps: -ds.steps;
+    if( motorAbsolutePosCur[mi] < 0){
+        //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
+    }
 }
 
 void MainWindow::parseFPGAMsg(QByteArray ba)
@@ -579,9 +574,9 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
     }
 
     bool bAllMotorHasCmd = true;
-    for(int i=0; i<motorCount; i++){
-        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
-    }
+//    for(int i=0; i<motorCount; i++){
+//        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
+//    }
     bAllMotorHasCmd = true; // ***
     if((bAllFree == true) && bAllMotorHasCmd){
         allFreeToWrite();
@@ -678,23 +673,23 @@ void MainWindow::terminatorState(int i, bool bEna)
 
     }
     else if((mtState[i] == MT_INIT_GoDOWN) && (bEna == true)){
-         motorAbsolutePosCur[i] = 0;
+//         motorAbsolutePosCur[i] = 0;
 
-        //mtState[i] = MT_IDLE;
-        mtState[i] = MT_INIT_GoUp;
-        DivPosDataStr ds;
-        int startPos =0;
+//        //mtState[i] = MT_IDLE;
+//        mtState[i] = MT_INIT_GoUp;
+//        DivPosDataStr ds;
+//        int startPos =0;
 
-        if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPosImp(i);
-        else
-            startPos = motorPosCmdData[i].last().pos;
+//        if(motorPosCmdData[i].length() == 0)
+//            startPos = getMotorAbsPosImp(i);
+//        else
+//            startPos = motorPosCmdData[i].last().pos;
 
-        ds.pos = startPos+400;
-        for(int k=0; k<40; k++){
-            motorPosCmdData[i] << ds;
-             ds.pos += 400;
-        }
+//        ds.pos = startPos+400;
+//        for(int k=0; k<40; k++){
+//            motorPosCmdData[i] << ds;
+//             ds.pos += 400;
+//        }
 
     }
     bTermState[i] = bEna;
@@ -703,57 +698,56 @@ void MainWindow::terminatorState(int i, bool bEna)
 //motorPosCmdData not empty
 void MainWindow::allFreeToWrite()
 {
-    bool bAllMtStop = true;
-    for(int i=0; i<motorCount; i++){
-        if((mtState[i]==MT_IDLE) && (motorPosCmdData[i].isEmpty() == false)){
-            int delta = motorPosCmdData[i].first().pos - getMotorAbsPosImp(i);
-            bAllMtStop &= (delta==0);
-        }
-        else{
-            bAllMtStop = false;
-            break;
-        }
-    }
+//    bool bAllMtStop = true;
+//    for(int i=0; i<motorCount; i++){
+//        if((mtState[i]==MT_IDLE) && (motorPosCmdData[i].isEmpty() == false)){
+//            int delta = motorPosCmdData[i].first().pos - getMotorAbsPosImp(i);
+//            bAllMtStop &= (delta==0);
+//        }
+//        else{
+//            bAllMtStop = false;
+//            break;
+//        }
+//    }
 
-    if(bAllMtStop){
-        int absPosMsec = motorPosCmdData[0].first().absMsec;
-        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-        for(int i=0; i<motorCount; i++){
-            if(absPosMsec != motorPosCmdData[i].first().absMsec){
-                ui->plainTextUDP->appendPlainText(QString("%1 absPosMsec not equal at all on %2").arg(curMsec).arg(motorPosCmdData[i].length()));
-                for(int k=0; k<motorCount; k++){
-                    ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
-                }
-                break;
-            }
-        }
-        int shift = absPosMsec - curMsec;
-
-        ui->plainTextUDP->appendPlainText(QString("%1 shift %2").arg(curMsec).arg(shift));
-        if( (abs(shift) <=100) ||
-                (shift <0) ){        //если проигрывание отстаёт
-//            for(int i=0; i<MOTOR_CNT; i++){
-//                motorPosCmdData[i].removeFirst();  // то прибьём текущий шаг
+//    if(bAllMtStop){
+//        int absPosMsec = motorPosCmdData[0].first().absMsec;
+//        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+//        for(int i=0; i<motorCount; i++){
+//            if(absPosMsec != motorPosCmdData[i].first().absMsec){
+//                ui->plainTextUDP->appendPlainText(QString("%1 absPosMsec not equal at all on %2").arg(curMsec).arg(motorPosCmdData[i].length()));
+//                for(int k=0; k<motorCount; k++){
+//                    ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
+//                }
+//                break;
 //            }
-            ui->plainTextUDP->appendPlainText(QString("%1 skip").arg(curMsec));
-        }
-        else{ //если проигрывание опережает то не управляем двигателем
-            ui->plainTextUDP->appendPlainText(QString("%1 wait").arg(curMsec));
-            return;
-        }
+//        }
+//        int shift = absPosMsec - curMsec;
+
+//        ui->plainTextUDP->appendPlainText(QString("%1 shift %2").arg(curMsec).arg(shift));
+//        if( (abs(shift) <=100) ||
+//                (shift <0) ){        //если проигрывание отстаёт
+////            for(int i=0; i<MOTOR_CNT; i++){
+////                motorPosCmdData[i].removeFirst();  // то прибьём текущий шаг
+////            }
+//            ui->plainTextUDP->appendPlainText(QString("%1 skip").arg(curMsec));
+//        }
+//        else{ //если проигрывание опережает то не управляем двигателем
+//            ui->plainTextUDP->appendPlainText(QString("%1 wait").arg(curMsec));
+//            return;
+//        }
 
 
-    }
+//    }
 
     for(int i=0; i<motorCount; i++){
         switch(mtState[i]){
         case MT_IDLE:
         case MT_INIT_GoUp:
         {
-            if(motorPosCmdData[i].isEmpty() == false){                
-                DivPosDataStr &ds = motorPosCmdData[i].first();
-
-
+            if(motorPosCmdData[i].isEmpty())
+                continue;
+            DivPosDataStr &ds = motorPosCmdData[i].first();
                 //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
                 //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
                 //                qDebug("not in zero and no term!");
@@ -761,24 +755,17 @@ void MainWindow::allFreeToWrite()
                 //                sendDivPos(i, ds, ds.pos);
                 //            }
                 //            else{
-
-                int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-                if(ds.steps > 0){
-                    if(i == 0) qDebug() << curMsec << ds.steps;
-                    if(sendDivPos(i, ds, ds.pos) == true){
-                        motorPosCmdData[i].dequeue();
-                        bFreeToWrite[i] = false;
-                    }
-                }
-                else{
-                    if(i == 0) qDebug() << curMsec << "waiting!" << ds.msecsFor;
-                    if(ds.skipStartTime == 0){
-                        ds.skipStartTime = curMsec;
-                    }
-                    else if((curMsec - ds.skipStartTime) > ds.msecsFor){
-                        motorPosCmdData[i].dequeue();
-                    }
-
+            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+            if(ds.steps > 0){
+                //if(i == 0) qDebug() << curMsec << ds.steps;
+                sendDivPos(i, ds);
+                motorPosCmdData[i].removeFirst();
+                bFreeToWrite[i] = false;
+            }
+            else{
+                if(ds.skipStartTime == 0){
+                    ds.skipStartTime = curMsec;
+                    //if(i == 0) qDebug() << curMsec << "new wait";
                 }
             }
         }
@@ -796,29 +783,29 @@ void MainWindow::freeToWrite(int i)
 {
     switch(mtState[i]){
     case MT_GoUP:
-        if(getMotorAbsPosImp(0) < 360000){
-            DivPosDataStr ds;
-            ds.pos = getMotorAbsPosImp(i) + 4560;
-            sendDivPos(i, ds, ds.pos);
-        }
-        else{
-            mtState[i] = MT_GoDOWN;
-        }
+//        if(getMotorAbsPosImp(0) < 360000){
+//            DivPosDataStr ds;
+//            ds.pos = getMotorAbsPosImp(i) + 4560;
+//            sendDivPos(i, ds);
+//        }
+//        else{
+//            mtState[i] = MT_GoDOWN;
+//        }
         break;
 
     case MT_GoDOWN:
     case MT_INIT_GoDOWN:
-        DivPosDataStr ds;
-        if(speedTrig[i]){
-            ds.pos = getMotorAbsPosImp(i)-500;
-            speedTrig[i] = false;
-        }
-        else{
-            ds.pos = getMotorAbsPosImp(i)-10;
-            speedTrig[i] = true;
-        }
-        ds.pos = getMotorAbsPosImp(i)-500;
-        sendDivPos(i, ds, ds.pos);
+//        DivPosDataStr ds;
+//        if(speedTrig[i]){
+//            ds.pos = getMotorAbsPosImp(i)-500;
+//            speedTrig[i] = false;
+//        }
+//        else{
+//            ds.pos = getMotorAbsPosImp(i)-10;
+//            speedTrig[i] = true;
+//        }
+//        ds.pos = getMotorAbsPosImp(i)-500;
+//        sendDivPos(i, ds);
 
         break;
 
@@ -966,7 +953,7 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr, quint32 udpDgRe
 void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
 {
     DivPosDataStr ds;
-    ds.pos = newPosImp;
+    ds.finishPos = newPosImp;
     if(motorPosCmdData[mn].length() == 0){
         int delta = newPosImp - getMotorAbsPosImp(mn);
         int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
@@ -984,13 +971,13 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
                                               .arg(n)
                                               .arg(delta));
         }
-        ds.pos = getMotorAbsPosImp(mn);
-        ds.absMsec = msecsForMove; //curMsces + 100;
+        quint32 pos = getMotorAbsPosImp(mn);
 
         for(int i=0; i<n; i++){
             //ds.absMsec += 100;
-            ds.pos = ds.pos+delta;
+            ds.finishPos = pos;
 
+            pos += delta;
             ds.dir = delta > 0? 1: 0;
             if(ui->checkBoxDirInverse->isChecked())
                 ds.dir = delta > 0? 0: 1;
@@ -1002,7 +989,7 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
 
     }
     else{
-        int delta = newPosImp - motorPosCmdData[mn].last().pos;
+        int delta = newPosImp - motorPosCmdData[mn].last().finishPos;
         ds.steps =  abs(delta);
         ds.dir = delta > 0? 1: 0;
         if(ui->checkBoxDirInverse->isChecked())
@@ -1011,14 +998,12 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
         float secsOnStep = msecsForMove / (ds.steps*1000.);
         ds.div = (quint32)(FPGA_FREQ * secsOnStep) ;
         if(ds.div > 0x1fff){
-            qDebug() << "maxSpeed err on" << mn;
+            qDebug("%d maxSpeed err %x", mn, ds.div);
             ds.div = 0x1fff;
         }
 
         //if(delta != 0)
         //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
-
-        ds.absMsec = msecsForMove;
         ds.msecsFor = msecsForMove;
         ds.skipStartTime = 0;
         motorPosCmdData[mn].append(ds);
@@ -1249,6 +1234,21 @@ void MainWindow::sendOnTimer()
         return;
     //qDebug("%d sendOnTimer", QTime::currentTime().msecsSinceStartOfDay()&0xfff );
 
+    //тут подождём
+    int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+    for(int i=0; i<motorCount; i++){
+        if(motorPosCmdData[i].isEmpty())
+            continue;
+        DivPosDataStr &ds = motorPosCmdData[i].first();
+        if(ds.steps == 0){
+            if(ds.skipStartTime != 0 ){
+                //if(i == 0) qDebug() << curMsec << "external waiting" << ds.msecsFor;
+                if((curMsec - ds.skipStartTime) > ds.msecsFor){
+                    motorPosCmdData[i].removeFirst();
+                }
+            }
+        }
+    }
     QTime tt;
     tt.start();
     char c = 0xff;
@@ -1421,47 +1421,47 @@ void MainWindow::on_pushButtonPosReset_clicked()
 
 void MainWindow::on_pushMoveUp_clicked()
 {
-    DivPosDataStr ds;
+//    DivPosDataStr ds;
 
-    for(int i=0; i<motorCount; i++){
-        int startPos =0;
+//    for(int i=0; i<motorCount; i++){
+//        int startPos =0;
 
-        if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPosImp(i);
-        else
-            startPos = motorPosCmdData[i].last().pos;
+//        if(motorPosCmdData[i].length() == 0)
+//            startPos = getMotorAbsPosImp(i);
+//        else
+//            startPos = motorPosCmdData[i].last().pos;
 
-        ds.pos = startPos+400;
-        for(int k=0; k<5; k++){
-            motorPosCmdData[i] << ds;
-             ds.pos += 400;
-        }
-//        ds.dir = 0;
-//        //for(int k=0; k<30; k++)
-//        //    motorPosCmdData[i] << ds;
-    }
+//        ds.pos = startPos+400;
+//        for(int k=0; k<5; k++){
+//            motorPosCmdData[i] << ds;
+//             ds.pos += 400;
+//        }
+////        ds.dir = 0;
+////        //for(int k=0; k<30; k++)
+////        //    motorPosCmdData[i] << ds;
+//    }
 
 }
 
 void MainWindow::on_pushMoveDown_clicked()
 {
-    DivPosDataStr ds;
+//    DivPosDataStr ds;
 
-    for(int i=0; i<10; i++){
-        int startPos =0;
+//    for(int i=0; i<10; i++){
+//        int startPos =0;
 
-        if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPosImp(i);
-        else
-            startPos = motorPosCmdData[i].last().pos;
-        ds.pos = startPos-400;
-        for(int k=0; k<5; k++){
-            motorPosCmdData[i] << ds;
-            ds.pos -= 400;
-        }
-        //for(int k=0; k<30; k++)
-        //    motorPosCmdData[i] << ds;
-    }
+//        if(motorPosCmdData[i].length() == 0)
+//            startPos = getMotorAbsPosImp(i);
+//        else
+//            startPos = motorPosCmdData[i].last().pos;
+//        ds.pos = startPos-400;
+//        for(int k=0; k<5; k++){
+//            motorPosCmdData[i] << ds;
+//            ds.pos -= 400;
+//        }
+//        //for(int k=0; k<30; k++)
+//        //    motorPosCmdData[i] << ds;
+//    }
 }
 
 
@@ -1598,7 +1598,7 @@ void MainWindow::uiUpdateTimerSlot()
                 if(i==0){
                    // qDebug("%d >> %d",curMsec, motorPosCmdData[i].first().absMsec);
                 }
-                shift = motorPosCmdData[i].first().absMsec - curMsec;
+                //shift = motorPosCmdData[i].first().absMsec - curMsec;
 
     //            if(shift > timeShiftMaxPos){
     //                timeShiftMaxPos = (shift-shift%100)+500;
@@ -1683,25 +1683,25 @@ void MainWindow::on_pushButtonInitiate_clicked()
 
 void MainWindow::on_pushButtonGoZero_clicked()
 {
-    DivPosDataStr ds;  
-    int startPos =0;
-    for(int mi=0; mi<MOTOR_CNT; mi++){
-        if(motorPosCmdData[mi].length() == 0)
-            startPos = getMotorAbsPosImp(mi);
-        else
-            startPos = motorPosCmdData[mi].last().pos;
+//    DivPosDataStr ds;
+//    int startPos =0;
+//    for(int mi=0; mi<MOTOR_CNT; mi++){
+//        if(motorPosCmdData[mi].length() == 0)
+//            startPos = getMotorAbsPosImp(mi);
+//        else
+//            startPos = motorPosCmdData[mi].last().pos;
 
-        int iters = startPos/400;
-        ds.pos = startPos;
-        for(int i=0; i<iters; i++){
-            ds.pos -=400;
-            motorPosCmdData[mi] << ds;
-        }
-        if(ds.pos > 0){
-            ds.pos = 0;
-            motorPosCmdData[mi] << ds;
-        }
-    }
+//        int iters = startPos/400;
+//        ds.pos = startPos;
+//        for(int i=0; i<iters; i++){
+//            ds.pos -=400;
+//            motorPosCmdData[mi] << ds;
+//        }
+//        if(ds.pos > 0){
+//            ds.pos = 0;
+//            motorPosCmdData[mi] << ds;
+//        }
+//    }
 
 
 }

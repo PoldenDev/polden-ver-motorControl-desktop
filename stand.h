@@ -25,8 +25,7 @@ typedef struct{
     quint32 div;
     quint32 steps;
     int dir;
-    qint32 pos;
-    int absMsec;
+    qint32 finishPos; //pos after cmd
     quint32 msecsFor;
     quint32 skipStartTime;
 } DivPosDataStr;
