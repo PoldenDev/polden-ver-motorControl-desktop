@@ -22,7 +22,7 @@ typedef enum{
 
 
 typedef struct{
-    int div;
+    quint32 div;
     int steps;
     int dir;
     qint32 pos;
