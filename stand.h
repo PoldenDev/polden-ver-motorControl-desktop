@@ -23,8 +23,10 @@ typedef enum{
 
 typedef struct{
     quint32 div;
-    int steps;
+    quint32 steps;
     int dir;
     qint32 pos;
     int absMsec;
+    quint32 msecsFor;
+    quint32 skipStartTime;
 } DivPosDataStr;

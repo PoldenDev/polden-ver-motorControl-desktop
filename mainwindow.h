@@ -144,7 +144,7 @@ private:
     int x, xUdpRecv;
     void createPlot(QString name);
 
-    void parseCmdMotorStr(int, int newPosImp, int msecsForStep);
+    void addMotorCmd(int, int newPosImp, int msecsForStep);
     void parseCmdMultiMotorStr(QString, quint32 udpDgRecvInterval);
 
     QMap<int, int> xMap;
