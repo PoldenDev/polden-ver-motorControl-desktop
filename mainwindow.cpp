@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     motorCount = settings.value("motorCount", 0).toInt();
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
-    ui->lineEditMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
+    ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
     ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
 
@@ -261,7 +261,7 @@ void MainWindow::createPlot(QString name)
 
 MainWindow::~MainWindow()
 {
-    settings.setValue("maxPosValue", ui->lineEditMaxVal->text().toInt());
+    settings.setValue("maxPosValue", ui->lineEditUDPMaxVal->text().toInt());
     settings.setValue("minPosValue", ui->lineEditMinVal->text().toInt());
     settings.setValue("dirInverse", ui->checkBoxDirInverse->isChecked());
     settings.setValue("vmax_mmsec", ui->lineEdit_vmax_mmsec->text().toInt());
@@ -446,7 +446,7 @@ void MainWindow::setPos(int pos)
 int lastMsec = 0;
 bool MainWindow::sendDivPos(int mi, DivPosDataStr &ds, quint32 pos)
 {
-    int delta = pos - getMotorAbsPos(mi);
+    int delta = pos - getMotorAbsPosImp(mi);
     quint32 dir = delta > 0? 1: 0;
     if(ui->checkBoxDirInverse->isChecked())
         dir = delta > 0? 0: 1;
@@ -716,7 +716,7 @@ void MainWindow::terminatorState(int i, bool bEna)
         int startPos =0;
 
         if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPos(i);
+            startPos = getMotorAbsPosImp(i);
         else
             startPos = motorPosCmdData[i].last().pos;
 
@@ -736,7 +736,7 @@ void MainWindow::allFreeToWrite()
     bool bAllMtStop = true;
     for(int i=0; i<MOTOR_CNT; i++){
         if((mtState[i]==MT_IDLE) && (motorPosCmdData[i].isEmpty() == false)){
-            int delta = motorPosCmdData[i].first().pos - getMotorAbsPos(i);
+            int delta = motorPosCmdData[i].first().pos - getMotorAbsPosImp(i);
             bAllMtStop &= (delta==0);
         }
         else{
@@ -814,9 +814,9 @@ void MainWindow::freeToWrite(int i)
 {
     switch(mtState[i]){
     case MT_GoUP:
-        if(getMotorAbsPos(0) < 360000){
+        if(getMotorAbsPosImp(0) < 360000){
             DivPosDataStr ds;
-            ds.pos = getMotorAbsPos(i) + 4560;
+            ds.pos = getMotorAbsPosImp(i) + 4560;
             sendDivPos(i, ds, ds.pos);
         }
         else{
@@ -828,14 +828,14 @@ void MainWindow::freeToWrite(int i)
     case MT_INIT_GoDOWN:
         DivPosDataStr ds;
         if(speedTrig[i]){
-            ds.pos = getMotorAbsPos(i)-500;
+            ds.pos = getMotorAbsPosImp(i)-500;
             speedTrig[i] = false;
         }
         else{
-            ds.pos = getMotorAbsPos(i)-10;
+            ds.pos = getMotorAbsPosImp(i)-10;
             speedTrig[i] = true;
         }
-        ds.pos = getMotorAbsPos(i)-500;
+        ds.pos = getMotorAbsPosImp(i)-500;
         sendDivPos(i, ds, ds.pos);
 
         break;
@@ -946,37 +946,20 @@ void MainWindow::handleSerialDataWritten(qint64 bytes)
 
 }
 
-void MainWindow::parseCmdMultiMotorStrList(QStringList cmdMultiMotorStrList)
-{        
+void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr, quint32 udpDgRecvInterval)
+{                    
+    qDebug() << udpDgRecvInterval;
+    int maxUDPVal = ui->lineEditUDPMaxVal->text().toInt();
+    int maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
+//    int msecsForStep = 0;
+//    if(motorPosCmdData[0].isEmpty() == true){
+//        msecsForStep = QTime::currentTime().msecsSinceStartOfDay();
+//    }
+//    else{
+//        msecsForStep = motorPosCmdData[0].last().absMsec;
+//    }
+//    msecsForStep += 100;
 
-    static QTime lastDebTime = QTime::currentTime();
-    if((QTime::currentTime().msecsSinceStartOfDay() - lastDebTime.msecsSinceStartOfDay()) > 1000){
-        lastDebTime = QTime::currentTime();
-        //qDebug() << "  ";
-        //qDebug() << "  ";
-    }
-
-
-    foreach (QString cmdStr, cmdMultiMotorStrList) {        
-        //convertPosModeToVelMode(cmdStr);        
-        parseCmdMultiMotorStr(cmdStr);
-
-        //qDebug() << QTime::currentTime().toString("hh:mm:ss") << "--- "<< cmdStr;
-    }
-}
-
-void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
-{
-    QString convertedString;
-    int maxVal = ui->lineEditMaxVal->text().toInt();  
-    int msecsForStep = 0;
-    if(motorPosCmdData[0].isEmpty() == true){
-        msecsForStep = QTime::currentTime().msecsSinceStartOfDay();
-    }
-    else{
-        msecsForStep = motorPosCmdData[0].last().absMsec;
-    }
-    msecsForStep += 100;
 //last().absMsec + 100;
     QStringList motorStrList =  cmdMultiMotorStr.split("p", QString::SkipEmptyParts);
 //    if(motorStrList.length() != MOTOR_CNT){
@@ -985,54 +968,28 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr)
 //    }
     //foreach (QString motorStr, motorStrList) {
     for(int i=0; i<motorStrList.length(); i++){
-        QString vs = motorStrList[i];        
-        float ip = vs.toInt()/1000.;
-        int convVal = ip*maxVal;
-        vs = QString("%1").arg(convVal, 3, 'g', -1, '0');
-        //if((i==3)){
-            parseCmdMotorStr(i, vs, msecsForStep);
-        //}
-        convertedString += "p" + vs;
-
+        QString vs = motorStrList[i];                
+        quint32 convVal = vs.toInt();
+        if(convVal > maxUDPVal)
+            ui->plainTextUDP->appendPlainText("!!! max UDP val error !!!");
+        quint32 newPos = maxHeightImpVal * (convVal/(float)maxUDPVal);
+        qDebug() << convVal << newPos;
+        parseCmdMotorStr(i, newPos, udpDgRecvInterval);
     }
-    convertedString += "\r\n";
-
-    //motorPosCmdStrings << convertedString;
 }
 
 DivPosDataStr ds;
-void MainWindow::parseCmdMotorStr(int mn, QString cmdStr, int msecsForStep)
+void MainWindow::parseCmdMotorStr(int mn, int newPosImp, int msecsForStep)
 {
-    //if(cmdStr[0] == 'S'){
     if(true){
-        //int mn = QString(cmdStr[1]).toInt();
-        //QString midstr = cmdStr.mid(3, 3);
-        //int pos = cmdStr.mid(3, 3).toInt();
-        int pos = cmdStr.toInt();
 
         //if(mn==3) ui->plainTextUDP->appendPlainText(cmdStr);
 
         //int pos = cmdStr.right(3).toInt();
         if((mn>=0)&&(mn<10)){
-//            int lastPos = 0;
-//            if(motorPosCmdData[mn].size() == 0){
-//                lastPos = 0;
-//            }
-//            else{
-//                lastPos = motorPosCmdData[mn].last().pos;
-//            }
-
-            if(pos > 999){
-                qDebug("pos exceed 100! pos=%d", pos);
-            }
-            if(pos <0){
-                qDebug("pos less 0! pos=%d", pos);
-            }
-            int maxVal = ui->lineEdit_MaxHeightImp->text().toInt();
-            int newPos = maxVal*(pos/1000.);
-            ds.pos = newPos;
+            ds.pos = newPosImp;
             if(motorPosCmdData[mn].length() == 0){
-                int delta = newPos - getMotorAbsPos(mn);
+                int delta = newPosImp - getMotorAbsPosImp(mn);
                 //if(delta != 0)
                 //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, FPGA_FREQ/(delta*10), delta/abs(delta));
 
@@ -1054,7 +1011,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr, int msecsForStep)
                                                       .arg(n)
                                                       .arg(delta));
                 }
-                ds.pos = getMotorAbsPos(mn);
+                ds.pos = getMotorAbsPosImp(mn);
                 ds.absMsec = msecsForStep; //curMsces + 100;
                 for(int i=0; i<n; i++){
                     //ds.absMsec += 100;
@@ -1065,7 +1022,7 @@ void MainWindow::parseCmdMotorStr(int mn, QString cmdStr, int msecsForStep)
 
             }
             else{                
-                int delta = newPos - motorPosCmdData[mn].last().pos;
+                int delta = newPosImp - motorPosCmdData[mn].last().pos;
                 //if(delta != 0)
                 //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
 
@@ -1148,7 +1105,7 @@ void MainWindow::readPendingDatagrams()
         //continue;
 
         //qDebug() << "3";
-        QStringList outStrings;
+       // QStringList outStrings;
         if(dataStr.compare("start\r\n") == 0){
 //            lastCmdMap.clear();
 //            lastPosMap.clear();
@@ -1175,49 +1132,30 @@ void MainWindow::readPendingDatagrams()
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
             //qDebug()<<dataStr;
             quint32 curMsecs = QTime::currentTime().msecsSinceStartOfDay();
-            quint32 udpDgRecvInterval = curMsecs - lastUdpDatagrammRecvd;
+            qint32 udpDgRecvInterval = curMsecs - lastUdpDatagrammRecvd;
             lastUdpDatagrammRecvd = curMsecs;
-            udpDgrmRecvdInterval.append(udpDgRecvInterval);
-            if(udpDgrmRecvdInterval.length() > 20){
-                udpDgrmRecvdInterval.removeFirst();
-                quint32 s=0;
-                foreach (quint32 recvInterval, udpDgrmRecvdInterval) {
-                    s+=recvInterval;
+            if(udpDgRecvInterval < 1000){
+                udpDgrmRecvIntervalList.append(udpDgRecvInterval);
+                if(udpDgrmRecvIntervalList.length() > 20){
+                    udpDgrmRecvIntervalList.removeFirst();
+                    quint32 s=0;
+                    foreach (quint32 recvInterval, udpDgrmRecvIntervalList) {
+                        s+=recvInterval;
+                    }
+                    s/=20;
+                    ui->statusBar->showMessage(QString("average UDP recv interval %1").arg(s), 5000);
                 }
-                s/=20;
-                ui->statusBar->showMessage(QString("average UDP recv interval %1").arg(s), 5000);
             }
+
             QString showStr = QString("%1 %2 (%3)").arg(QTime::currentTime().toString("mm:ss:zzz"))
                                                     .arg(dataStr).arg(udpDgRecvInterval);
-            int indOfCrLn = showStr.lastIndexOf("\r\n");
-            if(indOfCrLn != -1){
-                showStr.remove(indOfCrLn, 2);
-            }
+//            int indOfCrLn = showStr.lastIndexOf("\r\n");
+//            if(indOfCrLn != -1){
+//                showStr.remove(indOfCrLn, 2);
+//            }
             ui->plainTextUDP->appendPlainText(showStr);
-            //QString  contrStr =  dataStr.left(13);
-//            QString debStr;
-//            foreach (QString posStr, list1) {
-//                debStr.append(posStr + " ");
-//            }
-            //qDebug("%s", debStr.toLatin1().constData());
 
-
-//            if(list1.size() == 20){
-//                foreach (QString cmdStr, list1) {
-//                    int mn = QString(cmdStr[1]).toInt();
-//                    lastCmdMap[mn] = cmdStr.mid(2, 4);
-//                    QString outString;
-//                    for(int i=0; i<10; i++){
-//                        if(lastCmdMap[i] == NULL){
-//                            lastCmdMap[i] = QString("p000");
-//                        }
-//                        outString += lastCmdMap[i];
-//                    }
-//                    outString += "\r\n";
-//                    outStrings << outString;
-//                }
-//            }
-//            else{
+            if(udpDgRecvInterval > 400) udpDgRecvInterval=400;
 
             foreach (QString multiMotorStr, list1) {
                 QStringList motorList = multiMotorStr.split("S", QString::SkipEmptyParts);
@@ -1226,47 +1164,12 @@ void MainWindow::readPendingDatagrams()
                     outString += cmdStr.mid(1, 4);
                 }
                 outString += "\r\n";
-                outStrings << outString;
-
+                //outStrings << outString;
+                parseCmdMultiMotorStr(outString, udpDgRecvInterval);
             }
             gridLines++;
-//            }
-            parseCmdMultiMotorStrList(outStrings);
         }
-
-
-
-
-
-//        foreach (QString cmdStr, list1) {
-//            parseCmdStr(cmdStr);
-//        }
-
-
-//        if(dataStr[0] == 'P'){
-//            int mn = QString(contrStr[1]).toInt();
-
-//            if((mn>=0)&&(mn<10)){
-//                //qDebug("%s", mem.toLatin1().constData());
-//                int pos = contrStr.mid(3, 4).toInt();
-//                slList[mn]->setValue(pos);
-//    //            if(mn == 1)
-//    //                qDebug("mn %d pos %d", mn, pos);
-//            }
-//            QByteArray motorOkba = QString("M%1Ok\r\n").arg(mn).toLatin1();
-//            QNetworkDatagram drply = datagram.makeReply(motorOkba);
-//            udpSocket->writeDatagram(drply);
-//            return;
-
-//        }
     }
-    //qDebug() << "readPendingDatagrams time" << rpdEst.elapsed() << " gl " << gridLines;
-    //qDebug("readPendingDatagrams rb %d gl %04d time %d", rb, gridLines, rpdEst.elapsed());
-//    qDebug("%d rPDms recvd in %d ms: %d %d %d", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
-//           rpdEst.elapsed(),
-//           motorPosCmdData[0].length(),
-//           motorPosCmdData[1].length(),
-//           motorPosCmdData[2].length());
 }
 
 
@@ -1530,7 +1433,7 @@ void MainWindow::on_pushMoveUp_clicked()
         int startPos =0;
 
         if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPos(i);
+            startPos = getMotorAbsPosImp(i);
         else
             startPos = motorPosCmdData[i].last().pos;
 
@@ -1554,7 +1457,7 @@ void MainWindow::on_pushMoveDown_clicked()
         int startPos =0;
 
         if(motorPosCmdData[i].length() == 0)
-            startPos = getMotorAbsPos(i);
+            startPos = getMotorAbsPosImp(i);
         else
             startPos = motorPosCmdData[i].last().pos;
         ds.pos = startPos-400;
@@ -1568,47 +1471,47 @@ void MainWindow::on_pushMoveDown_clicked()
 }
 
 
-void MainWindow::on_pushTestData_clicked()
-{
+//void MainWindow::on_pushTestData_clicked()
+//{
 
-    int startLength = motorPosCmdData[0].length();
-    DivPosDataStr ds;
-    ds.pos = 1;
-    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
+//    int startLength = motorPosCmdData[0].length();
+//    DivPosDataStr ds;
+//    ds.pos = 1;
+//    ds.steps = 2400; ds.div = 1000; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 13600; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 18400; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
 
-    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32800; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
 
-    ds.steps = 33599; ds.div = 71; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 32801; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 33599; ds.div = 71; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32801; ds.div = 73; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 32000; ds.div = 75; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 30400; ds.div = 78; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 28800; ds.div = 83; ds.dir = 1; motorPosCmdData[0] << ds;
 
-    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 18399; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 13601; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
-    ds.steps = 3200; ds.div = 750; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 25600; ds.div = 93; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 22400; ds.div = 107; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 18399; ds.div = 130; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 13601; ds.div = 176; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 8800; ds.div = 272; ds.dir = 1; motorPosCmdData[0] << ds;
+//    ds.steps = 3200; ds.div = 750; ds.dir = 1; motorPosCmdData[0] << ds;
 
 
-    for(int i=0; i<MOTOR_CNT; i++){
-        ds = motorPosCmdData[i].last();
-        for(int j=0; j<(motorPosCmdData[i].length() - startLength); j++){
-            motorPosCmdData[i] << ds;
-        }
-    }
+//    for(int i=0; i<MOTOR_CNT; i++){
+//        ds = motorPosCmdData[i].last();
+//        for(int j=0; j<(motorPosCmdData[i].length() - startLength); j++){
+//            motorPosCmdData[i] << ds;
+//        }
+//    }
 
-}
+//}
 
 void MainWindow::on_tabWidget_tabBarClicked(int index)
 {
@@ -1790,7 +1693,7 @@ void MainWindow::on_pushButtonGoZero_clicked()
     int startPos =0;
     for(int mi=0; mi<MOTOR_CNT; mi++){
         if(motorPosCmdData[mi].length() == 0)
-            startPos = getMotorAbsPos(mi);
+            startPos = getMotorAbsPosImp(mi);
         else
             startPos = motorPosCmdData[mi].last().pos;
 

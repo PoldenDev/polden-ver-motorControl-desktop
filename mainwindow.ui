@@ -86,7 +86,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabMainStat">
        <attribute name="title">
@@ -1095,7 +1095,7 @@
           <string>max</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEditMaxVal">
+        <widget class="QLineEdit" name="lineEditUDPMaxVal">
          <property name="geometry">
           <rect>
            <x>50</x>

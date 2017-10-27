@@ -139,7 +139,7 @@ public:
     QLineEdit *lineEditMinVal;
     QLabel *label;
     QLabel *label_2;
-    QLineEdit *lineEditMaxVal;
+    QLineEdit *lineEditUDPMaxVal;
     QGroupBox *groupBox_8;
     QLabel *label_13;
     QLabel *labelCompileTime;
@@ -759,10 +759,10 @@ public:
         label_2 = new QLabel(groupBox_7);
         label_2->setObjectName(QStringLiteral("label_2"));
         label_2->setGeometry(QRect(20, 60, 20, 23));
-        lineEditMaxVal = new QLineEdit(groupBox_7);
-        lineEditMaxVal->setObjectName(QStringLiteral("lineEditMaxVal"));
-        lineEditMaxVal->setGeometry(QRect(50, 60, 71, 20));
-        lineEditMaxVal->setAlignment(Qt::AlignCenter);
+        lineEditUDPMaxVal = new QLineEdit(groupBox_7);
+        lineEditUDPMaxVal->setObjectName(QStringLiteral("lineEditUDPMaxVal"));
+        lineEditUDPMaxVal->setGeometry(QRect(50, 60, 71, 20));
+        lineEditUDPMaxVal->setAlignment(Qt::AlignCenter);
         groupBox_8 = new QGroupBox(tabSettings);
         groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
         groupBox_8->setGeometry(QRect(240, 190, 151, 51));
@@ -1009,7 +1009,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1056,8 +1056,8 @@ public:
         lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
         label->setText(QApplication::translate("MainWindow", "min:", Q_NULLPTR));
         label_2->setText(QApplication::translate("MainWindow", "max", Q_NULLPTR));
-        lineEditMaxVal->setInputMask(QString());
-        lineEditMaxVal->setText(QApplication::translate("MainWindow", "1000", Q_NULLPTR));
+        lineEditUDPMaxVal->setInputMask(QString());
+        lineEditUDPMaxVal->setText(QApplication::translate("MainWindow", "1000", Q_NULLPTR));
         groupBox_8->setTitle(QApplication::translate("MainWindow", "About", Q_NULLPTR));
         label_13->setText(QApplication::translate("MainWindow", "compile time:", Q_NULLPTR));
         labelCompileTime->setText(QApplication::translate("MainWindow", "TextLabel", Q_NULLPTR));

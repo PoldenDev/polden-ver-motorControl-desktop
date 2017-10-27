@@ -74,7 +74,7 @@ private slots:
     void on_pushBUttonToIdle_clicked();
     void on_pushButtonGotoPEriodState_clicked();
     void on_pushButtonPosReset_clicked();
-    void on_pushTestData_clicked();
+    //void on_pushTestData_clicked();
 
     void on_tabWidget_tabBarClicked(int index);
     void on_goToTerm_clicked();
@@ -144,9 +144,8 @@ private:
     int x, xUdpRecv;
     void createPlot(QString name);
 
-    void parseCmdMotorStr(int, QString, int msecsForStep);
-    void parseCmdMultiMotorStr(QString);
-    void parseCmdMultiMotorStrList(QStringList);
+    void parseCmdMotorStr(int, int newPosImp, int msecsForStep);
+    void parseCmdMultiMotorStr(QString, quint32 udpDgRecvInterval);
 
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;
@@ -158,7 +157,7 @@ private:
     //quint32 motorAbsolutePos[MOTOR_CNT];
     qint32 motorAbsolutePosCur[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
-    qint32 getMotorAbsPos(int i) { return motorAbsolutePosCur[i];}
+    qint32 getMotorAbsPosImp(int i) { return motorAbsolutePosCur[i];}
 
     //void convertPosModeToVelMode(QString);
     QMap<int, int> lastPosMap;
@@ -225,8 +224,9 @@ private:
     QList<QWidget*> motorStatWidgetList;
 
     QList<bool*> motorRespRecvdList;
+
     quint32 lastUdpDatagrammRecvd;
-    QList<quint32> udpDgrmRecvdInterval;
+    QList<quint32> udpDgrmRecvIntervalList;
 
 
 };
