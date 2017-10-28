@@ -63,6 +63,7 @@ signals:
 private slots:
     void handleExchTimer();
     void handleReadyRead();
+    void handleSerialDataWritten(qint64 bytes);
     void handleErrorOccurred(QSerialPort::SerialPortError);
 };
 

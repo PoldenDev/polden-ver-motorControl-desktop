@@ -41,7 +41,7 @@ private slots:
 
     void readPendingDatagrams();
     void stateChanged(QAbstractSocket::SocketState socketState);
-    void handleSerialDataWritten(qint64 bytes);
+
     void on_pushButton_refreshCom_clicked();
     void on_pushButtonClear_clicked();
     void dataProcess100msTimeOut();
@@ -83,7 +83,7 @@ private slots:
     void termState(int, bool);
 
 private:
-    quint32 motorCount;
+    //quint32 motorCount;
 
     Ui::MainWindow *ui;
 
@@ -129,7 +129,7 @@ private:
     //int timeShiftMaxPos, timeShiftMaxNeg;
 
     QTime usbConnectionTime, udpConnectionTime;
-    QList<QCheckBox*> termCheckBox;
+    QList<QCheckBox*> termCheckBoxList;
     QList<QLineEdit*> euqueLineEdit;
     quint32 dataGramCnt;
 

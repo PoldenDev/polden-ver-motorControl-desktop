@@ -116,50 +116,58 @@ void FpgaControl::handleExchTimer()
     //        curMotorSendIdx = 0;
 
 
-        if(serial.isOpen() == false)
-            return;
-        //qDebug("%d sendOnTimer", QTime::currentTime().msecsSinceStartOfDay()&0xfff );
+    if(serial.isOpen() == false)
+        return;
+    //qDebug("%d sendOnTimer", QTime::currentTime().msecsSinceStartOfDay()&0xfff );
 
-        //тут подождём
-        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-        for(int i=0; i<motorCount; i++){
-            if(motorPosCmdData[i].isEmpty())
-                continue;
-            DivPosDataStr &ds = motorPosCmdData[i].first();
-            if(ds.steps == 0){
-                if(ds.skipStartTime != 0 ){
-                    //if(i == 0) qDebug() << (curMsec&0xffff) << "external waiting" << ds.msecsFor;
-                    //if(curMsec >= ds.finishAbsTimeMsec){
-                    if((curMsec - ds.skipStartTime) >= ds.msecsFor ){
-                        motorPosCmdData[i].removeFirst();
-                    }
+    QTime tt, t2, t3;
+    tt.start();
+    t2.start();
+    t3.start();
+
+    //тут подождём
+    int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+    for(int i=0; i<motorCount; i++){
+        if(motorPosCmdData[i].isEmpty())
+            continue;
+        DivPosDataStr &ds = motorPosCmdData[i].first();
+        if(ds.steps == 0){
+            if(ds.startTime != 0 ){
+                //if(i == 0) qDebug() << (curMsec&0xffff) << "external waiting" << ds.msecsFor;
+                //if(curMsec >= ds.finishAbsTimeMsec){
+                if((curMsec - ds.startTime) >= ds.msecsFor ){
+                    motorPosCmdData[i].removeFirst();
+                }
+                else{
+                    if(i == 0) qDebug()<<(curMsec&0xffff) << "waiting" << ds.msecsFor;
                 }
             }
         }
-    //    QTime tt;
-    //    tt.start();
-        char c = 0xff;
-        serial.write(&c, 1);
+    }
+    qDebug("%d data recvd 1 in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
+           t2.elapsed());
+    char c = 0xff;
+    serial.write(&c, 1);
 
-        int bytesToRecv = 4;
-        char dArr[4];
-        while(bytesToRecv>0){
-            //qDebug("try to recv %d bytes", bytesToRecv);
-            if(serial.waitForReadyRead(50) ==false){
-                //qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
-                //ui->plainTextUDP->appendPlainText(QString("dataRecvTimeout on recvd %1 bytes").arg(4-bytesToRecv));
-                return;
-            }
-            int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
-            bytesToRecv -= dRecvd;
+    int bytesToRecv = 4;
+    char dArr[4];
+    while(bytesToRecv>0){
+        //qDebug("try to recv %d bytes", bytesToRecv);
+        if(serial.waitForReadyRead(50) ==false){
+            //qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
+            //ui->plainTextUDP->appendPlainText(QString("dataRecvTimeout on recvd %1 bytes").arg(4-bytesToRecv));
+            return;
         }
+        int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
+        bytesToRecv -= dRecvd;
+    }
+    qDebug("%d data recvd 2 in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
+           t3.elapsed());
 
-
-        comExchanges++;
-        parseFPGAMsg(QByteArray(dArr, 4));
-    //    qDebug("%d data recvd in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
-    //           tt.elapsed());
-
+    comExchanges++;
+    parseFPGAMsg(QByteArray(dArr, 4));
+    qDebug("%d data recvd 3 in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
+           tt.elapsed());
 }
 
 
@@ -348,14 +356,15 @@ void FpgaControl::freeToWrite(int i)
             bFreeToWrite[i] = false;
         }
         else{
-            if(ds.skipStartTime == 0){
+            if(ds.startTime == 0){
                 if(i == 0){
                     //qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
                     lastDebugShowTime = curMsec;
                 }
-                ds.skipStartTime = curMsec;
+
             }
         }
+        ds.startTime = curMsec;
     }
         break;
     }
@@ -502,12 +511,12 @@ void FpgaControl::allFreeToWrite()
                 bFreeToWrite[i] = false;
             }
             else{
-                if(ds.skipStartTime == 0){
+                if(ds.startTime == 0){
                     if(i == 0){
                         qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
                         lastDebugShowTime = curMsec;
                     }
-                    ds.skipStartTime = curMsec;
+                    ds.startTime = curMsec;
                 }
             }
         }
@@ -580,12 +589,77 @@ void FpgaControl::handleReadyRead()
     //ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
 }
 
+void FpgaControl::handleSerialDataWritten(qint64 bytes)
+{
+    //QDateTime current = QDateTime::currentDateTime();
+    //uint msecs = setTime.time().msecsTo(current.time());
+    //current.currentMSecsSinceEpoch()
+
+   // qDebug() <<  QTime::currentTime().msecsSinceStartOfDay()  << " " << "handleSerialDataWritten";
+    return;
+//    //qDebug("handleSerialDataWritten %d", bytes);
+//    if(serial.isOpen()){
+
+//        for(int i=0; i<MOTOR_CNT; i++){
+//            if((mtstr[i].sendState == idle) &&
+//                (mtstr[i].contrStringQueue.isEmpty() == false) &&
+//                (i == curMotorSendIdx)){
+//                QString wrStr = contrStringQueue.head();
+//                //qDebug("%s", qPrintable(wrStr));
+//                serial.write(wrStr.toLatin1());
+//                mtstr[i].sendState = waitForAck;
+//            }
+
+//        }
+//        while(true){
+//            TMotorStr *pMst = &(mtstr[curMotorSendIdx]);
+//            if((pMst->sendState == idle) && (pMst->contrStringQueue.isEmpty() == false)){
+//                QString wrStr = contrStringQueue.head();
+//                //qDebug("%s", qPrintable(wrStr));
+//                serial.write(wrStr.toLatin1());
+//            }
+
+////            if(mtstr[i].contrStringQueue.isEmpty()){
+////                noDataSending = true;
+////            }
+////            else{
+////                if(bCmdOk){
+////                    qDebug() << "last send OK, send next";
+////                    contrStringQueue.dequeue();
+////                    mtstr[i].bCmdOk = false;
+////                }
+////               else{
+////                    qDebug() << "last send Fail, repeat ";
+////                }
+////               if(contrStringQueue.isEmpty()){
+////                    noDataSending = true;
+////                }
+////                else{
+////                    QString wrStr = contrStringQueue.head();
+////                    //qDebug("%s", qPrintable(wrStr));
+////                    serial.write(wrStr.toLatin1());
+////                }
+////            }
+
+//            curMotorSendIdx++;
+//            if(curMotorSendIdx >= MOTOR_CNT){
+//                curMotorSendIdx = 0;
+
+//            }
+//        }
+//    }
+
+////    if(timerSerialSendTo[lastMotorReceptInd]){
+
+////    }
+
+}
 
 void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id)
 {
     float secsOnMove = msecsForMove/1000.;
     quint32 freqOnMove = fpgaFreq*secsOnMove;
-    ds.skipStartTime = 0;
+    ds.startTime = 0;
     ds.dir = delta > 0? 1: 0;
     if(bDirInvers)
         ds.dir = delta > 0? 0: 1;
@@ -610,12 +684,12 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
         }
     }
     motorPosCmdData[id].append(ds);
-    if(dt > 0){
-        ds.steps = 0;
-        ds.msecsFor = dt;
-        motorPosCmdData[id].append(ds);
-        //qDebug("added Pt");
-    }
+//    if(dt > 0){
+//        ds.steps = 0;
+//        ds.msecsFor = dt;
+//        motorPosCmdData[id].append(ds);
+//        //qDebug("added Pt");
+//    }
 }
 
 void FpgaControl::addMotorCmd(int mn, int newPosImp, int msecsForMove)

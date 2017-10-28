@@ -31,7 +31,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    motorCount(0),
+    //motorCount(0),
     udpSocket(NULL),    
     curMotorSendIdx(0),
     settings("murinets", "vertolet"),
@@ -47,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    motorCount = settings.value("motorCount", 0).toInt();
+    quint32 motorCount = settings.value("motorCount", 0).toInt();
+    fpgaCtrl.setMotorCount(motorCount);
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
@@ -60,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButtonUdpOpenClose_clicked();
 
     on_lineEdit_MaxHeightImp_editingFinished();
+
 
 
     quint32 fpgaFreq = settings.value("FPGA_FREQ", FPGA_FREQ_25).toInt();
@@ -250,8 +252,8 @@ void MainWindow::termState(int id, bool bEna)
         case 8: ui->term9->setChecked(bEna); break;
         case 9: ui->term10->setChecked(bEna); break;
     }
-    if(id < motorCount){
-        termCheckBox[id]->setChecked(bEna);
+    if(id < termCheckBoxList.length()){
+        termCheckBoxList[id]->setChecked(bEna);
     }
 }
 
@@ -405,72 +407,6 @@ void MainWindow::on_pushButtonComOpen_clicked()
 
 
 
-void MainWindow::handleSerialDataWritten(qint64 bytes)
-{
-    //QDateTime current = QDateTime::currentDateTime();
-    //uint msecs = setTime.time().msecsTo(current.time());
-    //current.currentMSecsSinceEpoch()
-
-   // qDebug() <<  QTime::currentTime().msecsSinceStartOfDay()  << " " << "handleSerialDataWritten";
-    return;
-//    //qDebug("handleSerialDataWritten %d", bytes);
-//    if(serial.isOpen()){
-
-//        for(int i=0; i<MOTOR_CNT; i++){
-//            if((mtstr[i].sendState == idle) &&
-//                (mtstr[i].contrStringQueue.isEmpty() == false) &&
-//                (i == curMotorSendIdx)){
-//                QString wrStr = contrStringQueue.head();
-//                //qDebug("%s", qPrintable(wrStr));
-//                serial.write(wrStr.toLatin1());
-//                mtstr[i].sendState = waitForAck;
-//            }
-
-//        }
-//        while(true){
-//            TMotorStr *pMst = &(mtstr[curMotorSendIdx]);
-//            if((pMst->sendState == idle) && (pMst->contrStringQueue.isEmpty() == false)){
-//                QString wrStr = contrStringQueue.head();
-//                //qDebug("%s", qPrintable(wrStr));
-//                serial.write(wrStr.toLatin1());
-//            }
-
-////            if(mtstr[i].contrStringQueue.isEmpty()){
-////                noDataSending = true;
-////            }
-////            else{
-////                if(bCmdOk){
-////                    qDebug() << "last send OK, send next";
-////                    contrStringQueue.dequeue();
-////                    mtstr[i].bCmdOk = false;
-////                }
-////               else{
-////                    qDebug() << "last send Fail, repeat ";
-////                }
-////               if(contrStringQueue.isEmpty()){
-////                    noDataSending = true;
-////                }
-////                else{
-////                    QString wrStr = contrStringQueue.head();
-////                    //qDebug("%s", qPrintable(wrStr));
-////                    serial.write(wrStr.toLatin1());
-////                }
-////            }
-
-//            curMotorSendIdx++;
-//            if(curMotorSendIdx >= MOTOR_CNT){
-//                curMotorSendIdx = 0;
-
-//            }
-//        }
-//    }
-
-////    if(timerSerialSendTo[lastMotorReceptInd]){
-
-////    }
-
-}
-
 void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr, quint32 udpDgRecvInterval)
 {                    
     //qDebug() << udpDgRecvInterval;
@@ -552,11 +488,9 @@ void MainWindow::graphReset()
 void MainWindow::stateChanged(QAbstractSocket::SocketState socketState)
 {
     switch(socketState){
-    case QAbstractSocket::ListeningState: ui->lineEditUdpState->setText("listen"); break;
-    case QAbstractSocket::BoundState: ui->lineEditUdpState->setText("bound"); break;
-    case QAbstractSocket::UnconnectedState: ui->lineEditUdpState->setText("uncon"); break;
-
-
+        case QAbstractSocket::ListeningState: ui->lineEditUdpState->setText("listen"); break;
+        case QAbstractSocket::BoundState: ui->lineEditUdpState->setText("bound"); break;
+        case QAbstractSocket::UnconnectedState: ui->lineEditUdpState->setText("uncon"); break;
     }
 
 }
@@ -971,7 +905,8 @@ void MainWindow::uiUpdateTimerSlot()
     QString tabName = ui->tabWidget->tabText(curTabInd);
     if(tabName == "mainStat"){
         bool bOk = false;
-        int sliderMaxVal = ui->lineEdit_MaxHeightImp->text().toInt(&bOk);
+        int sliderMaxVal = ui->lineEdit_MaxHeightImp->text().toInt(&bOk);        
+        quint32 motorCount = ui->lineEditMotorCount->text().toInt();
         for(int i=0; i<motorCount; i++){
             if(bOk){
                 absPosSlider[i]->setMaximum(sliderMaxVal);
@@ -1126,9 +1061,8 @@ void MainWindow::on_pushButtonTest_clicked()
 //        addMotorCmd(0, newPos, 113);
 //    }
 
-
+    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
     quint32 maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
-
     for(int i=0; i<motorCount; i++){
         for(int j=0; j<10; j++){
             if(i == 0){
@@ -1242,7 +1176,7 @@ void MainWindow::createMainInterface()
     absPosSlider.clear();
     absPosLineEdit.clear();
     stateLineEdit.clear();
-    termCheckBox.clear();
+    termCheckBoxList.clear();
     euqueLineEdit.clear();
     debPortStatusMainLeList.clear();
 
@@ -1265,7 +1199,7 @@ void MainWindow::createMainInterface()
     //lo->addWidget(mainWdg);
     //QHBoxLayout *hblo = new QHBoxLayout(mainWdg);
     //lo->addWidget(mainWdg);
-
+    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
     for(int i=0; i<motorCount; i++){
         QWidget *wdg = new QWidget(ui->groupBoxMain);
         QVBoxLayout *vblo = new QVBoxLayout(wdg);
@@ -1296,7 +1230,7 @@ void MainWindow::createMainInterface()
         cb->setFocusPolicy(Qt::NoFocus);
         //cb->setChecked(true);
         vblo->addWidget(cb, 0, Qt::AlignHCenter);
-        termCheckBox.append(cb);
+        termCheckBoxList.append(cb);
 
         le = new QLineEdit(wdg);
         le->setReadOnly(true);
@@ -1356,6 +1290,8 @@ void MainWindow::createDebugSerialPortInterface()
     if(hblo == NULL){
         hblo = new QHBoxLayout;
     }
+
+    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
     for(int i=0; i<motorCount; i++){
         QGroupBox *gb = new QGroupBox(QString("Port %1").arg(i));
         //gb->setAlignment(Qt::AlignHCenter);
@@ -1465,7 +1401,7 @@ void MainWindow::comPortClose(int id)
 
 void MainWindow::on_lineEditMotorCount_editingFinished()
 {
-    motorCount = ui->lineEditMotorCount->text().toInt();
+    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
     settings.setValue("motorCount", motorCount);
     ui->plainTextEdit->appendPlainText(QString("new motor count %1").arg(ui->lineEditMotorCount->text()));
     createDebugSerialPortInterface();
