@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSerialPort>
 #include <QUdpSocket>
 #include <QNetworkDatagram>
 #include <QQueue>
@@ -38,37 +37,18 @@ public:
     ~MainWindow();
 
 private slots:
-    //void on_butPos_clicked();
-
     void on_pushButtonComOpen_clicked();
 
-    //void on_pushButtonClose_clicked();
-    //void on_pushButton_clicked();
-    //void on_pushButtonDir_clicked();
-    //void on_pushButtonSetRange_clicked();
-    //void on_pushButtonSetCont_clicked();
-    //void on_butPos_2_clicked();
-    //void on_pushButton_2_clicked();
-    //void on_pushButtonDir_2_clicked();
-    //void on_pushButtonSetRange_2_clicked();
-    //void on_pushButtonSetCont_2_clicked();
-    //void on_verticalSlider_sliderReleased();
-    //void on_verticalSlider_sliderMoved(int position);
-    //void on_verticalSlider_2_sliderReleased();
     void readPendingDatagrams();
     void stateChanged(QAbstractSocket::SocketState socketState);
-    void handleReadyRead();
     void handleSerialDataWritten(qint64 bytes);
     void on_pushButton_refreshCom_clicked();
     void on_pushButtonClear_clicked();
-    void sendOnTimer();
-    void sendTimeOut();
     void dataProcess100msTimeOut();
    // void processUartExchange();
     void waitForFifoFreeFifo();
 
     void response(QString str);
-
 
     //void on_pushMoveDownState_clicked();
     void on_pushBUttonToIdle_clicked();
@@ -100,37 +80,20 @@ private slots:
     void on_lineEditMotorCount_editingFinished();
     void checkDebugComTimerHandle();
 
+    void termState(int, bool);
+
 private:
     quint32 motorCount;
-    void setPos(int pos);
-    Ui::MainWindow *ui;
-    QSerialPort serial;
 
-    int speed;
+    Ui::MainWindow *ui;
 
     QUdpSocket *udpSocket;
 
-
-    quint32 cmdNum;
-    QString uartBuff;
-    //bool bFifoFull;
-
-    QTimer timer;
     QList<QSlider*> slList;
-
-    quint8 lastMotorReceptInd;
-    //QTimer timerSerialSendTo[MOTOR_CNT];
-
-    //bool noDataSending;
-    //void processUartSendExchange();
-    //void processUartRecvExchange(QString str);
     QTimer waitForFifoFreeTimer;
-    //UartThread UartThread;
     QTimer dataProcess100msTimer;
     QTimer uiUpdateTimer;
 
-
-    //TMotorStr mtstr[MOTOR_CNT];
     quint8 curMotorSendIdx;
 
 //    QList<QwtPlot*> plotList;
@@ -150,15 +113,8 @@ private:
 
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;
-    //QQueue<QString> motorPosCmdStrings;
 
-    //int absolutePos[MOTOR_CNT];
-
-    quint32 lastCtrlTimeMsecs[MOTOR_CNT];
-    //quint32 motorAbsolutePos[MOTOR_CNT];
-    qint32 motorAbsolutePosCur[MOTOR_CNT];
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
-    qint32 getMotorAbsPosImp(int i) { return motorAbsolutePosCur[i];}
 
     //void convertPosModeToVelMode(QString);
     QMap<int, int> lastPosMap;
@@ -166,14 +122,6 @@ private:
 
     void graphReset();
     QSettings settings;
-
-    void sendDivPos(int mi, DivPosDataStr &ds);
-
-    TMotorState mtState[MOTOR_CNT];
-
-    void freeToWrite(int i);
-    void terminatorState(int i, bool bEna);
-    void allFreeToWrite();
 
     QList<QLineEdit*> timeStatLE;
     QList<QSlider*> timeStatSlider;
@@ -183,22 +131,15 @@ private:
     QList<QLineEdit*> stateLineEdit;
     //int timeShiftMaxPos, timeShiftMaxNeg;
 
-    quint32 comExchanges;
     QTime usbConnectionTime, udpConnectionTime;
-    int bytesOnIter;
     QList<QCheckBox*> termCheckBox;
-    bool bTermState[MOTOR_CNT];
     QList<QLineEdit*> euqueLineEdit;
     quint32 dataGramCnt;
 
     void udpServerOpen();
     void udpServerClose();
 
-    bool bFreeToWrite[MOTOR_CNT];
-    quint32 FPGA_FREQ;
-
     int mmToImp(int mm);
-    void parseFPGAMsg(QByteArray ba);
     bool speedTrig[MOTOR_CNT];
 
     void handleSliderReleased(int id, int newPos);
