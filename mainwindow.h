@@ -228,6 +228,8 @@ private:
     quint32 lastUdpDatagrammRecvd;
     QList<quint32> udpDgrmRecvIntervalList;
 
+    quint32 lastDebugShowTime;
+
 
 };
 

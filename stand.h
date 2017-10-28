@@ -3,8 +3,8 @@
 typedef enum {idle, waitForAck, waitForFifoFree} TSendState;
 
 #define MOTOR_CNT 10
-#define FPGA_FREQ_24 25000000
-#define FPGA_FREQ_25 24000000
+#define FPGA_FREQ_24 24000000
+#define FPGA_FREQ_25 25000000
 typedef struct{
     QQueue<QString> contrStringQueue;
     bool bCmdOk;
@@ -28,4 +28,5 @@ typedef struct{
     qint32 finishPos; //pos after cmd
     quint32 msecsFor;
     quint32 skipStartTime;
+    quint32 finishAbsTimeMsec;
 } DivPosDataStr;

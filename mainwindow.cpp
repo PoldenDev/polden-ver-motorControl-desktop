@@ -45,7 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
     paletteGrey(NULL),
     paletteRed(NULL),
     paletteGreen(NULL),
-    lastUdpDatagrammRecvd(0)
+    lastUdpDatagrammRecvd(0),
+    lastDebugShowTime(0)
 {
     ui->setupUi(this);
 
@@ -449,7 +450,8 @@ void MainWindow::sendDivPos(int mi, DivPosDataStr &ds)
 {
     quint32 dir = ds.dir;
     quint32 steps = ds.steps;
-    quint32 div = FPGA_FREQ/ (steps*10); //calc speed
+    //quint32 div = FPGA_FREQ/ (steps*10); //calc speed
+    quint32 div = ds.div; //calc speed
     //qDebug() << div <<ds.div;
     if(div > 0x1fff){
         qDebug("mi %d div exceed 0x1fff!", mi);
@@ -577,10 +579,14 @@ void MainWindow::parseFPGAMsg(QByteArray ba)
 //    for(int i=0; i<motorCount; i++){
 //        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
 //    }
-    bAllMotorHasCmd = true; // ***
-    if((bAllFree == true) && bAllMotorHasCmd){
-        allFreeToWrite();
-    }
+//    bAllMotorHasCmd = true; // ***
+//    if((bAllFree == true) && bAllMotorHasCmd){
+//        allFreeToWrite();
+//    }
+//    else{
+//        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+//        qDebug() << (curMsec&0xffff) << "not all free";
+//    }
 
 }
 
@@ -757,15 +763,21 @@ void MainWindow::allFreeToWrite()
                 //            else{
             int curMsec = QTime::currentTime().msecsSinceStartOfDay();
             if(ds.steps > 0){
-                //if(i == 0) qDebug() << curMsec << ds.steps;
+                if(i == 0){
+                    qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div ;
+                    lastDebugShowTime = curMsec;
+                }
                 sendDivPos(i, ds);
                 motorPosCmdData[i].removeFirst();
                 bFreeToWrite[i] = false;
             }
             else{
                 if(ds.skipStartTime == 0){
+                    if(i == 0){
+                        qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
+                        lastDebugShowTime = curMsec;
+                    }
                     ds.skipStartTime = curMsec;
-                    //if(i == 0) qDebug() << curMsec << "new wait";
                 }
             }
         }
@@ -811,26 +823,37 @@ void MainWindow::freeToWrite(int i)
 
     case MT_IDLE:
     case MT_INIT_GoUp:
-//        if(motorPosCmdData[i].isEmpty() == false){
-//            DivPosDataStr ds;
-//            ds = motorPosCmdData[i].first();
-//            int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-
-
-//            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
-////            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
-////                qDebug("not in zero and no term!");
-////                ds.pos = -400;
-////                sendDivPos(i, ds, ds.pos);
-////            }
-////            else{
-//                if(sendDivPos(i, ds, ds.pos) == true){
-//                    motorPosCmdData[i].dequeue();
-//                    bFreeToWrite[curMotorSendIdx] = false;
-//                }
-//                //motorPosCmdData[i].dequeue();
-////            }
-//        }
+    {
+        if(motorPosCmdData[i].isEmpty())
+            break;
+        DivPosDataStr &ds = motorPosCmdData[i].first();
+            //qDebug("div=%x, st=%d, d=%d", ds.div, ds.steps, ds.dir);
+            //            if((ds.pos==0)&&(getMotorAbsPos(i)==0)&&(bTermState[i]==false)){
+            //                qDebug("not in zero and no term!");
+            //                ds.pos = -400;
+            //                sendDivPos(i, ds, ds.pos);
+            //            }
+            //            else{
+        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+        if(ds.steps > 0){
+            if(i == 0){
+                qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div ;
+                lastDebugShowTime = curMsec;
+            }
+            sendDivPos(i, ds);
+            motorPosCmdData[i].removeFirst();
+            bFreeToWrite[i] = false;
+        }
+        else{
+            if(ds.skipStartTime == 0){
+                if(i == 0){
+                    qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
+                    lastDebugShowTime = curMsec;
+                }
+                ds.skipStartTime = curMsec;
+            }
+        }
+    }
         break;
     }
 
@@ -954,6 +977,9 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
 {
     DivPosDataStr ds;
     ds.finishPos = newPosImp;
+    quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
+    float secsOnMove = msecsForMove/1000.;
+    quint32 freqOnMove = FPGA_FREQ*secsOnMove;
     if(motorPosCmdData[mn].length() == 0){
         int delta = newPosImp - getMotorAbsPosImp(mn);
         int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
@@ -984,6 +1010,17 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
 
             ds.steps =  abs(delta);
             ds.msecsFor = msecsForMove;
+
+            if(delta == 0){
+                ds.finishAbsTimeMsec = curmSecs + 100;
+            }
+            else{
+                ds.div = (quint32)(freqOnMove/ds.steps) ;
+                if(ds.div > 0x1fff){
+                    //qDebug("%d maxSpeed err %x", mn, ds.div);
+                    ds.div = 0x1fff;
+                }
+            }
             motorPosCmdData[mn].append(ds);
         }
 
@@ -995,17 +1032,22 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
         if(ui->checkBoxDirInverse->isChecked())
             ds.dir = delta > 0? 0: 1;
 
-        float secsOnStep = msecsForMove / (ds.steps*1000.);
-        ds.div = (quint32)(FPGA_FREQ * secsOnStep) ;
-        if(ds.div > 0x1fff){
-            qDebug("%d maxSpeed err %x", mn, ds.div);
-            ds.div = 0x1fff;
-        }
-
         //if(delta != 0)
         //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
         ds.msecsFor = msecsForMove;
         ds.skipStartTime = 0;
+        if(delta == 0){
+            ds.finishAbsTimeMsec = curmSecs + 100;
+        }
+        else{
+            //float secsOnStep = msecsForMove / (ds.steps*1000.);
+            //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
+            ds.div = (quint32)(freqOnMove/ds.steps);
+            if(ds.div > 0x1fff){
+                qDebug("%d maxSpeed err %x", mn, ds.div);
+                ds.div = 0x1fff;
+            }
+        }
         motorPosCmdData[mn].append(ds);
     }
 
@@ -1127,10 +1169,10 @@ void MainWindow::readPendingDatagrams()
 
             QString showStr = QString("%1 %2 (%3)").arg(QTime::currentTime().toString("mm:ss:zzz"))
                                                     .arg(dataStr).arg(udpDgRecvInterval);
-//            int indOfCrLn = showStr.lastIndexOf("\r\n");
-//            if(indOfCrLn != -1){
-//                showStr.remove(indOfCrLn, 2);
-//            }
+            int indOfCrLn = showStr.lastIndexOf("\r\n");
+            if(indOfCrLn != -1){
+                showStr.remove(indOfCrLn, 2);
+            }
             ui->plainTextUDP->appendPlainText(showStr);
 
             if(udpDgRecvInterval > 400) udpDgRecvInterval=400;
@@ -1242,15 +1284,16 @@ void MainWindow::sendOnTimer()
         DivPosDataStr &ds = motorPosCmdData[i].first();
         if(ds.steps == 0){
             if(ds.skipStartTime != 0 ){
-                //if(i == 0) qDebug() << curMsec << "external waiting" << ds.msecsFor;
-                if((curMsec - ds.skipStartTime) > ds.msecsFor){
+                //if(i == 0) qDebug() << (curMsec&0xffff) << "external waiting" << ds.msecsFor;
+                //if(curMsec >= ds.finishAbsTimeMsec){
+                if((curMsec - ds.skipStartTime) >= ds.msecsFor ){
                     motorPosCmdData[i].removeFirst();
                 }
             }
         }
     }
-    QTime tt;
-    tt.start();
+//    QTime tt;
+//    tt.start();
     char c = 0xff;
     serial.write(&c, 1);
 
@@ -1708,6 +1751,16 @@ void MainWindow::on_pushButtonGoZero_clicked()
 
 void MainWindow::on_pushButtonTest_clicked()
 {
+
+//    for(int k=0; k<100; k++){
+//        //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
+//        quint32 newPos = k*1000;
+//        addMotorCmd(0, newPos, 113);
+//    }
+
+
+    quint32 maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
+
     for(int i=0; i<motorCount; i++){
         for(int j=0; j<10; j++){
             if(i == 0){
@@ -1726,7 +1779,8 @@ void MainWindow::on_pushButtonTest_clicked()
 
             for(int k=0; k<100; k++){
                 //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
-                quint32 newPos = 116200 * qSin((k/100.)*M_PI);
+                if(i==0)qDebug() <<qAbs(qSin((k/100.)*M_PI));
+                quint32 newPos = maxHeightImpVal * qAbs(qSin((k/100.)*M_PI));
                 addMotorCmd(i, newPos, 100);
             }
 
