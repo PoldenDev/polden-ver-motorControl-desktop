@@ -107,14 +107,11 @@ private:
     int x, xUdpRecv;
     void createPlot(QString name);
 
-    void calcCmd(DivPosDataStr &ds, QQueue<DivPosDataStr> &q, int delta, quint32 curmSecs, quint32 msecsForMove, int debMn);
-    void addMotorCmd(int, int newPosImp, int msecsForStep);
+    void calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int debMn);
     void parseCmdMultiMotorStr(QString, quint32 udpDgRecvInterval);
 
     QMap<int, int> xMap;
     QMap<int, QString> lastCmdMap;
-
-    QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
 
     //void convertPosModeToVelMode(QString);
     QMap<int, int> lastPosMap;

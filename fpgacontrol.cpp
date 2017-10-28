@@ -7,7 +7,8 @@ FpgaControl::FpgaControl(QObject *parent) :
     motorCount(0),
     bytesOnIter(0),
     comExchanges(0),
-    fpgaFreq(FPGA_FREQ_25)
+    fpgaFreq(FPGA_FREQ_25),
+    bDirInvers(false)
 {
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
@@ -16,6 +17,9 @@ FpgaControl::FpgaControl(QObject *parent) :
         motorAbsolutePosCur[i] = 0;
         //lastCtrlTimeMsecs[i] = 0;
     }
+
+    connect(&serial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
+            this, SLOT(handleErrorOccurred(QSerialPort::SerialPortError)));
 
     timer.setInterval(10);
     connect(&timer, SIGNAL(timeout()), this, SLOT(handleExchTimer()));
@@ -33,7 +37,9 @@ bool FpgaControl::openPort(QString portName)
         return false;
     }
     comExchanges = 0;
+    return true;
 }
+
 void FpgaControl::closePort()
 {
     serial.close();
@@ -73,6 +79,12 @@ void FpgaControl::setFpgaFreq(quint32 ff)
 {
     fpgaFreq = ff;
 }
+
+//void FpgaControl::addMotorCmd(int id, DivPosDataStr &ds)
+//{
+//    motorPosCmdData[id].append(ds);
+//}
+
 
 void FpgaControl::posReset()
 {
@@ -163,8 +175,6 @@ void FpgaControl::parseFPGAMsg(QByteArray ba)
         tempStor[n] = b/*|tempStor[n]*/;
     }
 
-
-
     //сначала обработаем концевики
     foreach (char b, tempStor){
         switch((b>>6)&0x3){
@@ -225,7 +235,7 @@ void FpgaControl::parseFPGAMsg(QByteArray ba)
 
     }
 
-    bool bAllMotorHasCmd = true;
+//    bool bAllMotorHasCmd = true;
 //    for(int i=0; i<motorCount; i++){
 //        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
 //    }
@@ -244,8 +254,10 @@ void FpgaControl::parseFPGAMsg(QByteArray ba)
 
 void FpgaControl::terminatorState(int i, bool bEna)
 {
-
-    emit(termStateChanged(i, bEna));
+    if(bTermState[i] != bEna){
+        bTermState[i] = bEna;
+        emit(termStateChanged(i, bEna));
+    }
 
     if(bEna == true){
         motorAbsolutePosCur[i] = 0;
@@ -278,7 +290,7 @@ void FpgaControl::terminatorState(int i, bool bEna)
 //        }
 
     }
-    bTermState[i] = bEna;
+
 }
 
 
@@ -506,6 +518,10 @@ void FpgaControl::allFreeToWrite()
     }
 }
 
+void FpgaControl::handleErrorOccurred(QSerialPort::SerialPortError err)
+{
+    qDebug() << "handleErrorOccurred" << err;
+}
 
 void FpgaControl::handleReadyRead()
 {
@@ -562,5 +578,93 @@ void FpgaControl::handleReadyRead()
     //ui->plainTextEdit->appendPlainText(str);
 
     //ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
-
 }
+
+
+void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id)
+{
+    float secsOnMove = msecsForMove/1000.;
+    quint32 freqOnMove = fpgaFreq*secsOnMove;
+    ds.skipStartTime = 0;
+    ds.dir = delta > 0? 1: 0;
+    if(bDirInvers)
+        ds.dir = delta > 0? 0: 1;
+
+    ds.steps =  abs(delta);
+    ds.msecsFor = msecsForMove;
+    int dt = 0;
+    if(delta == 0){
+        ds.finishAbsTimeMsec = curmSecs + 100;
+    }
+    else{
+        //float secsOnStep = msecsForMove / (ds.steps*1000.);
+        //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
+        ds.div = (quint32)(freqOnMove/ds.steps);
+        if(ds.div > 0x1fff){
+            ds.div = 0x1fff;
+            int nt = (ds.div*ds.steps*1000)/fpgaFreq;
+            dt = msecsForMove - nt;
+            if(id==0){
+                //qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
+            }
+        }
+    }
+    motorPosCmdData[id].append(ds);
+    if(dt > 0){
+        ds.steps = 0;
+        ds.msecsFor = dt;
+        motorPosCmdData[id].append(ds);
+        //qDebug("added Pt");
+    }
+}
+
+void FpgaControl::addMotorCmd(int mn, int newPosImp, int msecsForMove)
+{
+    DivPosDataStr ds;
+    ds.finishPos = newPosImp;
+    quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
+
+    if(motorPosCmdData[mn].length() == 0){
+        quint32 curPos = getMotorAbsPosImp(mn);
+        int delta = newPosImp - curPos;
+        //int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
+        //int maxImpPerDelta = mmToImp(vmaxMmsec)/10;
+        //qDebug("%d", maxImpPerDelta);
+
+        int maxImpPerDelta = 10000;
+
+        int n=1;
+        for(; abs(delta)>maxImpPerDelta; n*=2){
+            delta/=2;
+        }
+        if(n>1){
+            //qDebug("%d add %d Pts %d", mn, n, delta);
+//            ui->plainTextUDP->appendPlainText(QString("%1 add %2 Pts,delta=%3")
+//                                              .arg(mn)
+//                                              .arg(n)
+//                                              .arg(delta));
+        }
+
+        for(int i=0; i<n; i++){
+            ds.finishPos = curPos;
+            curPos += delta;
+            calcCmd(ds, delta, curmSecs, msecsForMove, mn);
+            //motorPosCmdData[mn].append(ds);
+        }
+    }
+    else{
+        int delta = newPosImp - motorPosCmdData[mn].last().finishPos;
+        //if(delta != 0)
+        //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
+        calcCmd(ds, delta, curmSecs, msecsForMove, mn);
+        //motorPosCmdData[mn].append(ds);
+    }
+}
+
+void FpgaControl::clearCmdList()
+{
+    for(int i=0; i<MOTOR_CNT; i++){
+        motorPosCmdData[i].clear();
+    }
+}
+

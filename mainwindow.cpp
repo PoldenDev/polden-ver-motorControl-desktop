@@ -250,7 +250,9 @@ void MainWindow::termState(int id, bool bEna)
         case 8: ui->term9->setChecked(bEna); break;
         case 9: ui->term10->setChecked(bEna); break;
     }
-    termCheckBox[id]->setChecked(bEna);
+    if(id < motorCount){
+        termCheckBox[id]->setChecked(bEna);
+    }
 }
 
 void MainWindow::dataProcess100msTimeOut()
@@ -499,87 +501,11 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr, quint32 udpDgRe
             ui->plainTextUDP->appendPlainText("!!! motInd error !!!");
         quint32 newPos = maxHeightImpVal * (convVal/(float)maxUDPVal);
         //qDebug() << convVal << newPos;
-        addMotorCmd(i, newPos, udpDgRecvInterval);
+        fpgaCtrl.addMotorCmd(i, newPos, udpDgRecvInterval);
     }
 }
 
-void MainWindow::calcCmd(DivPosDataStr &ds, QQueue<DivPosDataStr> &q, int delta, quint32 curmSecs, quint32 msecsForMove, int debMn)
-{
-    float secsOnMove = msecsForMove/1000.;
-    quint32 freqOnMove = fpgaCtrl.fpgaFreq*secsOnMove;
-    ds.skipStartTime = 0;
-    ds.dir = delta > 0? 1: 0;
-    if(ui->checkBoxDirInverse->isChecked())
-        ds.dir = delta > 0? 0: 1;
 
-    ds.steps =  abs(delta);
-    ds.msecsFor = msecsForMove;
-    int dt = 0;
-    if(delta == 0){
-        ds.finishAbsTimeMsec = curmSecs + 100;
-    }
-    else{
-        //float secsOnStep = msecsForMove / (ds.steps*1000.);
-        //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
-        ds.div = (quint32)(freqOnMove/ds.steps);
-        if(ds.div > 0x1fff){
-            ds.div = 0x1fff;
-            int nt = (ds.div*ds.steps*1000)/fpgaCtrl.fpgaFreq;
-            dt = msecsForMove - nt;
-            if(debMn==0){
-                //qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
-            }
-        }
-    }
-    q.append(ds);
-    if(dt > 0){
-        ds.steps = 0;
-        ds.msecsFor = dt;
-        q.append(ds);
-        //qDebug("added Pt");
-    }
-}
-
-void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
-{
-    DivPosDataStr ds;
-    ds.finishPos = newPosImp;
-    quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
-
-    if(motorPosCmdData[mn].length() == 0){
-        quint32 curPos = fpgaCtrl.getMotorAbsPosImp(mn);
-        int delta = newPosImp - curPos;
-        int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
-        int maxImpPerDelta = mmToImp(vmaxMmsec)/10;
-        //qDebug("%d", maxImpPerDelta);
-
-        int n=1;
-        for(; abs(delta)>maxImpPerDelta; n*=2){
-            delta/=2;
-        }
-        if(n>1){
-            //qDebug("%d add %d Pts %d", mn, n, delta);
-            ui->plainTextUDP->appendPlainText(QString("%1 add %2 Pts,delta=%3")
-                                              .arg(mn)
-                                              .arg(n)
-                                              .arg(delta));
-        }
-
-        for(int i=0; i<n; i++){
-            ds.finishPos = curPos;
-            curPos += delta;
-            calcCmd(ds, motorPosCmdData[mn], delta, curmSecs, msecsForMove, mn);
-            //motorPosCmdData[mn].append(ds);
-        }
-    }
-    else{
-        int delta = newPosImp - motorPosCmdData[mn].last().finishPos;
-        //if(delta != 0)
-        //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));        
-        calcCmd(ds, motorPosCmdData[mn], delta, curmSecs, msecsForMove, mn);
-        //motorPosCmdData[mn].append(ds);
-    }
-}
 
 //void MainWindow::convertPosModeToVelMode(QString cmdStr)
 //{
@@ -671,9 +597,7 @@ void MainWindow::readPendingDatagrams()
         }
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
-            for(int i=0; i<MOTOR_CNT; i++){
-                motorPosCmdData[i].clear();                
-            }
+            fpgaCtrl.clearCmdList();
             ui->plainTextUDP->appendPlainText("stop cmd");
         }
         else{
@@ -780,9 +704,7 @@ void MainWindow::on_pushButtonClear_clicked()
     ui->plainTextEdit->clear();
     ui->plainTextUDP->clear();
 
-    for(int i=0; i<MOTOR_CNT; i++){
-        motorPosCmdData[i].clear();
-    }
+    fpgaCtrl.clearCmdList();
 }
 
 void MainWindow::waitForFifoFreeFifo()
@@ -1069,7 +991,7 @@ void MainWindow::uiUpdateTimerSlot()
             if(ui->checkBoxSliderPosCtrl->isChecked()==false)
                 absPosSlider[i]->setValue(fpgaCtrl.getMotorAbsPosImp(i));
             absPosLineEdit[i]->setText(QString::number(posMm));
-            euqueLineEdit[i]->setText(QString::number(motorPosCmdData[i].length()));
+            euqueLineEdit[i]->setText(QString::number(fpgaCtrl.getCmdListLength(i)));
 
         }
         ui->lineEditComExchanges->setText(QString::number(fpgaCtrl.comExchanges));
@@ -1092,7 +1014,7 @@ void MainWindow::uiUpdateTimerSlot()
     else if(tabName == "timeStat"){
         int curMsec = QTime::currentTime().msecsSinceStartOfDay();
         for(int i=0; i<MOTOR_CNT; i++){
-            if(motorPosCmdData[i].size() != 0){
+            if(fpgaCtrl.getCmdListLength(i) != 0){
                 int shift = 0;
                 if(i==0){
                    // qDebug("%d >> %d",curMsec, motorPosCmdData[i].first().absMsec);
@@ -1211,15 +1133,15 @@ void MainWindow::on_pushButtonTest_clicked()
         for(int j=0; j<10; j++){
             if(i == 0){
                 for(int k=0; k<0; k++)
-                    addMotorCmd(i, 0, 100);
+                    fpgaCtrl.addMotorCmd(i, 0, 100);
             }
             else if(i == 1){
                 for(int k=0; k<10; k++)
-                    addMotorCmd(i, 0, 100);
+                    fpgaCtrl.addMotorCmd(i, 0, 100);
             }
             else if(i == 2){
                 for(int k=0; k<20; k++)
-                    addMotorCmd(i, 0, 100);
+                    fpgaCtrl.addMotorCmd(i, 0, 100);
             }
 
 
@@ -1227,20 +1149,20 @@ void MainWindow::on_pushButtonTest_clicked()
                 //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
                 if(i==0)qDebug() <<qAbs(qSin((k/100.)*M_PI));
                 quint32 newPos = maxHeightImpVal * qAbs(qSin((k/100.)*M_PI));
-                addMotorCmd(i, newPos, 100);
+                fpgaCtrl.addMotorCmd(i, newPos, 100);
             }
 
             if(i == 0){
                 for(int k=0; k<20; k++)
-                    addMotorCmd(i, 0, 100);
+                    fpgaCtrl.addMotorCmd(i, 0, 100);
             }
             else if(i == 1){
                 for(int k=0; k<10; k++)
-                    addMotorCmd(i, 0, 100);
+                    fpgaCtrl.addMotorCmd(i, 0, 100);
             }
             else if(i == 2){
                 for(int k=0; k<0; k++)
-                    addMotorCmd(i, 0, 100);
+                    fpgaCtrl.addMotorCmd(i, 0, 100);
             }
         }
     }
