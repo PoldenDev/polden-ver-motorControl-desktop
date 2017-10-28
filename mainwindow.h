@@ -19,7 +19,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QGroupBox>
-
+#include "fpgacontrol.h"
 
 //#include <qwt_plot_curve.h>
 
@@ -144,6 +144,7 @@ private:
     int x, xUdpRecv;
     void createPlot(QString name);
 
+    void calcCmd(DivPosDataStr &ds, QQueue<DivPosDataStr> &q, int delta, quint32 curmSecs, quint32 msecsForMove, int debMn);
     void addMotorCmd(int, int newPosImp, int msecsForStep);
     void parseCmdMultiMotorStr(QString, quint32 udpDgRecvInterval);
 
@@ -230,6 +231,7 @@ private:
 
     quint32 lastDebugShowTime;
 
+    FpgaControl fpgaCtrl;
 
 };
 

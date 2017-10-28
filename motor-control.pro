@@ -32,13 +32,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    uartthread.cpp
+    uartthread.cpp \
+    fpgacontrol.cpp
 
 HEADERS  += mainwindow.h \
     UartThread \
     UartThread \
     uartthread.h \
-    stand.h
+    stand.h \
+    fpgacontrol.h
 
 FORMS    += mainwindow.ui
 

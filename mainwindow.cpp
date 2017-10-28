@@ -46,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
     paletteRed(NULL),
     paletteGreen(NULL),
     lastUdpDatagrammRecvd(0),
-    lastDebugShowTime(0)
+    lastDebugShowTime(0),
+    fpgaCtrl(this)
 {
     ui->setupUi(this);
 
@@ -837,7 +838,7 @@ void MainWindow::freeToWrite(int i)
         int curMsec = QTime::currentTime().msecsSinceStartOfDay();
         if(ds.steps > 0){
             if(i == 0){
-                qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div ;
+                //qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div ;
                 lastDebugShowTime = curMsec;
             }
             sendDivPos(i, ds);
@@ -847,7 +848,7 @@ void MainWindow::freeToWrite(int i)
         else{
             if(ds.skipStartTime == 0){
                 if(i == 0){
-                    qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
+                    //qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
                     lastDebugShowTime = curMsec;
                 }
                 ds.skipStartTime = curMsec;
@@ -972,14 +973,49 @@ void MainWindow::parseCmdMultiMotorStr(QString cmdMultiMotorStr, quint32 udpDgRe
     }
 }
 
+void MainWindow::calcCmd(DivPosDataStr &ds, QQueue<DivPosDataStr> &q, int delta, quint32 curmSecs, quint32 msecsForMove, int debMn)
+{
+    float secsOnMove = msecsForMove/1000.;
+    quint32 freqOnMove = FPGA_FREQ*secsOnMove;
+    ds.skipStartTime = 0;
+    ds.dir = delta > 0? 1: 0;
+    if(ui->checkBoxDirInverse->isChecked())
+        ds.dir = delta > 0? 0: 1;
+
+    ds.steps =  abs(delta);
+    ds.msecsFor = msecsForMove;
+    int dt = 0;
+    if(delta == 0){
+        ds.finishAbsTimeMsec = curmSecs + 100;
+    }
+    else{
+        //float secsOnStep = msecsForMove / (ds.steps*1000.);
+        //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
+        ds.div = (quint32)(freqOnMove/ds.steps);
+        if(ds.div > 0x1fff){
+            ds.div = 0x1fff;
+            int nt = (ds.div*ds.steps*1000)/FPGA_FREQ;
+            dt = msecsForMove - nt;
+            if(debMn==0){
+                //qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
+            }
+        }
+    }
+    q.append(ds);
+    if(dt > 0){
+        ds.steps = 0;
+        ds.msecsFor = dt;
+        q.append(ds);
+        //qDebug("added Pt");
+    }
+}
 
 void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
 {
     DivPosDataStr ds;
     ds.finishPos = newPosImp;
     quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
-    float secsOnMove = msecsForMove/1000.;
-    quint32 freqOnMove = FPGA_FREQ*secsOnMove;
+
     if(motorPosCmdData[mn].length() == 0){
         int delta = newPosImp - getMotorAbsPosImp(mn);
         int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
@@ -1000,57 +1036,19 @@ void MainWindow::addMotorCmd(int mn, int newPosImp, int msecsForMove)
         quint32 pos = getMotorAbsPosImp(mn);
 
         for(int i=0; i<n; i++){
-            //ds.absMsec += 100;
             ds.finishPos = pos;
-
             pos += delta;
-            ds.dir = delta > 0? 1: 0;
-            if(ui->checkBoxDirInverse->isChecked())
-                ds.dir = delta > 0? 0: 1;
-
-            ds.steps =  abs(delta);
-            ds.msecsFor = msecsForMove;
-
-            if(delta == 0){
-                ds.finishAbsTimeMsec = curmSecs + 100;
-            }
-            else{
-                ds.div = (quint32)(freqOnMove/ds.steps) ;
-                if(ds.div > 0x1fff){
-                    //qDebug("%d maxSpeed err %x", mn, ds.div);
-                    ds.div = 0x1fff;
-                }
-            }
-            motorPosCmdData[mn].append(ds);
+            calcCmd(ds, motorPosCmdData[mn], delta, curmSecs, msecsForMove, mn);
+            //motorPosCmdData[mn].append(ds);
         }
-
     }
     else{
         int delta = newPosImp - motorPosCmdData[mn].last().finishPos;
-        ds.steps =  abs(delta);
-        ds.dir = delta > 0? 1: 0;
-        if(ui->checkBoxDirInverse->isChecked())
-            ds.dir = delta > 0? 0: 1;
-
         //if(delta != 0)
-        //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
-        ds.msecsFor = msecsForMove;
-        ds.skipStartTime = 0;
-        if(delta == 0){
-            ds.finishAbsTimeMsec = curmSecs + 100;
-        }
-        else{
-            //float secsOnStep = msecsForMove / (ds.steps*1000.);
-            //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
-            ds.div = (quint32)(freqOnMove/ds.steps);
-            if(ds.div > 0x1fff){
-                qDebug("%d maxSpeed err %x", mn, ds.div);
-                ds.div = 0x1fff;
-            }
-        }
-        motorPosCmdData[mn].append(ds);
+        //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));        
+        calcCmd(ds, motorPosCmdData[mn], delta, curmSecs, msecsForMove, mn);
+        //motorPosCmdData[mn].append(ds);
     }
-
 }
 
 //void MainWindow::convertPosModeToVelMode(QString cmdStr)
