@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
     ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
 
+    fpgaCtrl.setDirInverse(ui->checkBoxDirInverse->isChecked());
     ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
     ui->lineEdit_MaxHeightImp->setText(settings.value("maxHeightImp", 200000).toString());
     ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec", 50).toString());
@@ -799,47 +800,44 @@ void MainWindow::on_pushButtonInitiate_clicked()
 
 void MainWindow::on_pushMoveUp_clicked()
 {
-//    DivPosDataStr ds;
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(fpgaCtrl.getCmdListLength(i) == 0){
+            int pos = fpgaCtrl.getMotorAbsPosImp(i);
 
-//    for(int i=0; i<motorCount; i++){
-//        int startPos =0;
-
-//        if(motorPosCmdData[i].length() == 0)
-//            startPos = getMotorAbsPosImp(i);
-//        else
-//            startPos = motorPosCmdData[i].last().pos;
-
-//        ds.pos = startPos+400;
-//        for(int k=0; k<5; k++){
-//            motorPosCmdData[i] << ds;
-//             ds.pos += 400;
-//        }
-////        ds.dir = 0;
-////        //for(int k=0; k<30; k++)
-////        //    motorPosCmdData[i] << ds;
-//    }
-
+            pos +=400;
+            for(int k=0; k<5; k++){
+                fpgaCtrl.addMotorCmd(i, pos, 100);
+                pos +=400;
+            }
+        }
+        else{
+            QString msg = QString("m %1 queue not empty").arg(i);
+            ui->plainTextEdit->appendPlainText(msg);
+        }
+    }
 }
 
 void MainWindow::on_pushMoveDown_clicked()
 {
-//    DivPosDataStr ds;
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(fpgaCtrl.getCmdListLength(i) == 0){
+            int pos = fpgaCtrl.getMotorAbsPosImp(i);
 
-//    for(int i=0; i<10; i++){
-//        int startPos =0;
-
-//        if(motorPosCmdData[i].length() == 0)
-//            startPos = getMotorAbsPosImp(i);
-//        else
-//            startPos = motorPosCmdData[i].last().pos;
-//        ds.pos = startPos-400;
-//        for(int k=0; k<5; k++){
-//            motorPosCmdData[i] << ds;
-//            ds.pos -= 400;
-//        }
-//        //for(int k=0; k<30; k++)
-//        //    motorPosCmdData[i] << ds;
-//    }
+            pos -=400;
+            for(int k=0; k<5; k++){
+                fpgaCtrl.addMotorCmd(i, pos, 100);
+                pos -=400;
+//                if(pos <=0){
+//                    pos = 0;
+//                    break;
+//                }
+            }
+        }
+        else{
+            QString msg = QString("m %1 queue not empty").arg(i);
+            ui->plainTextEdit->appendPlainText(msg);
+        }
+    }
 }
 
 
@@ -1045,25 +1043,29 @@ void MainWindow::on_pushButtonUdpOpenClose_clicked()
 
 void MainWindow::on_pushButtonGoZero_clicked()
 {
-//    DivPosDataStr ds;
-//    int startPos =0;
-//    for(int mi=0; mi<MOTOR_CNT; mi++){
-//        if(motorPosCmdData[mi].length() == 0)
-//            startPos = getMotorAbsPosImp(mi);
-//        else
-//            startPos = motorPosCmdData[mi].last().pos;
+    DivPosDataStr ds;
+    int pos =0;
+    for(int mi=0; mi<MOTOR_CNT; mi++){
+        if(fpgaCtrl.getCmdListLength(mi) == 0){
+            pos = fpgaCtrl.getMotorAbsPosImp(mi);
+        //    else
+        //        pos = motorPosCmdData[mi].last().pos;
 
-//        int iters = startPos/400;
-//        ds.pos = startPos;
-//        for(int i=0; i<iters; i++){
-//            ds.pos -=400;
-//            motorPosCmdData[mi] << ds;
-//        }
-//        if(ds.pos > 0){
-//            ds.pos = 0;
-//            motorPosCmdData[mi] << ds;
-//        }
-//    }
+            int iters = pos/400;
+            for(int i=0; i<iters; i++){
+                pos -=400;
+                fpgaCtrl.addMotorCmd(mi, pos, 100);
+            }
+            if(pos > 0){
+                pos = 0;
+                fpgaCtrl.addMotorCmd(mi, pos, 100);
+            }
+        }
+        else{
+            QString msg = QString("m %1 queue not empty").arg(mi);
+            ui->plainTextEdit->appendPlainText(msg);
+        }
+    }
 
 
 }
@@ -1555,3 +1557,8 @@ quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
 }
 
 
+
+void MainWindow::on_checkBoxDirInverse_clicked()
+{
+    fpgaCtrl.setDirInverse(ui->checkBoxDirInverse->isChecked());
+}

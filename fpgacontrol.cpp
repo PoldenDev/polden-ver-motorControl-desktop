@@ -397,7 +397,12 @@ void FpgaControl::sendDivPos(int mi, DivPosDataStr &ds)
     //if(serial.flush() == false){
     //qDebug("dataFlushed");
     //}
-    motorAbsolutePosCur[mi] += ds.dir? +ds.steps: -ds.steps;
+
+    if(bDirInvers)
+        motorAbsolutePosCur[mi] += ds.dir? -ds.steps: +ds.steps;
+    else
+        motorAbsolutePosCur[mi] += ds.dir? +ds.steps: -ds.steps;
+
     if( motorAbsolutePosCur[mi] < 0){
         //qDebug("mi %d motorAbsolutePosCur less 0 =", mi, motorAbsolutePosCur[mi]);
     }

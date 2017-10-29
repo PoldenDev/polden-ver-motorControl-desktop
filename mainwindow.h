@@ -84,6 +84,8 @@ private slots:
     void fpgaCtrlErrorOccured(QString);
 
 
+    void on_checkBoxDirInverse_clicked();
+
 private:
     //quint32 motorCount;
 
