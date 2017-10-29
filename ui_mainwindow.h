@@ -144,6 +144,7 @@ public:
     QLabel *label;
     QLabel *label_2;
     QLineEdit *lineEditUDPMaxVal;
+    QCheckBox *checkBoxPrintUDPData;
     QGroupBox *groupBox_8;
     QLabel *label_13;
     QLabel *labelCompileTime;
@@ -181,7 +182,6 @@ public:
     QPushButton *pushBUttonToIdle;
     QPushButton *pushButtonClear;
     QPushButton *pushButtonGotoPEriodState;
-    QCheckBox *checkBoxDebugUDPPrint;
     QCheckBox *checkBoxDebugComPrint;
     QCheckBox *checkBoxCycle;
     QWidget *widget;
@@ -774,7 +774,7 @@ public:
         checkBoxDirInverse->setLayoutDirection(Qt::LeftToRight);
         groupBox_7 = new QGroupBox(tabSettings);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
-        groupBox_7->setGeometry(QRect(20, 200, 141, 101));
+        groupBox_7->setGeometry(QRect(20, 200, 141, 111));
         lineEditMinVal = new QLineEdit(groupBox_7);
         lineEditMinVal->setObjectName(QStringLiteral("lineEditMinVal"));
         lineEditMinVal->setGeometry(QRect(50, 20, 71, 20));
@@ -784,11 +784,14 @@ public:
         label->setGeometry(QRect(20, 20, 20, 23));
         label_2 = new QLabel(groupBox_7);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(20, 60, 20, 23));
+        label_2->setGeometry(QRect(20, 50, 20, 21));
         lineEditUDPMaxVal = new QLineEdit(groupBox_7);
         lineEditUDPMaxVal->setObjectName(QStringLiteral("lineEditUDPMaxVal"));
-        lineEditUDPMaxVal->setGeometry(QRect(50, 60, 71, 20));
+        lineEditUDPMaxVal->setGeometry(QRect(50, 51, 71, 20));
         lineEditUDPMaxVal->setAlignment(Qt::AlignCenter);
+        checkBoxPrintUDPData = new QCheckBox(groupBox_7);
+        checkBoxPrintUDPData->setObjectName(QStringLiteral("checkBoxPrintUDPData"));
+        checkBoxPrintUDPData->setGeometry(QRect(20, 80, 61, 20));
         groupBox_8 = new QGroupBox(tabSettings);
         groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
         groupBox_8->setGeometry(QRect(240, 190, 151, 51));
@@ -971,11 +974,6 @@ public:
 
         horizontalLayout_20->addWidget(pushButtonGotoPEriodState);
 
-        checkBoxDebugUDPPrint = new QCheckBox(widget_29);
-        checkBoxDebugUDPPrint->setObjectName(QStringLiteral("checkBoxDebugUDPPrint"));
-
-        horizontalLayout_20->addWidget(checkBoxDebugUDPPrint);
-
         checkBoxDebugComPrint = new QCheckBox(widget_29);
         checkBoxDebugComPrint->setObjectName(QStringLiteral("checkBoxDebugComPrint"));
 
@@ -1035,7 +1033,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1085,6 +1083,7 @@ public:
         label_2->setText(QApplication::translate("MainWindow", "max", Q_NULLPTR));
         lineEditUDPMaxVal->setInputMask(QString());
         lineEditUDPMaxVal->setText(QApplication::translate("MainWindow", "1000", Q_NULLPTR));
+        checkBoxPrintUDPData->setText(QApplication::translate("MainWindow", "print", Q_NULLPTR));
         groupBox_8->setTitle(QApplication::translate("MainWindow", "About", Q_NULLPTR));
         label_13->setText(QApplication::translate("MainWindow", "compile time:", Q_NULLPTR));
         labelCompileTime->setText(QApplication::translate("MainWindow", "TextLabel", Q_NULLPTR));
@@ -1111,7 +1110,6 @@ public:
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         pushButtonClear->setText(QApplication::translate("MainWindow", "clear queue", Q_NULLPTR));
         pushButtonGotoPEriodState->setText(QApplication::translate("MainWindow", "to Period", Q_NULLPTR));
-        checkBoxDebugUDPPrint->setText(QApplication::translate("MainWindow", "debugUdpPrint", Q_NULLPTR));
         checkBoxDebugComPrint->setText(QApplication::translate("MainWindow", "debugComPrint", Q_NULLPTR));
         checkBoxCycle->setText(QApplication::translate("MainWindow", "cycle", Q_NULLPTR));
     } // retranslateUi

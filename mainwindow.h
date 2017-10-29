@@ -39,7 +39,7 @@ public:
 private slots:
     void on_pushButtonComOpen_clicked();
 
-    void readPendingDatagrams();
+    void handleReadPendingDatagrams();
     void stateChanged(QAbstractSocket::SocketState socketState);
 
     void on_pushButton_refreshCom_clicked();

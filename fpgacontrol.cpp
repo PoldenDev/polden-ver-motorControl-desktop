@@ -315,19 +315,19 @@ void FpgaControl::freeToWrite(int i)
                 lastDebugShowTime = curMsec;
             }
             sendDivPos(i, ds);
-            //motorPosCmdData[i].removeFirst();
+            motorPosCmdData[i].removeFirst();
             //bFreeToWrite[i] = false;
         }
         else{
             if(ds.startTime == 0){
+                ds.startTime = curMsec;
                 if(i == 0){
                     //qDebug() << (curMsec&0xffff) << ((curMsec-lastDebugShowTime)&0xffff) << ds.msecsFor << "s" << ds.steps << "d" << ds.div << "ws!";
                     lastDebugShowTime = curMsec;
-                }
-
+                }                
             }
         }
-        ds.startTime = curMsec;
+
     }
         break;
     }
@@ -602,6 +602,7 @@ void FpgaControl::handleReadyRead()
                     motorPosCmdData[i].removeFirst();
                 }
                 else{
+                    isBufFree[i] = false;
                     if(i == 0){
                         if(isBufFree[i]){
                             int nt = (ds.div*ds.steps*1000)/fpgaFreq;
@@ -609,7 +610,6 @@ void FpgaControl::handleReadyRead()
                                    << "calced" << nt;
                         }
                     }
-                    isBufFree[i] = false;
                 }
             }
         }
@@ -727,16 +727,16 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
             int nt = (ds.div*ds.steps*1000)/fpgaFreq;
             dt = msecsForMove - nt;
             if(id==0){
-                //qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
+                qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
             }
         }
     }
     motorPosCmdData[id].append(ds);
     if(dt > 0){
-//        ds.steps = 0;
-//        ds.msecsFor = dt;
-//        motorPosCmdData[id].append(ds);
-//        //qDebug("added Pt");
+        ds.steps = 0;
+        ds.msecsFor = dt;
+        motorPosCmdData[id].append(ds);
+        if(id==0) qDebug("added Pt");
     }
 }
 

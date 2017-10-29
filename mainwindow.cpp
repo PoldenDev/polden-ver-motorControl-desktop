@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
     fpgaCtrl.setMotorCount(motorCount);
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
+    ui->checkBoxPrintUDPData->setChecked(settings.value("printUdpData", false).toBool());
+
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
     ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
 
@@ -236,6 +238,8 @@ MainWindow::~MainWindow()
     settings.setValue("minPosValue", ui->lineEditMinVal->text().toInt());
     settings.setValue("dirInverse", ui->checkBoxDirInverse->isChecked());
     settings.setValue("vmax_mmsec", ui->lineEdit_vmax_mmsec->text().toInt());
+
+    settings.setValue("printUdpData", ui->checkBoxPrintUDPData->isChecked());
 
     delete ui;
 }
@@ -501,7 +505,7 @@ void MainWindow::stateChanged(QAbstractSocket::SocketState socketState)
 
 }
 
-void MainWindow::readPendingDatagrams()
+void MainWindow::handleReadPendingDatagrams()
 {
     QTime rpdEst;
     rpdEst.start();
@@ -559,13 +563,15 @@ void MainWindow::readPendingDatagrams()
                 }
             }
 
-            QString showStr = QString("%1 %2 (%3)").arg(QTime::currentTime().toString("mm:ss:zzz"))
-                                                    .arg(dataStr).arg(udpDgRecvInterval);
-            int indOfCrLn = showStr.lastIndexOf("\r\n");
-            if(indOfCrLn != -1){
-                showStr.remove(indOfCrLn, 2);
+            if(ui->checkBoxPrintUDPData->isChecked()){
+                QString showStr = QString("%1 %2 (%3)").arg(QTime::currentTime().toString("mm:ss:zzz"))
+                                                        .arg(dataStr).arg(udpDgRecvInterval);
+                int indOfCrLn = showStr.lastIndexOf("\r\n");
+                if(indOfCrLn != -1){
+                    showStr.remove(indOfCrLn, 2);
+                }
+                ui->plainTextUDP->appendPlainText(showStr);
             }
-            ui->plainTextUDP->appendPlainText(showStr);
 
             if(udpDgRecvInterval > 400) udpDgRecvInterval=400;
 
@@ -1004,7 +1010,7 @@ void MainWindow::udpServerOpen()
         }
 
         connect(udpSocket, SIGNAL(readyRead()),
-                this, SLOT(readPendingDatagrams()));
+                this, SLOT(handleReadPendingDatagrams()));
         udpConnectionTime.start();
         ui->pushButtonUdpOpenClose->setText("UDP Close");
     }
