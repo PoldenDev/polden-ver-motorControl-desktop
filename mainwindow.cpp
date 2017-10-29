@@ -533,16 +533,19 @@ void MainWindow::handleReadPendingDatagrams()
 //                dataProcess100msTimer.start();
 //            }
             //qDebug("start cmd");
-            ui->plainTextUDP->appendPlainText("start cmd");
+            //if(ui->checkBoxPrintUDPData->isChecked())
+                ui->plainTextUDP->appendPlainText("start cmd");
         }
         else if(dataStr.compare("init\r\n") == 0){
             on_pushButtonInitiate_clicked();
-            ui->plainTextUDP->appendPlainText("init cmd");
+            //if(ui->checkBoxPrintUDPData->isChecked())
+                ui->plainTextUDP->appendPlainText("init cmd");
         }
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
             fpgaCtrl.clearCmdList();
-            ui->plainTextUDP->appendPlainText("stop cmd");
+            //if(ui->checkBoxPrintUDPData->isChecked())
+                ui->plainTextUDP->appendPlainText("stop cmd");
         }
         else{
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
