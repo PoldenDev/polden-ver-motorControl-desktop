@@ -62,6 +62,10 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_5;
     QLineEdit *lineEditBytesOnIter;
+    QWidget *widget_24;
+    QHBoxLayout *horizontalLayout_15;
+    QLabel *label_14;
+    QLineEdit *lineEditRecvInterval;
     QGroupBox *groupBoxMain;
     QGroupBox *groupBox_4;
     QVBoxLayout *verticalLayout_3;
@@ -242,7 +246,7 @@ public:
         tabMainStat->setObjectName(QStringLiteral("tabMainStat"));
         groupBox_2 = new QGroupBox(tabMainStat);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(600, 30, 153, 111));
+        groupBox_2->setGeometry(QRect(600, 30, 153, 121));
         verticalLayout_15 = new QVBoxLayout(groupBox_2);
         verticalLayout_15->setSpacing(6);
         verticalLayout_15->setContentsMargins(11, 11, 11, 11);
@@ -307,6 +311,28 @@ public:
 
 
         verticalLayout_15->addWidget(widget_23);
+
+        widget_24 = new QWidget(groupBox_2);
+        widget_24->setObjectName(QStringLiteral("widget_24"));
+        horizontalLayout_15 = new QHBoxLayout(widget_24);
+        horizontalLayout_15->setSpacing(6);
+        horizontalLayout_15->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_15->setObjectName(QStringLiteral("horizontalLayout_15"));
+        horizontalLayout_15->setContentsMargins(0, 0, 0, 0);
+        label_14 = new QLabel(widget_24);
+        label_14->setObjectName(QStringLiteral("label_14"));
+
+        horizontalLayout_15->addWidget(label_14);
+
+        lineEditRecvInterval = new QLineEdit(widget_24);
+        lineEditRecvInterval->setObjectName(QStringLiteral("lineEditRecvInterval"));
+        lineEditRecvInterval->setAlignment(Qt::AlignCenter);
+        lineEditRecvInterval->setReadOnly(true);
+
+        horizontalLayout_15->addWidget(lineEditRecvInterval);
+
+
+        verticalLayout_15->addWidget(widget_24);
 
         groupBoxMain = new QGroupBox(tabMainStat);
         groupBoxMain->setObjectName(QStringLiteral("groupBoxMain"));
@@ -1024,6 +1050,7 @@ public:
         groupBox_2->setTitle(QApplication::translate("MainWindow", "USB", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "\320\237\320\260\320\272\320\265\321\202\320\276\320\262", Q_NULLPTR));
         label_5->setText(QApplication::translate("MainWindow", "bytesOnIter", Q_NULLPTR));
+        label_14->setText(QApplication::translate("MainWindow", "recvInterval", Q_NULLPTR));
         groupBoxMain->setTitle(QApplication::translate("MainWindow", "\320\237\320\276 \320\277\321\200\320\270\320\262\320\276\320\264\320\260\320\274", Q_NULLPTR));
         groupBox_4->setTitle(QApplication::translate("MainWindow", "UDP", Q_NULLPTR));
         label_7->setText(QApplication::translate("MainWindow", "state", Q_NULLPTR));

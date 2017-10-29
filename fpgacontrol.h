@@ -3,6 +3,8 @@
 #include <QTimer>
 #include <QSerialPort>
 #include <QQueue>
+#include <QTime>
+#include <QBitArray>
 
 #include "stand.h"
 
@@ -32,7 +34,9 @@ public:
     TMotorState mtState[MOTOR_CNT];
     quint32 fpgaFreq;
     quint32 comExchanges;
+
     quint32 bytesOnIter;
+    qint32 recvInterval;
 //    void addMotorCmd(int, DivPosDataStr&);
 
     void clearCmdList();
@@ -40,15 +44,18 @@ public:
     quint32 getCmdListLength(int id){return motorPosCmdData[id].length();}
 
 private:
-    QTimer timer;
     int motorCount;
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
-    bool bFreeToWrite[MOTOR_CNT];
+    //bool bFreeToWrite[MOTOR_CNT];
     qint32 motorAbsolutePosCur[MOTOR_CNT];
-    bool bTermState[MOTOR_CNT];
+    QBitArray bTermState;
     //quint32 lastCtrlTimeMsecs[MOTOR_CNT];
     quint32 lastDebugShowTime;
     bool bDirInvers;
+
+    QTime exchInterval;
+    QTimer timer, exchTimeoutTimer;
+
 
     void parseFPGAMsg(QByteArray ba);
     void freeToWrite(int i);
@@ -57,13 +64,18 @@ private:
     void sendDivPos(int mi, DivPosDataStr &ds);
     void calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id);
 
+//    bool isBufferFree(qint32, int);
+//    void setBufferNotFree(qint32&, int);
+//    bool isTermEna(qint32, int);
+
 signals:
     void termStateChanged(int, bool);
+    void errorOccured(QString);
 
 private slots:
-    void handleExchTimer();
     void handleReadyRead();
     void handleSerialDataWritten(qint64 bytes);
-    void handleErrorOccurred(QSerialPort::SerialPortError);
+    void handleComPortErrorOccurred(QSerialPort::SerialPortError);
+    void handleExchTimeout();
 };
 

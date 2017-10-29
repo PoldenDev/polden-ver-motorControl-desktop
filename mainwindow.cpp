@@ -150,7 +150,9 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_refreshCom_clicked();
 
     connect(&fpgaCtrl, SIGNAL(termStateChanged(int,bool)),
-            this, SLOT(termState(int, bool)));
+            this, SLOT(fpgaCtrlTermState(int, bool)));
+    connect(&fpgaCtrl, SIGNAL(errorOccured(QString)),
+            this, SLOT(fpgaCtrlErrorOccured(QString)));
 
 }
 
@@ -238,7 +240,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::termState(int id, bool bEna)
+void MainWindow::fpgaCtrlTermState(int id, bool bEna)
 {
     switch(id){
         case 0: ui->term1->setChecked(bEna); break;
@@ -255,6 +257,10 @@ void MainWindow::termState(int id, bool bEna)
     if(id < termCheckBoxList.length()){
         termCheckBoxList[id]->setChecked(bEna);
     }
+}
+void MainWindow::fpgaCtrlErrorOccured(QString errStr)
+{
+    ui->plainTextEdit->appendPlainText(errStr);
 }
 
 void MainWindow::dataProcess100msTimeOut()
@@ -940,6 +946,7 @@ void MainWindow::uiUpdateTimerSlot()
 
         ui->lineEditBytesOnIter->setText(QString::number(fpgaCtrl.bytesOnIter));
 
+        ui->lineEditRecvInterval->setText(QString::number(fpgaCtrl.recvInterval));
         ui->lineEditDataGramCnt->setText(QString::number(dataGramCnt));
 
 

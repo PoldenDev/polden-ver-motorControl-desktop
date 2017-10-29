@@ -1,6 +1,7 @@
 #include "fpgacontrol.h"
 #include <QDebug>
 #include <QTime>
+#include <QBitArray>
 
 FpgaControl::FpgaControl(QObject *parent) :
     QObject(parent),
@@ -8,23 +9,29 @@ FpgaControl::FpgaControl(QObject *parent) :
     bytesOnIter(0),
     comExchanges(0),
     fpgaFreq(FPGA_FREQ_25),
-    bDirInvers(false)
+    bDirInvers(false),
+    recvInterval(-1),
+    bTermState(MOTOR_CNT)
 {
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
         mtState[i] = MT_IDLE;
-        bFreeToWrite[i] = false;
+        //bFreeToWrite[i] = false;
         motorAbsolutePosCur[i] = 0;
         //lastCtrlTimeMsecs[i] = 0;
     }
 
     connect(&serial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
-            this, SLOT(handleErrorOccurred(QSerialPort::SerialPortError)));
+            this, SLOT(handleComPortErrorOccurred(QSerialPort::SerialPortError)));
+    connect(&serial, SIGNAL(readyRead()), this, SLOT(handleReadyRead()));
 
-    timer.setInterval(10);
-    connect(&timer, SIGNAL(timeout()), this, SLOT(handleExchTimer()));
-    timer.start();
-
+    //timer.setInterval(10);
+    //connect(&timer, SIGNAL(timeout()), this, SLOT(handleExchTimer()));
+    //timer.start();
+    connect(&exchTimeoutTimer, SIGNAL(timeout()),
+            this, SLOT(handleExchTimeout()));
+    exchTimeoutTimer.setSingleShot(false);
+    exchTimeoutTimer.setInterval(100);
 }
 
 bool FpgaControl::openPort(QString portName)
@@ -37,11 +44,15 @@ bool FpgaControl::openPort(QString portName)
         return false;
     }
     comExchanges = 0;
+    char c = 0xff;
+    serial.write(&c, 1);
+    exchTimeoutTimer.start();
     return true;
 }
 
 void FpgaControl::closePort()
 {
+    exchTimeoutTimer.stop();
     serial.close();
 }
 
@@ -103,158 +114,110 @@ void FpgaControl::posReset()
     }
 }
 
-void FpgaControl::handleExchTimer()
-{
-    //    if(serial.isOpen() && (bFreeToWrite[curMotorSendIdx] == true)){
-    //        //QString wrStr = motorPosCmdStrings.dequeue();
-    //        //serial.write(wrStr.toLatin1());
-    //        freeToWrite(curMotorSendIdx);
+//bool FpgaControl::isBufferFree(QByteArray &dt, int id)
+//{
+//    foreach (char b, dt) {
+//        int n = (b>>6)&0x3;
+//        if((n==0)||(n==1)){
 
-    //    }
-    //    curMotorSendIdx++;
-    //    if(curMotorSendIdx >= MOTOR_CNT)
-    //        curMotorSendIdx = 0;
+//        }
+//    }
+//}
 
+//void FpgaControl::setBufferNotFree(QByteArray &d, int id)
+//{
 
-    if(serial.isOpen() == false)
-        return;
-    //qDebug("%d sendOnTimer", QTime::currentTime().msecsSinceStartOfDay()&0xfff );
+//}
 
-    QTime tt, t2, t3;
-    tt.start();
-    t2.start();
-    t3.start();
+//bool FpgaControl::isTermEna(QByteArray &, int id)
+//{
 
-    //тут подождём
-    int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-    for(int i=0; i<motorCount; i++){
-        if(motorPosCmdData[i].isEmpty())
-            continue;
-        DivPosDataStr &ds = motorPosCmdData[i].first();
-        if(ds.steps == 0){
-            if(ds.startTime != 0 ){
-                //if(i == 0) qDebug() << (curMsec&0xffff) << "external waiting" << ds.msecsFor;
-                //if(curMsec >= ds.finishAbsTimeMsec){
-                if((curMsec - ds.startTime) >= ds.msecsFor ){
-                    motorPosCmdData[i].removeFirst();
-                }
-                else{
-                    if(i == 0) qDebug()<<(curMsec&0xffff) << "waiting" << ds.msecsFor;
-                }
-            }
-        }
-    }
-    qDebug("%d data recvd 1 in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
-           t2.elapsed());
-    char c = 0xff;
-    serial.write(&c, 1);
-
-    int bytesToRecv = 4;
-    char dArr[4];
-    while(bytesToRecv>0){
-        //qDebug("try to recv %d bytes", bytesToRecv);
-        if(serial.waitForReadyRead(50) ==false){
-            //qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
-            //ui->plainTextUDP->appendPlainText(QString("dataRecvTimeout on recvd %1 bytes").arg(4-bytesToRecv));
-            return;
-        }
-        int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
-        bytesToRecv -= dRecvd;
-    }
-    qDebug("%d data recvd 2 in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
-           t3.elapsed());
-
-    comExchanges++;
-    parseFPGAMsg(QByteArray(dArr, 4));
-    qDebug("%d data recvd 3 in %d ms", QTime::currentTime().msecsSinceStartOfDay()&0xfff ,
-           tt.elapsed());
-}
+//}
 
 
 void FpgaControl::parseFPGAMsg(QByteArray ba)
 {
-    bytesOnIter = ba.length();
-    //qDebug("enter bytesRecv %d", str.length());
-    QMap<char, char> tempStor;
-    foreach (char b, ba) {
-        char n = (b>>6)&0x3;
-//        if(tempStor.contains(n))
-//            qDebug("in this pack already contains!");
-        tempStor[n] = b/*|tempStor[n]*/;
-    }
+//    //qDebug("enter bytesRecv %d", str.length());
+//    QMap<char, char> tempStor;
+//    foreach (char b, ba) {
+//        char n = (b>>6)&0x3;
+////        if(tempStor.contains(n))
+////            qDebug("in this pack already contains!");
+//        tempStor[n] = b/*|tempStor[n]*/;
+//    }
 
-    //сначала обработаем концевики
-    foreach (char b, tempStor){
-        switch((b>>6)&0x3){
-        case 0x2:
-            //qDebug("%02x 1 %02x", b, (b&0x1f));
-            for(int i=0; i<5; i++){
-                terminatorState(i, b&(1<<i));
-            }
-
-            break;
-        case 0x3:
-            //qDebug("%02x 2 %02x", b, (b&0x1f));
-            for(int i=0; i<5; i++){
-                terminatorState(5+i, b&(1<<i));
-            }
-            break;
-        }
-    }
-
-     //затем обработаем буферы
-    foreach (char b, tempStor){
-        switch((b>>6)&0x3){
-        case 0x0:
-            for(int i=0; i<5; i++){
-                bFreeToWrite[i] = ((b&(1<<i)) == 0);
-                if((b&(1<<i)) == 0){
-                    freeToWrite(i);
-                }
-            }
-            break;
-        case 0x1:
-            for(int i=0; i<5; i++){
-                bFreeToWrite[5+i] = ((b&(1<<i)) == 0);
-                if((b&(1<<i)) == 0){
-                    freeToWrite(5+i);
-                }
-            }
-            break;
-        }
-    }
-
-    int size = motorPosCmdData[0].length();
-
-//    for(int i=0; i<MOTOR_CNT; i++){
-//        if(size != motorPosCmdData[i].length()){
-//            ui->plainTextUDP->appendPlainText("size not equal");
-//            for(int k=0; k<MOTOR_CNT; k++){
-//                ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
+//    //сначала обработаем концевики
+//    foreach (char b, tempStor){
+//        switch((b>>6)&0x3){
+//        case 0x2:
+//            //qDebug("%02x 1 %02x", b, (b&0x1f));
+//            for(int i=0; i<5; i++){
+//                terminatorState(i, b&(1<<i));
 //            }
 
+//            break;
+//        case 0x3:
+//            //qDebug("%02x 2 %02x", b, (b&0x1f));
+//            for(int i=0; i<5; i++){
+//                terminatorState(5+i, b&(1<<i));
+//            }
+//            break;
 //        }
+//    }
+
+//     //затем обработаем буферы
+//    foreach (char b, tempStor){
+//        switch((b>>6)&0x3){
+//        case 0x0:
+//            for(int i=0; i<5; i++){
+//                bFreeToWrite[i] = ((b&(1<<i)) == 0);
+//                if((b&(1<<i)) == 0){
+//                    freeToWrite(i);
+//                }
+//            }
+//            break;
+//        case 0x1:
+//            for(int i=0; i<5; i++){
+//                bFreeToWrite[5+i] = ((b&(1<<i)) == 0);
+//                if((b&(1<<i)) == 0){
+//                    freeToWrite(5+i);
+//                }
+//            }
+//            break;
+//        }
+//    }
+
+//    int size = motorPosCmdData[0].length();
+
+////    for(int i=0; i<MOTOR_CNT; i++){
+////        if(size != motorPosCmdData[i].length()){
+////            ui->plainTextUDP->appendPlainText("size not equal");
+////            for(int k=0; k<MOTOR_CNT; k++){
+////                ui->plainTextUDP->appendPlainText(QString("%1").arg(motorPosCmdData[k].length()));
+////            }
+
+////        }
+
+////    }
+
+//    bool bAllFree = true;
+//    for(int i=0; i<MOTOR_CNT; i++){
+//        bAllFree = (bAllFree&&bFreeToWrite[i]);
 
 //    }
 
-    bool bAllFree = true;
-    for(int i=0; i<MOTOR_CNT; i++){
-        bAllFree = (bAllFree&&bFreeToWrite[i]);
-
-    }
-
-//    bool bAllMotorHasCmd = true;
-//    for(int i=0; i<motorCount; i++){
-//        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
-//    }
-//    bAllMotorHasCmd = true; // ***
-//    if((bAllFree == true) && bAllMotorHasCmd){
-//        allFreeToWrite();
-//    }
-//    else{
-//        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
-//        qDebug() << (curMsec&0xffff) << "not all free";
-//    }
+////    bool bAllMotorHasCmd = true;
+////    for(int i=0; i<motorCount; i++){
+////        bAllMotorHasCmd &= (motorPosCmdData[i].isEmpty() == false);
+////    }
+////    bAllMotorHasCmd = true; // ***
+////    if((bAllFree == true) && bAllMotorHasCmd){
+////        allFreeToWrite();
+////    }
+////    else{
+////        int curMsec = QTime::currentTime().msecsSinceStartOfDay();
+////        qDebug() << (curMsec&0xffff) << "not all free";
+////    }
 
 }
 
@@ -352,8 +315,8 @@ void FpgaControl::freeToWrite(int i)
                 lastDebugShowTime = curMsec;
             }
             sendDivPos(i, ds);
-            motorPosCmdData[i].removeFirst();
-            bFreeToWrite[i] = false;
+            //motorPosCmdData[i].removeFirst();
+            //bFreeToWrite[i] = false;
         }
         else{
             if(ds.startTime == 0){
@@ -508,7 +471,7 @@ void FpgaControl::allFreeToWrite()
                 }
                 sendDivPos(i, ds);
                 motorPosCmdData[i].removeFirst();
-                bFreeToWrite[i] = false;
+                //bFreeToWrite[i] = false;
             }
             else{
                 if(ds.startTime == 0){
@@ -527,66 +490,151 @@ void FpgaControl::allFreeToWrite()
     }
 }
 
-void FpgaControl::handleErrorOccurred(QSerialPort::SerialPortError err)
+void FpgaControl::handleComPortErrorOccurred(QSerialPort::SerialPortError error)
 {
-    qDebug() << "handleErrorOccurred" << err;
+    if(error != QSerialPort::NoError){
+        qDebug() << "handleErrorOccurred" << error;
+
+        QString errorStr;
+        switch(error){
+            case QSerialPort::DeviceNotFoundError: errorStr = "DeviceNotFoundError"; break;
+            case QSerialPort::PermissionError: errorStr = "PermissionError"; break;
+            case QSerialPort::OpenError: errorStr = "OpenError"; break;
+            case QSerialPort::ParityError: errorStr = "ParityError"; break;
+            case QSerialPort::FramingError: errorStr = "FramingError"; break;
+            case QSerialPort::BreakConditionError: errorStr = "BreakConditionError"; break;
+            case QSerialPort::WriteError: errorStr = "WriteError"; break;
+            case QSerialPort::ReadError: errorStr = "ReadError"; break;
+            case QSerialPort::ResourceError: errorStr = "ResourceError"; break;
+            case QSerialPort::UnsupportedOperationError: errorStr = "UnsupportedOperationError"; break;
+            case QSerialPort::TimeoutError: errorStr = "TimeoutError"; break;
+            case QSerialPort::NotOpenError: errorStr = "NotOpenError"; break;
+            default:
+            case QSerialPort::UnknownError: errorStr = "UnknownError"; break;
+        }
+
+        QString msg = QString("fpga %1 error: %2").arg(qUtf8Printable(serial.portName())).arg(errorStr);
+        emit errorOccured(msg);
+
+        //qDebug() <<"!!!!!!!" << id <<error;
+        if((error == QSerialPort::ResourceError) ||
+           (error == QSerialPort::PermissionError)){
+            //pushButtonComOpen_clicked(id);
+            closePort();
+        }
+    }
 }
 
 void FpgaControl::handleReadyRead()
 {
+//    QTime t1, t2, t3;
+//    t1.start();
+//    t2.start();
+//    t3.start();
 
-    QByteArray str = serial.readAll();
+    recvInterval = exchInterval.elapsed();
 
-//    uartBuff += str;
-//    //uartBuff.split("\r\n");
-//    bool bAcked = false;
-//    int lfInd = uartBuff.indexOf("\r\n");
-//    if(lfInd != -1){
-//        QString cmd = uartBuff.left(lfInd+2);
-//        uartBuff.remove(0, lfInd+2);
+    quint32 curMsec = QTime::currentTime().msecsSinceStartOfDay();
+    //qDebug() << curMsec << "handleReadyRead" << recvInterval;
 
-//        bool bOk;
-//        //qDebug() << cmd.mid(11, 4);
-//        markerXPos = cmd.mid(11, 4).toInt(&bOk, 16);
-//        qDebug() << "corr >> "<< markerXPos;
-//        for(int i=0; i<markrlist.length(); i++){
-//            markrlist[i]->setXValue(markerXPos);
-//            plotList[i]->replot();
+    QByteArray dArr = serial.readAll();
+
+    bytesOnIter = dArr.length();
+    if(bytesOnIter != 4){
+        //qDebug() << "handleReadyRead !!! ERROR !!!" << dArr.length();
+        QString msg = QString("handleReadyRead !!! ERROR !!! err %1").arg(dArr.length());
+        emit errorOccured(msg);
+    }
+
+//    int bytesToRecv = 4;
+//    char dArr[4];
+//    while(bytesToRecv>0){
+//        //qDebug("try to recv %d bytes", bytesToRecv);
+//        if(serial.waitForReadyRead(50) ==false){
+//            //qDebug("dataRecvTimeout on recvd %d bytes", 4-bytesToRecv);
+//            //ui->plainTextUDP->appendPlainText(QString("dataRecvTimeout on recvd %1 bytes").arg(4-bytesToRecv));
+//            return;
 //        }
+//        int dRecvd = serial.read(&(dArr[4-bytesToRecv]), bytesToRecv);
+//        bytesToRecv -= dRecvd;
 //    }
 
-    //processUartRecvExchange(cmd);
+    QBitArray isBufFree(MOTOR_CNT);
 
+    foreach (char b, dArr){
+        switch((b>>6)&0x3){
+        case 0x0:
+            for(int i=0; i<5; i++){
+                isBufFree[i] = ((b&(1<<i)) == 0);
+            }
+            break;
+        case 0x1:
+            for(int i=0; i<5; i++){
+                isBufFree[5+i] = ((b&(1<<i)) == 0);
+            }
+            break;
+        case 0x2:
+            //qDebug("%02x 1 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                terminatorState(i, b&(1<<i));
+            }
+            break;
+        case 0x3:
+            //qDebug("%02x 2 %02x", b, (b&0x1f));
+            for(int i=0; i<5; i++){
+                terminatorState(5+i, b&(1<<i));
+            }
+            break;
+        }
+    }
 
+    //тут подождём
+    for(int i=0; i<motorCount; i++){
+        if(motorPosCmdData[i].isEmpty())
+            continue;
+        DivPosDataStr &ds = motorPosCmdData[i].first();
+        if(ds.steps == 0){
+            if(ds.startTime != 0 ){
+                //if(i == 0) qDebug() << (curMsec&0xffff) << "external waiting" << ds.msecsFor;
+                //if(curMsec >= ds.finishAbsTimeMsec){
+                int curDelta = curMsec - ds.startTime;
+                if(curDelta >= ds.msecsFor ){
+                    motorPosCmdData[i].removeFirst();
+                }
+                else{
+                    if(i == 0){
+                        if(isBufFree[i]){
+                            int nt = (ds.div*ds.steps*1000)/fpgaFreq;
+                            qDebug()<<(curMsec&0xffff) << "waiting" << ds.msecsFor << "curDelt" << curDelta
+                                   << "calced" << nt;
+                        }
+                    }
+                    isBufFree[i] = false;
+                }
+            }
+        }
+    }
 
+    for(int i=0; i<MOTOR_CNT; i++){
+        if(isBufFree[i] == true)
+            freeToWrite(i);
+    }
 
+    //parseFPGAMsg(dArr);
 
-//        for(int i=0; i<MOTOR_CNT; i++){
-//            if(mtState[i] == MT_GoUP){
-//                if(motorAbsolutePos[i] < 360000){
-//                    DivPosDataStr ds;
-//                    //ds.div = 0x4fff;
-//                    ds.div = 500;
-//                    ds.dir = 1;
-//                    //ds.pos = 1;
-//                    ds.steps = 4560;
-//                    motorPosCmdData[i] << ds;
-//                    motorAbsolutePos[i] += 4560;
-//                }
-//                else{
-//                    mtState[i] = MT_GoDOWN;
-//                }
-//            }
-//        }
+    char c = 0xff;
+    serial.write(&c, 1);
+    exchInterval.start();
+    exchTimeoutTimer.start();
+    comExchanges++;
+}
 
-    //qDebug() << str;
-    //ui->plainTextEdit->moveCursor (QTextCursor::End);
-    //ui->plainTextEdit->insertPlainText(str);
-    //ui->plainTextEdit->insertPlainText(QString(t.msecsSinceStartOfDay()));
-    //ui->plainTextEdit->moveCursor (QTextCursor::End);
-    //ui->plainTextEdit->appendPlainText(str);
-
-    //ui->plainTextEdit->verticalScrollBar()->setValue(ui->plainTextEdit->verticalScrollBar()->maximum());
+void FpgaControl::handleExchTimeout()
+{
+    recvInterval = -1;
+    emit errorOccured(QString("fpga exch timeout, no data"));
+    char c = 0xff;
+    serial.write(&c, 1);
 }
 
 void FpgaControl::handleSerialDataWritten(qint64 bytes)
@@ -684,12 +732,12 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
         }
     }
     motorPosCmdData[id].append(ds);
-//    if(dt > 0){
+    if(dt > 0){
 //        ds.steps = 0;
 //        ds.msecsFor = dt;
 //        motorPosCmdData[id].append(ds);
 //        //qDebug("added Pt");
-//    }
+    }
 }
 
 void FpgaControl::addMotorCmd(int mn, int newPosImp, int msecsForMove)
@@ -741,4 +789,5 @@ void FpgaControl::clearCmdList()
         motorPosCmdData[i].clear();
     }
 }
+
 

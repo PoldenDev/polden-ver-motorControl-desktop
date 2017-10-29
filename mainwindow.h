@@ -80,7 +80,9 @@ private slots:
     void on_lineEditMotorCount_editingFinished();
     void checkDebugComTimerHandle();
 
-    void termState(int, bool);
+    void fpgaCtrlTermState(int, bool);
+    void fpgaCtrlErrorOccured(QString);
+
 
 private:
     //quint32 motorCount;
