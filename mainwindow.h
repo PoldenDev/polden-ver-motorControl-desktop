@@ -86,6 +86,10 @@ private slots:
 
     void on_checkBoxDirInverse_clicked();
 
+    void on_pushButtonTest1_clicked();
+
+    void on_pushButtonTest2_clicked();
+
 private:
     //quint32 motorCount;
 

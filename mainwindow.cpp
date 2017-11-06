@@ -1073,52 +1073,69 @@ void MainWindow::on_pushButtonGoZero_clicked()
 void MainWindow::on_pushButtonTest_clicked()
 {
 
-//    for(int k=0; k<100; k++){
-//        //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
-//        quint32 newPos = k*1000;
-//        addMotorCmd(0, newPos, 113);
+////    for(int k=0; k<100; k++){
+////        //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
+////        quint32 newPos = k*1000;
+////        addMotorCmd(0, newPos, 113);
+////    }
+
+//    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
+//    quint32 maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
+//    for(int i=0; i<motorCount; i++){
+//        for(int j=0; j<10; j++){
+//            if(i == 0){
+//                for(int k=0; k<0; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 1){
+//                for(int k=0; k<10; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 2){
+//                for(int k=0; k<20; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+
+
+//            for(int k=0; k<100; k++){
+//                //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
+//                if(i==0)qDebug() <<qAbs(qSin((k/100.)*M_PI));
+//                quint32 newPos = maxHeightImpVal * qAbs(qSin((k/100.)*M_PI));
+//                fpgaCtrl.addMotorCmd(i, newPos, 100);
+//            }
+
+//            if(i == 0){
+//                for(int k=0; k<20; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 1){
+//                for(int k=0; k<10; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 2){
+//                for(int k=0; k<0; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//        }
 //    }
-
-    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
-    quint32 maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
-    for(int i=0; i<motorCount; i++){
-        for(int j=0; j<10; j++){
-            if(i == 0){
-                for(int k=0; k<0; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 1){
-                for(int k=0; k<10; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 2){
-                for(int k=0; k<20; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-
-
-            for(int k=0; k<100; k++){
-                //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
-                if(i==0)qDebug() <<qAbs(qSin((k/100.)*M_PI));
-                quint32 newPos = maxHeightImpVal * qAbs(qSin((k/100.)*M_PI));
-                fpgaCtrl.addMotorCmd(i, newPos, 100);
-            }
-
-            if(i == 0){
-                for(int k=0; k<20; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 1){
-                for(int k=0; k<10; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 2){
-                for(int k=0; k<0; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-        }
-    }
+    fpgaCtrl.addRawCmd(0, (quint32)0xffff, (quint32)2, 0);
+//    fpgaCtrl.addRawCmd(0, (quint32)0xfff, (quint32)2);
+//    fpgaCtrl.addRawCmd(0, (quint32)0xff, (quint32)2);
+//    fpgaCtrl.addRawCmd(0, (quint32)0xf, (quint32)2);
 }
+
+
+void MainWindow::on_pushButtonTest1_clicked()
+{
+    fpgaCtrl.addRawCmd(0, (quint32)0xfff, (quint32)2, 1);
+}
+
+void MainWindow::on_pushButtonTest2_clicked()
+{
+    fpgaCtrl.addRawCmd(0, (quint32)0xf, (quint32)2, 0);
+}
+
+
 
 void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
 {

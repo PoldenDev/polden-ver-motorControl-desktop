@@ -176,6 +176,8 @@ public:
     QPushButton *goToTerm;
     QPushButton *pushButtonGoZero;
     QPushButton *pushButtonTest;
+    QPushButton *pushButtonTest1;
+    QPushButton *pushButtonTest2;
     QWidget *widget_29;
     QHBoxLayout *horizontalLayout_20;
     QPushButton *pushButtonPosReset;
@@ -945,6 +947,16 @@ public:
 
         horizontalLayout_4->addWidget(pushButtonTest);
 
+        pushButtonTest1 = new QPushButton(widget_6);
+        pushButtonTest1->setObjectName(QStringLiteral("pushButtonTest1"));
+
+        horizontalLayout_4->addWidget(pushButtonTest1);
+
+        pushButtonTest2 = new QPushButton(widget_6);
+        pushButtonTest2->setObjectName(QStringLiteral("pushButtonTest2"));
+
+        horizontalLayout_4->addWidget(pushButtonTest2);
+
 
         verticalLayout_2->addWidget(widget_6);
 
@@ -1045,7 +1057,7 @@ public:
         pushButtonComOpen->setText(QApplication::translate("MainWindow", "open", Q_NULLPTR));
         pushButton_refreshCom->setText(QApplication::translate("MainWindow", "refresh", Q_NULLPTR));
         pushButtonUdpOpenClose->setText(QApplication::translate("MainWindow", "UDP Open", Q_NULLPTR));
-        groupBox_2->setTitle(QApplication::translate("MainWindow", "USB", Q_NULLPTR));
+        groupBox_2->setTitle(QApplication::translate("MainWindow", "FPGA", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "\320\237\320\260\320\272\320\265\321\202\320\276\320\262", Q_NULLPTR));
         label_5->setText(QApplication::translate("MainWindow", "bytesOnIter", Q_NULLPTR));
         label_14->setText(QApplication::translate("MainWindow", "recvInterval", Q_NULLPTR));
@@ -1106,6 +1118,8 @@ public:
         goToTerm->setText(QApplication::translate("MainWindow", "go term", Q_NULLPTR));
         pushButtonGoZero->setText(QApplication::translate("MainWindow", "go zero", Q_NULLPTR));
         pushButtonTest->setText(QApplication::translate("MainWindow", "test", Q_NULLPTR));
+        pushButtonTest1->setText(QApplication::translate("MainWindow", "test1", Q_NULLPTR));
+        pushButtonTest2->setText(QApplication::translate("MainWindow", "test2", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         pushButtonClear->setText(QApplication::translate("MainWindow", "clear queue", Q_NULLPTR));

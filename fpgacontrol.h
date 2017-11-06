@@ -43,6 +43,8 @@ public:
     void addMotorCmd(int mn, int newPosImp, int msecsForMove);
     quint32 getCmdListLength(int id){return motorPosCmdData[id].length();}
 
+    void addRawCmd(int id, quint32 d, quint32 st, int dir);
+
 private:
     int motorCount;
     QQueue<DivPosDataStr> motorPosCmdData[MOTOR_CNT];
@@ -63,6 +65,7 @@ private:
     void allFreeToWrite();
     void sendDivPos(int mi, DivPosDataStr &ds);
     void calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id);
+
 
 //    bool isBufferFree(qint32, int);
 //    void setBufferNotFree(qint32&, int);
