@@ -47,7 +47,7 @@ private slots:
     void on_pushButtonClear_clicked();
     void dataProcess100msTimeOut();
    // void processUartExchange();
-    void waitForFifoFreeFifo();
+    //void waitForFifoFreeFifo();
 
     void response(QString str);
 
@@ -160,10 +160,8 @@ private:
     QList<QLineEdit*> debPortStatusMainLeList;
     void pushDebugComPortOpen(int id);
     void comPortClose(int id);
-    void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
-    void handleReadyRead(int id);
-
-    void parseLeadShineMsg(int id, QByteArray &ba);
+    //void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
+    //void handleReadyRead(int id);
 
     QPalette *paletteGrey, *paletteRed, *paletteGreen;
 
@@ -178,9 +176,6 @@ private:
 
     FpgaControl fpgaCtrl;
     LeadshineDebugPort lsDebugPort;
-
-
-
 };
 
 

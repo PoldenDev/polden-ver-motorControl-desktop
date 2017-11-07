@@ -659,13 +659,6 @@ void MainWindow::on_pushButtonClear_clicked()
     fpgaCtrl.clearCmdList();
 }
 
-void MainWindow::waitForFifoFreeFifo()
-{
-    //qDebug() << "waitForFifoFreeFifo timeout. resend";
-    //processUartSendExchange();
-
-
-}
 
 //void MainWindow::processUartRecvExchange(QString msg)
 //{
@@ -764,9 +757,6 @@ void MainWindow::response(QString str)
 //    }
 //}
 
-
-
-
 void MainWindow::on_pushButtonGotoPEriodState_clicked()
 {
 //    if(serial.isOpen()){
@@ -774,7 +764,6 @@ void MainWindow::on_pushButtonGotoPEriodState_clicked()
 //     serial.write(str.toLatin1());
 //    }
     //bCycle =
-
 }
 
 void MainWindow::on_pushButtonPosReset_clicked()
@@ -1445,94 +1434,46 @@ void MainWindow::on_lineEditMotorCount_editingFinished()
     createMainInterface();
 }
 
-void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError error)
-{
-    if(error != QSerialPort::NoError){
-        QString errorStr;
-        switch(error){
-            case QSerialPort::DeviceNotFoundError: errorStr = "DeviceNotFoundError"; break;
-            case QSerialPort::PermissionError: errorStr = "PermissionError"; break;
-            case QSerialPort::OpenError: errorStr = "OpenError"; break;
-            case QSerialPort::ParityError: errorStr = "ParityError"; break;
-            case QSerialPort::FramingError: errorStr = "FramingError"; break;
-            case QSerialPort::BreakConditionError: errorStr = "BreakConditionError"; break;
-            case QSerialPort::WriteError: errorStr = "WriteError"; break;
-            case QSerialPort::ReadError: errorStr = "ReadError"; break;
-            case QSerialPort::ResourceError: errorStr = "ResourceError"; break;
-            case QSerialPort::UnsupportedOperationError: errorStr = "UnsupportedOperationError"; break;
-            case QSerialPort::TimeoutError: errorStr = "TimeoutError"; break;
-            case QSerialPort::NotOpenError: errorStr = "NotOpenError"; break;
-            default:
-            case QSerialPort::UnknownError: errorStr = "UnknownError"; break;
+//void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError error)
+//{
+//    if(error != QSerialPort::NoError){
+//        QString errorStr;
+//        switch(error){
+//            case QSerialPort::DeviceNotFoundError: errorStr = "DeviceNotFoundError"; break;
+//            case QSerialPort::PermissionError: errorStr = "PermissionError"; break;
+//            case QSerialPort::OpenError: errorStr = "OpenError"; break;
+//            case QSerialPort::ParityError: errorStr = "ParityError"; break;
+//            case QSerialPort::FramingError: errorStr = "FramingError"; break;
+//            case QSerialPort::BreakConditionError: errorStr = "BreakConditionError"; break;
+//            case QSerialPort::WriteError: errorStr = "WriteError"; break;
+//            case QSerialPort::ReadError: errorStr = "ReadError"; break;
+//            case QSerialPort::ResourceError: errorStr = "ResourceError"; break;
+//            case QSerialPort::UnsupportedOperationError: errorStr = "UnsupportedOperationError"; break;
+//            case QSerialPort::TimeoutError: errorStr = "TimeoutError"; break;
+//            case QSerialPort::NotOpenError: errorStr = "NotOpenError"; break;
+//            default:
+//            case QSerialPort::UnknownError: errorStr = "UnknownError"; break;
 
-        }
+//        }
 
-        QString msg = QString("%1 error: %2").arg(qUtf8Printable(lsDebugPort.portName(id))).arg(errorStr);
-        ui->plainTextEdit->appendPlainText(msg);
-        //qDebug() <<"!!!!!!!" << id <<error;
-        if((error == QSerialPort::ResourceError) ||
-           (error == QSerialPort::PermissionError)){
-            //pushButtonComOpen_clicked(id);
-            comPortClose(id);
-        }
-    }
-}
+//        QString msg = QString("%1 error: %2").arg(qUtf8Printable(lsDebugPort.portName(id))).arg(errorStr);
+//        ui->plainTextEdit->appendPlainText(msg);
+//        //qDebug() <<"!!!!!!!" << id <<error;
+//        if((error == QSerialPort::ResourceError) ||
+//           (error == QSerialPort::PermissionError)){
+//            //pushButtonComOpen_clicked(id);
+//            comPortClose(id);
+//        }
+//    }
+//}
 
-void MainWindow::handleReadyRead(int id)
-{
+//void MainWindow::handleReadyRead(int id)
+//{
 //    QByteArray ba = debSerialPortList[id]->readAll();
 //    //qDebug() << id << ba;
 //    parseLeadShineMsg(id, ba);
 
-}
-
-
-
-void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
-{
-    quint16 crc16 = lsDebugPort.CRC16_ModBusRTU(ba, ba.length()-2);
-    QByteArray crc16ba;
-    crc16ba.append(crc16&0xff);
-    crc16ba.append((crc16>>8)&0xff);
-
-    //quint8 crc16Recvd = ba[ba.length()-1];
-    if(ba.endsWith(crc16ba) == false){
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: recv CRC err").arg(id));
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: CRC %2").arg(id).arg(crc16));
-        return;
-    }
-
-    if((ba.length()==25)&&(ba[0] == 0x01)&&(ba[1] == 0x03)&&(ba[2] == 0x14)){
-        bool &bRespRecv = *(motorRespRecvdList[id]);
-        bRespRecv = true;
-
-        //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
-        if((ba[4]&0x50) == 0){
-            debPortStatusLeList[id]->setPalette(*paletteGreen);
-            debPortStatusMainLeList[id]->setPalette(*paletteGreen);
-            //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
-            debPortStatusLeList[id]->setText("OK");
-            debPortStatusMainLeList[id]->setText("OK");
-
-        }
-        else{
-            debPortStatusLeList[id]->setPalette(*paletteRed);
-            debPortStatusMainLeList[id]->setPalette(*paletteRed);
-            if(ba[4]&0x10){ //encErr
-                debPortStatusLeList[id]->setText("enc err");
-                debPortStatusMainLeList[id]->setText("enc err");
-            }
-            if(ba[4]&0x40){ //posErr
-                debPortStatusLeList[id]->setText("pos err");
-                debPortStatusMainLeList[id]->setText("pos err");
-            }
-        }
-    }
-    else{
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
-    }
-}
+//}
 
 void MainWindow::on_checkBoxDirInverse_clicked()
 {
