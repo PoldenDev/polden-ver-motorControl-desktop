@@ -98,7 +98,6 @@ private:
     QUdpSocket *udpSocket;
 
     QList<QSlider*> slList;
-    QTimer waitForFifoFreeTimer;
     QTimer dataProcess100msTimer;
     QTimer uiUpdateTimer;
 

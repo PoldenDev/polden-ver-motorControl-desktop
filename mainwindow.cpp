@@ -85,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent) :
     dataProcess100msTimer.setInterval(90);
     connect(&dataProcess100msTimer, SIGNAL(timeout()), this, SLOT(dataProcess100msTimeOut()));
 
-    connect(&waitForFifoFreeTimer, SIGNAL(timeout()), this, SLOT(waitForFifoFreeFifo()));
 
 
     ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
@@ -1110,6 +1109,7 @@ void MainWindow::on_pushButtonTest_clicked()
 //        }
 //    }
     fpgaCtrl.addRawCmd(0, (quint32)0xffff, (quint32)2, 0);
+    fpgaCtrl.addRawCmd(1, (quint32)0xffff, (quint32)2, 0);
 //    fpgaCtrl.addRawCmd(0, (quint32)0xfff, (quint32)2);
 //    fpgaCtrl.addRawCmd(0, (quint32)0xff, (quint32)2);
 //    fpgaCtrl.addRawCmd(0, (quint32)0xf, (quint32)2);
@@ -1119,11 +1119,13 @@ void MainWindow::on_pushButtonTest_clicked()
 void MainWindow::on_pushButtonTest1_clicked()
 {
     fpgaCtrl.addRawCmd(0, (quint32)0xfff, (quint32)2, 1);
+    fpgaCtrl.addRawCmd(1, (quint32)0xfff, (quint32)2, 1);
 }
 
 void MainWindow::on_pushButtonTest2_clicked()
 {
-    fpgaCtrl.addRawCmd(0, (quint32)0xf, (quint32)2, 0);
+    fpgaCtrl.addRawCmd(0, (quint32)0xff, (quint32)2, 0);
+    fpgaCtrl.addRawCmd(1, (quint32)0xff, (quint32)2, 0);
 }
 
 
