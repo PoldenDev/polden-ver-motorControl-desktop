@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include "fpgacontrol.h"
+#include "leadshinedebugport.h"
 
 //#include <qwt_plot_curve.h>
 
@@ -77,8 +78,7 @@ private slots:
     void on_lineEdit_mmPerRot_editingFinished();
     void on_lineEdit_vmax_mmsec_editingFinished();
 
-    void on_lineEditMotorCount_editingFinished();
-    void checkDebugComTimerHandle();
+    void on_lineEditMotorCount_editingFinished();    
 
     void fpgaCtrlTermState(int, bool);
     void fpgaCtrlErrorOccured(QString);
@@ -154,7 +154,7 @@ private:
 
     QList<QComboBox*> debPortCmbBxList;
     QList<QPushButton*> debPortpbList;
-    QList<QSerialPort*> debSerialPortList;
+    //QList<QSerialPort*> debSerialPortList;
     QList<QGroupBox*> debPortGbList;
     QList<QLineEdit*> debPortStatusLeList;
     QList<QLineEdit*> debPortStatusMainLeList;
@@ -162,9 +162,8 @@ private:
     void comPortClose(int id);
     void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
     void handleReadyRead(int id);
-    QTimer checkDebugComTimer;
+
     void parseLeadShineMsg(int id, QByteArray &ba);
-    quint16 CRC16_ModBusRTU(QByteArray buf, quint16 len);
 
     QPalette *paletteGrey, *paletteRed, *paletteGreen;
 
@@ -178,6 +177,9 @@ private:
     quint32 lastDebugShowTime;
 
     FpgaControl fpgaCtrl;
+    LeadshineDebugPort lsDebugPort;
+
+
 
 };
 

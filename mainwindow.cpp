@@ -43,12 +43,14 @@ MainWindow::MainWindow(QWidget *parent) :
     paletteGreen(NULL),
     lastUdpDatagrammRecvd(0),
     lastDebugShowTime(0),
-    fpgaCtrl(this)
+    fpgaCtrl(this),
+    lsDebugPort(this)
 {
     ui->setupUi(this);
 
     quint32 motorCount = settings.value("motorCount", 0).toInt();
     fpgaCtrl.setMotorCount(motorCount);
+    lsDebugPort.setPortCount(motorCount);
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
     ui->checkBoxPrintUDPData->setChecked(settings.value("printUdpData", false).toBool());
@@ -1310,14 +1312,14 @@ void MainWindow::createDebugSerialPortInterface()
         paletteGreen->setColor(QPalette::Base,Qt::green);
     }
 
-    checkDebugComTimer.stop();
+
     foreach (QGroupBox *gb, debPortGbList) {
         delete gb;
     }
 
     debPortCmbBxList.clear();
     debPortpbList.clear();
-    debSerialPortList.clear();
+    //debSerialPortList.clear();
     debPortGbList.clear();
     debPortStatusLeList.clear();
 
@@ -1348,14 +1350,14 @@ void MainWindow::createDebugSerialPortInterface()
         gb->setLayout(vblo);
         hblo->addWidget(gb);
 
-        QSerialPort *sp = new QSerialPort(gb);
-        connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
+        //QSerialPort *sp = new QSerialPort(gb);
+        //connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
         connect(pb, &QPushButton::clicked, [=](){ pushDebugComPortOpen(i);});
-        connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
+        //connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
 
         debPortCmbBxList.append(cb);
         debPortpbList.append(pb);
-        debSerialPortList.append(sp);
+        //debSerialPortList.append(sp);
         debPortGbList.append(gb);
         debPortStatusLeList.append(le);
 
@@ -1373,26 +1375,24 @@ void MainWindow::createDebugSerialPortInterface()
     on_pushButton_refreshCom_clicked();
 
 
-    connect(&checkDebugComTimer, SIGNAL(timeout()), this, SLOT(checkDebugComTimerHandle()));
-    checkDebugComTimer.setSingleShot(false);
-    checkDebugComTimer.setInterval(500);
-    checkDebugComTimer.start();
+
 }
 
 void MainWindow::pushDebugComPortOpen(int id)
 {
-    QSerialPort &sp = *debSerialPortList[id];
+    //QSerialPort &sp = *debSerialPortList[id];
     QPushButton &pb = *debPortpbList[id];
     QComboBox &cb = *debPortCmbBxList[id];
 
-    sp.setBaudRate(38400);
+
      if(pb.text() == "open"){
-         if(sp.isOpen() == false){
+         if(lsDebugPort.isPortOpen(id) == false){
              QString comName = cb.currentData().toString();
              if(comName.length() > 0){
                  //UartThread.requestToStart(comName);
-                 sp.setPortName(comName);
-                 if (!sp.open(QIODevice::ReadWrite)) {
+                 //sp.setPortName(comName);
+                 lsDebugPort.setPortName(id, comName);
+                 if (lsDebugPort.open(id) == false) {
                      //qDebug("%s port open FAIL", qUtf8Printable(comName));
                      ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL").arg(qUtf8Printable(comName)));
                      return;
@@ -1409,9 +1409,9 @@ void MainWindow::pushDebugComPortOpen(int id)
              }
          }
      }
-     else{
-         sp.close();
-         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(sp.portName()));
+     else{         
+         lsDebugPort.close(id);
+         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(lsDebugPort.portName(id)));
          pb.setText("open");
          cb.setDisabled(false);
      }
@@ -1420,16 +1420,17 @@ void MainWindow::pushDebugComPortOpen(int id)
 
 void MainWindow::comPortClose(int id)
 {
-    QSerialPort &sp = *debSerialPortList[id];
+    //QSerialPort &sp = *debSerialPortList[id];
     QPushButton &pb = *debPortpbList[id];
     QComboBox &cb = *debPortCmbBxList[id];
     QLineEdit &le = *debPortStatusLeList[id];
 
     cb.setEnabled(true);
     pb.setText("open");
-    if(sp.isOpen() == true){
-        ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(sp.portName()));
-        sp.close();
+    if(lsDebugPort.isPortOpen(id) == true){
+        ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(lsDebugPort.portName(id)));
+        //sp.close();
+        lsDebugPort.close(id);
     }
     le.setPalette(*paletteGrey);
 }
@@ -1438,6 +1439,7 @@ void MainWindow::on_lineEditMotorCount_editingFinished()
 {
     quint32 motorCount = ui->lineEditMotorCount->text().toInt();
     settings.setValue("motorCount", motorCount);
+    lsDebugPort.setPortCount(motorCount);
     ui->plainTextEdit->appendPlainText(QString("new motor count %1").arg(ui->lineEditMotorCount->text()));
     createDebugSerialPortInterface();
     createMainInterface();
@@ -1465,7 +1467,7 @@ void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError 
 
         }
 
-        QString msg = QString("%1 error: %2").arg(qUtf8Printable(debSerialPortList[id]->portName())).arg(errorStr);
+        QString msg = QString("%1 error: %2").arg(qUtf8Printable(lsDebugPort.portName(id))).arg(errorStr);
         ui->plainTextEdit->appendPlainText(msg);
         //qDebug() <<"!!!!!!!" << id <<error;
         if((error == QSerialPort::ResourceError) ||
@@ -1478,37 +1480,17 @@ void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError 
 
 void MainWindow::handleReadyRead(int id)
 {
-    QByteArray ba = debSerialPortList[id]->readAll();
-    //qDebug() << id << ba;
-    parseLeadShineMsg(id, ba);
+//    QByteArray ba = debSerialPortList[id]->readAll();
+//    //qDebug() << id << ba;
+//    parseLeadShineMsg(id, ba);
 
 }
 
-void MainWindow::checkDebugComTimerHandle()
-{
-    QByteArray reqBase = QByteArrayLiteral("\x01\x03\x00");
-    //const quint8 req1Str[] {0x01, 0x03, 0x00, 0xFD, 0x00, 0x01, 0x15, 0xfa};
-    QByteArray req1 = reqBase + QByteArrayLiteral("\xFD\x00\x01\x15\xfa");
-    QByteArray reqReqErrTrace = reqBase + QByteArrayLiteral("\x10\x00\x0A\xC4\x08");
-    //req1 << 0x01 << 0x03 << 0x00 << 0xFD << 0x00 << 0x01 << 0x15 << 0xfa;
 
-    for(int i=0; i<debPortStatusLeList.length(); i++){
-        bool &bRespRecv = *(motorRespRecvdList[i]);
-        if(bRespRecv == false){
-            debPortStatusMainLeList[i]->setPalette(*paletteGrey);
-            debPortStatusLeList[i]->setPalette(*paletteGrey);
-        }
-        QSerialPort *sp = debSerialPortList[i];
-        if(sp->isOpen()){
-            sp->write(reqReqErrTrace);
-        }
-        bRespRecv = false;
-    }
-}
 
 void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
 {
-    quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-2);
+    quint16 crc16 = lsDebugPort.CRC16_ModBusRTU(ba, ba.length()-2);
     QByteArray crc16ba;
     crc16ba.append(crc16&0xff);
     crc16ba.append((crc16>>8)&0xff);
@@ -1551,29 +1533,6 @@ void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
         ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
     }
 }
-
-#include <QtEndian>
-quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
-{
-    //Вычисляет контрольную сумму CRC16 для ModBus и выдаёт её с нужным порядком байтов
-      quint16 crc = 0xFFFF;
-      for (int pos = 0; pos < len; pos++)
-      {
-      crc ^= (quint16)buf[pos];    // XOR byte into least sig. byte of crc
-
-      for (int i = 8; i != 0; i--) {    // Loop over each bit
-        if ((crc & 0x0001) != 0) {      // If the LSB is set
-          crc >>= 1;                    // Shift right and XOR 0xA001
-          crc ^= 0xA001;
-        }
-        else                            // Else LSB is not set
-          crc >>= 1;                    // Just shift right
-        }
-      }
-      return crc;
-}
-
-
 
 void MainWindow::on_checkBoxDirInverse_clicked()
 {
