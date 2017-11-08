@@ -355,24 +355,23 @@ void FpgaControl::sendDivPos(int mi, DivPosDataStr &ds)
     //quint32 div = FPGA_FREQ/ (steps*10); //calc speed
     quint32 div = ds.div; //calc speed
     //qDebug() << div <<ds.div;
-    if(div > 0x1fff){
-        qDebug("mi %d div exceed 0x1fff!", mi);
-        div = 0x1fff;
+    if(div > MAX_DIV){
+        qDebug("mi %d div exceed 0x%x!", mi, MAX_DIV);
+        div = MAX_DIV;
     }
-    if(steps > 0x7fff){
-        qDebug("mi %d steps exceed 0x7fff!", mi);
-        steps = 0x7fff;
+    if(steps > MAX_STEPS){
+        qDebug("mi %d steps exceed 0x%x!", mi, MAX_STEPS);
+        steps = MAX_STEPS;
     }
 
-
-    quint64 temp = 0;
+    quint32 temp = 0;
     temp = mi&0xf;
-    temp |= ((div&0x7fff)<<4);
-    temp |= (((quint64)steps&0x7fff)<<19);
-    temp |= (((quint64)dir&0x1)<<34);
-    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint64));
+    temp |= ((div&DIV_MASK)<<4);
+    temp |= (((quint64)steps&STEPS_MASK)<<20);
+    temp |= (((quint64)dir&0x1)<<31);
+    QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint32));
 
-    ba.resize(5);
+    //ba.resize(5);
 
 
 
@@ -391,9 +390,9 @@ void FpgaControl::sendDivPos(int mi, DivPosDataStr &ds)
     //}
     quint64 dSend = serial.write(ba);
 
-    if(dSend != 5){
-        qDebug("dSend %d !!!!!", dSend);
-    }
+//    if(dSend != 5){
+//        qDebug("dSend %d !!!!!", dSend);
+//    }
     //if(serial.flush() == false){
     //qDebug("dataFlushed");
     //}
@@ -708,6 +707,16 @@ void FpgaControl::handleSerialDataWritten(qint64 bytes)
 
 }
 
+void FpgaControl::addRawCmd(int id, quint32 d, quint32 st, int dir)
+{
+    DivPosDataStr ds;
+    ds.div = d;
+    ds.dir = dir;
+    ds.steps = st;
+    motorPosCmdData[id].append(ds);
+
+}
+
 void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id)
 {
     float secsOnMove = msecsForMove/1000.;
@@ -727,14 +736,17 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
         //float secsOnStep = msecsForMove / (ds.steps*1000.);
         //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
         ds.div = (quint32)(freqOnMove/ds.steps);
-        if(ds.div > 0x1fff){
-            ds.div = 0x1fff;
+        if(ds.div > MAX_DIV){
+            ds.div = MAX_DIV;
             int nt = (ds.div*ds.steps*1000)/fpgaFreq;
             dt = msecsForMove - nt;
             if(id==0){
                 qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
             }
         }
+    }
+    if(id == 0){
+        qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
     }
     motorPosCmdData[id].append(ds);
     if(dt > 0){

@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include "fpgacontrol.h"
+#include "leadshinedebugport.h"
 
 //#include <qwt_plot_curve.h>
 
@@ -46,7 +47,7 @@ private slots:
     void on_pushButtonClear_clicked();
     void dataProcess100msTimeOut();
    // void processUartExchange();
-    void waitForFifoFreeFifo();
+    //void waitForFifoFreeFifo();
 
     void response(QString str);
 
@@ -77,14 +78,17 @@ private slots:
     void on_lineEdit_mmPerRot_editingFinished();
     void on_lineEdit_vmax_mmsec_editingFinished();
 
-    void on_lineEditMotorCount_editingFinished();
-    void checkDebugComTimerHandle();
+    void on_lineEditMotorCount_editingFinished();    
 
     void fpgaCtrlTermState(int, bool);
     void fpgaCtrlErrorOccured(QString);
 
 
     void on_checkBoxDirInverse_clicked();
+
+    void on_pushButtonTest1_clicked();
+
+    void on_pushButtonTest2_clicked();
 
 private:
     //quint32 motorCount;
@@ -94,7 +98,6 @@ private:
     QUdpSocket *udpSocket;
 
     QList<QSlider*> slList;
-    QTimer waitForFifoFreeTimer;
     QTimer dataProcess100msTimer;
     QTimer uiUpdateTimer;
 
@@ -150,17 +153,14 @@ private:
 
     QList<QComboBox*> debPortCmbBxList;
     QList<QPushButton*> debPortpbList;
-    QList<QSerialPort*> debSerialPortList;
+    //QList<QSerialPort*> debSerialPortList;
     QList<QGroupBox*> debPortGbList;
     QList<QLineEdit*> debPortStatusLeList;
     QList<QLineEdit*> debPortStatusMainLeList;
     void pushDebugComPortOpen(int id);
     void comPortClose(int id);
-    void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
-    void handleReadyRead(int id);
-    QTimer checkDebugComTimer;
-    void parseLeadShineMsg(int id, QByteArray &ba);
-    quint16 CRC16_ModBusRTU(QByteArray buf, quint16 len);
+    //void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
+    //void handleReadyRead(int id);
 
     QPalette *paletteGrey, *paletteRed, *paletteGreen;
 
@@ -174,7 +174,7 @@ private:
     quint32 lastDebugShowTime;
 
     FpgaControl fpgaCtrl;
-
+    LeadshineDebugPort lsDebugPort;
 };
 
 

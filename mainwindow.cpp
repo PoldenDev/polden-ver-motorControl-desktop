@@ -43,12 +43,14 @@ MainWindow::MainWindow(QWidget *parent) :
     paletteGreen(NULL),
     lastUdpDatagrammRecvd(0),
     lastDebugShowTime(0),
-    fpgaCtrl(this)
+    fpgaCtrl(this),
+    lsDebugPort(this)
 {
     ui->setupUi(this);
 
     quint32 motorCount = settings.value("motorCount", 0).toInt();
     fpgaCtrl.setMotorCount(motorCount);
+    lsDebugPort.setPortCount(motorCount);
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
     ui->checkBoxPrintUDPData->setChecked(settings.value("printUdpData", false).toBool());
@@ -83,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent) :
     dataProcess100msTimer.setInterval(90);
     connect(&dataProcess100msTimer, SIGNAL(timeout()), this, SLOT(dataProcess100msTimeOut()));
 
-    connect(&waitForFifoFreeTimer, SIGNAL(timeout()), this, SLOT(waitForFifoFreeFifo()));
 
 
     ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
@@ -657,13 +658,6 @@ void MainWindow::on_pushButtonClear_clicked()
     fpgaCtrl.clearCmdList();
 }
 
-void MainWindow::waitForFifoFreeFifo()
-{
-    //qDebug() << "waitForFifoFreeFifo timeout. resend";
-    //processUartSendExchange();
-
-
-}
 
 //void MainWindow::processUartRecvExchange(QString msg)
 //{
@@ -762,9 +756,6 @@ void MainWindow::response(QString str)
 //    }
 //}
 
-
-
-
 void MainWindow::on_pushButtonGotoPEriodState_clicked()
 {
 //    if(serial.isOpen()){
@@ -772,7 +763,6 @@ void MainWindow::on_pushButtonGotoPEriodState_clicked()
 //     serial.write(str.toLatin1());
 //    }
     //bCycle =
-
 }
 
 void MainWindow::on_pushButtonPosReset_clicked()
@@ -1073,52 +1063,72 @@ void MainWindow::on_pushButtonGoZero_clicked()
 void MainWindow::on_pushButtonTest_clicked()
 {
 
-//    for(int k=0; k<100; k++){
-//        //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
-//        quint32 newPos = k*1000;
-//        addMotorCmd(0, newPos, 113);
+////    for(int k=0; k<100; k++){
+////        //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
+////        quint32 newPos = k*1000;
+////        addMotorCmd(0, newPos, 113);
+////    }
+
+//    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
+//    quint32 maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
+//    for(int i=0; i<motorCount; i++){
+//        for(int j=0; j<10; j++){
+//            if(i == 0){
+//                for(int k=0; k<0; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 1){
+//                for(int k=0; k<10; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 2){
+//                for(int k=0; k<20; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+
+
+//            for(int k=0; k<100; k++){
+//                //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
+//                if(i==0)qDebug() <<qAbs(qSin((k/100.)*M_PI));
+//                quint32 newPos = maxHeightImpVal * qAbs(qSin((k/100.)*M_PI));
+//                fpgaCtrl.addMotorCmd(i, newPos, 100);
+//            }
+
+//            if(i == 0){
+//                for(int k=0; k<20; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 1){
+//                for(int k=0; k<10; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//            else if(i == 2){
+//                for(int k=0; k<0; k++)
+//                    fpgaCtrl.addMotorCmd(i, 0, 100);
+//            }
+//        }
 //    }
-
-    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
-    quint32 maxHeightImpVal = ui->lineEdit_MaxHeightImp->text().toInt();
-    for(int i=0; i<motorCount; i++){
-        for(int j=0; j<10; j++){
-            if(i == 0){
-                for(int k=0; k<0; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 1){
-                for(int k=0; k<10; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 2){
-                for(int k=0; k<20; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-
-
-            for(int k=0; k<100; k++){
-                //qDebug() << maxHeightImpVal * qSin((k/100.)*M_PI);
-                if(i==0)qDebug() <<qAbs(qSin((k/100.)*M_PI));
-                quint32 newPos = maxHeightImpVal * qAbs(qSin((k/100.)*M_PI));
-                fpgaCtrl.addMotorCmd(i, newPos, 100);
-            }
-
-            if(i == 0){
-                for(int k=0; k<20; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 1){
-                for(int k=0; k<10; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-            else if(i == 2){
-                for(int k=0; k<0; k++)
-                    fpgaCtrl.addMotorCmd(i, 0, 100);
-            }
-        }
-    }
+    fpgaCtrl.addRawCmd(0, (quint32)0xffff, (quint32)2, 0);
+    fpgaCtrl.addRawCmd(1, (quint32)0xffff, (quint32)2, 0);
+//    fpgaCtrl.addRawCmd(0, (quint32)0xfff, (quint32)2);
+//    fpgaCtrl.addRawCmd(0, (quint32)0xff, (quint32)2);
+//    fpgaCtrl.addRawCmd(0, (quint32)0xf, (quint32)2);
 }
+
+
+void MainWindow::on_pushButtonTest1_clicked()
+{
+    fpgaCtrl.addRawCmd(0, (quint32)0xfff, (quint32)2, 1);
+    fpgaCtrl.addRawCmd(1, (quint32)0xfff, (quint32)2, 1);
+}
+
+void MainWindow::on_pushButtonTest2_clicked()
+{
+    fpgaCtrl.addRawCmd(0, (quint32)0xff, (quint32)2, 0);
+    fpgaCtrl.addRawCmd(1, (quint32)0xff, (quint32)2, 0);
+}
+
+
 
 void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
 {
@@ -1293,14 +1303,14 @@ void MainWindow::createDebugSerialPortInterface()
         paletteGreen->setColor(QPalette::Base,Qt::green);
     }
 
-    checkDebugComTimer.stop();
+
     foreach (QGroupBox *gb, debPortGbList) {
         delete gb;
     }
 
     debPortCmbBxList.clear();
     debPortpbList.clear();
-    debSerialPortList.clear();
+    //debSerialPortList.clear();
     debPortGbList.clear();
     debPortStatusLeList.clear();
 
@@ -1331,14 +1341,14 @@ void MainWindow::createDebugSerialPortInterface()
         gb->setLayout(vblo);
         hblo->addWidget(gb);
 
-        QSerialPort *sp = new QSerialPort(gb);
-        connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
+        //QSerialPort *sp = new QSerialPort(gb);
+        //connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
         connect(pb, &QPushButton::clicked, [=](){ pushDebugComPortOpen(i);});
-        connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
+        //connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
 
         debPortCmbBxList.append(cb);
         debPortpbList.append(pb);
-        debSerialPortList.append(sp);
+        //debSerialPortList.append(sp);
         debPortGbList.append(gb);
         debPortStatusLeList.append(le);
 
@@ -1356,26 +1366,24 @@ void MainWindow::createDebugSerialPortInterface()
     on_pushButton_refreshCom_clicked();
 
 
-    connect(&checkDebugComTimer, SIGNAL(timeout()), this, SLOT(checkDebugComTimerHandle()));
-    checkDebugComTimer.setSingleShot(false);
-    checkDebugComTimer.setInterval(500);
-    checkDebugComTimer.start();
+
 }
 
 void MainWindow::pushDebugComPortOpen(int id)
 {
-    QSerialPort &sp = *debSerialPortList[id];
+    //QSerialPort &sp = *debSerialPortList[id];
     QPushButton &pb = *debPortpbList[id];
     QComboBox &cb = *debPortCmbBxList[id];
 
-    sp.setBaudRate(38400);
+
      if(pb.text() == "open"){
-         if(sp.isOpen() == false){
+         if(lsDebugPort.isPortOpen(id) == false){
              QString comName = cb.currentData().toString();
              if(comName.length() > 0){
                  //UartThread.requestToStart(comName);
-                 sp.setPortName(comName);
-                 if (!sp.open(QIODevice::ReadWrite)) {
+                 //sp.setPortName(comName);
+                 lsDebugPort.setPortName(id, comName);
+                 if (lsDebugPort.open(id) == false) {
                      //qDebug("%s port open FAIL", qUtf8Printable(comName));
                      ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL").arg(qUtf8Printable(comName)));
                      return;
@@ -1392,9 +1400,9 @@ void MainWindow::pushDebugComPortOpen(int id)
              }
          }
      }
-     else{
-         sp.close();
-         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(sp.portName()));
+     else{         
+         lsDebugPort.close(id);
+         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(lsDebugPort.portName(id)));
          pb.setText("open");
          cb.setDisabled(false);
      }
@@ -1403,16 +1411,17 @@ void MainWindow::pushDebugComPortOpen(int id)
 
 void MainWindow::comPortClose(int id)
 {
-    QSerialPort &sp = *debSerialPortList[id];
+    //QSerialPort &sp = *debSerialPortList[id];
     QPushButton &pb = *debPortpbList[id];
     QComboBox &cb = *debPortCmbBxList[id];
     QLineEdit &le = *debPortStatusLeList[id];
 
     cb.setEnabled(true);
     pb.setText("open");
-    if(sp.isOpen() == true){
-        ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(sp.portName()));
-        sp.close();
+    if(lsDebugPort.isPortOpen(id) == true){
+        ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(lsDebugPort.portName(id)));
+        //sp.close();
+        lsDebugPort.close(id);
     }
     le.setPalette(*paletteGrey);
 }
@@ -1422,142 +1431,52 @@ void MainWindow::on_lineEditMotorCount_editingFinished()
     quint32 motorCount = ui->lineEditMotorCount->text().toInt();
     fpgaCtrl.setMotorCount(motorCount);
     settings.setValue("motorCount", motorCount);
+    lsDebugPort.setPortCount(motorCount);
     ui->plainTextEdit->appendPlainText(QString("new motor count %1").arg(ui->lineEditMotorCount->text()));
     createDebugSerialPortInterface();
     createMainInterface();
 }
 
-void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError error)
-{
-    if(error != QSerialPort::NoError){
-        QString errorStr;
-        switch(error){
-            case QSerialPort::DeviceNotFoundError: errorStr = "DeviceNotFoundError"; break;
-            case QSerialPort::PermissionError: errorStr = "PermissionError"; break;
-            case QSerialPort::OpenError: errorStr = "OpenError"; break;
-            case QSerialPort::ParityError: errorStr = "ParityError"; break;
-            case QSerialPort::FramingError: errorStr = "FramingError"; break;
-            case QSerialPort::BreakConditionError: errorStr = "BreakConditionError"; break;
-            case QSerialPort::WriteError: errorStr = "WriteError"; break;
-            case QSerialPort::ReadError: errorStr = "ReadError"; break;
-            case QSerialPort::ResourceError: errorStr = "ResourceError"; break;
-            case QSerialPort::UnsupportedOperationError: errorStr = "UnsupportedOperationError"; break;
-            case QSerialPort::TimeoutError: errorStr = "TimeoutError"; break;
-            case QSerialPort::NotOpenError: errorStr = "NotOpenError"; break;
-            default:
-            case QSerialPort::UnknownError: errorStr = "UnknownError"; break;
+//void MainWindow::handleComPortErrorOccured(int id, QSerialPort::SerialPortError error)
+//{
+//    if(error != QSerialPort::NoError){
+//        QString errorStr;
+//        switch(error){
+//            case QSerialPort::DeviceNotFoundError: errorStr = "DeviceNotFoundError"; break;
+//            case QSerialPort::PermissionError: errorStr = "PermissionError"; break;
+//            case QSerialPort::OpenError: errorStr = "OpenError"; break;
+//            case QSerialPort::ParityError: errorStr = "ParityError"; break;
+//            case QSerialPort::FramingError: errorStr = "FramingError"; break;
+//            case QSerialPort::BreakConditionError: errorStr = "BreakConditionError"; break;
+//            case QSerialPort::WriteError: errorStr = "WriteError"; break;
+//            case QSerialPort::ReadError: errorStr = "ReadError"; break;
+//            case QSerialPort::ResourceError: errorStr = "ResourceError"; break;
+//            case QSerialPort::UnsupportedOperationError: errorStr = "UnsupportedOperationError"; break;
+//            case QSerialPort::TimeoutError: errorStr = "TimeoutError"; break;
+//            case QSerialPort::NotOpenError: errorStr = "NotOpenError"; break;
+//            default:
+//            case QSerialPort::UnknownError: errorStr = "UnknownError"; break;
 
-        }
+//        }
 
-        QString msg = QString("%1 error: %2").arg(qUtf8Printable(debSerialPortList[id]->portName())).arg(errorStr);
-        ui->plainTextEdit->appendPlainText(msg);
-        //qDebug() <<"!!!!!!!" << id <<error;
-        if((error == QSerialPort::ResourceError) ||
-           (error == QSerialPort::PermissionError)){
-            //pushButtonComOpen_clicked(id);
-            comPortClose(id);
-        }
-    }
-}
+//        QString msg = QString("%1 error: %2").arg(qUtf8Printable(lsDebugPort.portName(id))).arg(errorStr);
+//        ui->plainTextEdit->appendPlainText(msg);
+//        //qDebug() <<"!!!!!!!" << id <<error;
+//        if((error == QSerialPort::ResourceError) ||
+//           (error == QSerialPort::PermissionError)){
+//            //pushButtonComOpen_clicked(id);
+//            comPortClose(id);
+//        }
+//    }
+//}
 
-void MainWindow::handleReadyRead(int id)
-{
-    QByteArray ba = debSerialPortList[id]->readAll();
-    //qDebug() << id << ba;
-    parseLeadShineMsg(id, ba);
+//void MainWindow::handleReadyRead(int id)
+//{
+//    QByteArray ba = debSerialPortList[id]->readAll();
+//    //qDebug() << id << ba;
+//    parseLeadShineMsg(id, ba);
 
-}
-
-void MainWindow::checkDebugComTimerHandle()
-{
-    QByteArray reqBase = QByteArrayLiteral("\x01\x03\x00");
-    //const quint8 req1Str[] {0x01, 0x03, 0x00, 0xFD, 0x00, 0x01, 0x15, 0xfa};
-    QByteArray req1 = reqBase + QByteArrayLiteral("\xFD\x00\x01\x15\xfa");
-    QByteArray reqReqErrTrace = reqBase + QByteArrayLiteral("\x10\x00\x0A\xC4\x08");
-    //req1 << 0x01 << 0x03 << 0x00 << 0xFD << 0x00 << 0x01 << 0x15 << 0xfa;
-
-    for(int i=0; i<debPortStatusLeList.length(); i++){
-        bool &bRespRecv = *(motorRespRecvdList[i]);
-        if(bRespRecv == false){
-            debPortStatusMainLeList[i]->setPalette(*paletteGrey);
-            debPortStatusLeList[i]->setPalette(*paletteGrey);
-        }
-        QSerialPort *sp = debSerialPortList[i];
-        if(sp->isOpen()){
-            sp->write(reqReqErrTrace);
-        }
-        bRespRecv = false;
-    }
-}
-
-void MainWindow::parseLeadShineMsg(int id, QByteArray &ba)
-{
-    quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-2);
-    QByteArray crc16ba;
-    crc16ba.append(crc16&0xff);
-    crc16ba.append((crc16>>8)&0xff);
-
-    //quint8 crc16Recvd = ba[ba.length()-1];
-    if(ba.endsWith(crc16ba) == false){
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: recv CRC err").arg(id));
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: CRC %2").arg(id).arg(crc16));
-        return;
-    }
-
-    if((ba.length()==25)&&(ba[0] == 0x01)&&(ba[1] == 0x03)&&(ba[2] == 0x14)){
-        bool &bRespRecv = *(motorRespRecvdList[id]);
-        bRespRecv = true;
-
-        //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
-        if((ba[4]&0x50) == 0){
-            debPortStatusLeList[id]->setPalette(*paletteGreen);
-            debPortStatusMainLeList[id]->setPalette(*paletteGreen);
-            //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
-            debPortStatusLeList[id]->setText("OK");
-            debPortStatusMainLeList[id]->setText("OK");
-
-        }
-        else{
-            debPortStatusLeList[id]->setPalette(*paletteRed);
-            debPortStatusMainLeList[id]->setPalette(*paletteRed);
-            if(ba[4]&0x10){ //encErr
-                debPortStatusLeList[id]->setText("enc err");
-                debPortStatusMainLeList[id]->setText("enc err");
-            }
-            if(ba[4]&0x40){ //posErr
-                debPortStatusLeList[id]->setText("pos err");
-                debPortStatusMainLeList[id]->setText("pos err");
-            }
-        }
-    }
-    else{
-        ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
-    }
-}
-
-#include <QtEndian>
-quint16 MainWindow::CRC16_ModBusRTU(QByteArray buf, quint16 len)
-{
-    //Вычисляет контрольную сумму CRC16 для ModBus и выдаёт её с нужным порядком байтов
-      quint16 crc = 0xFFFF;
-      for (int pos = 0; pos < len; pos++)
-      {
-      crc ^= (quint16)buf[pos];    // XOR byte into least sig. byte of crc
-
-      for (int i = 8; i != 0; i--) {    // Loop over each bit
-        if ((crc & 0x0001) != 0) {      // If the LSB is set
-          crc >>= 1;                    // Shift right and XOR 0xA001
-          crc ^= 0xA001;
-        }
-        else                            // Else LSB is not set
-          crc >>= 1;                    // Just shift right
-        }
-      }
-      return crc;
-}
-
-
+//}
 
 void MainWindow::on_checkBoxDirInverse_clicked()
 {
