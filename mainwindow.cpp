@@ -1432,6 +1432,7 @@ void MainWindow::comPortClose(int id)
 void MainWindow::on_lineEditMotorCount_editingFinished()
 {
     quint32 motorCount = ui->lineEditMotorCount->text().toInt();
+    fpgaCtrl.setMotorCount(motorCount);
     settings.setValue("motorCount", motorCount);
     lsDebugPort.setPortCount(motorCount);
     ui->plainTextEdit->appendPlainText(QString("new motor count %1").arg(ui->lineEditMotorCount->text()));
