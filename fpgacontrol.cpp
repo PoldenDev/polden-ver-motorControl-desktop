@@ -748,7 +748,29 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
     if(id == 0){
         qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
     }
-    motorPosCmdData[id].append(ds);
+
+    if(ds.steps > MAX_STEPS){
+        int steps = ds.steps;
+        int pts = 1;
+        if(id==0){
+            qDebug("maxSteps err st: %d, msecsForMove %d", steps, msecsForMove);
+        }
+        while(steps>MAX_STEPS){
+            steps /= 2;
+            pts *= 2;
+        }
+        for(int i=0; i<pts; i++){
+            ds.steps = steps;
+            motorPosCmdData[id].append(ds);
+            if(id==0){
+                qDebug("maxSteps err addPt st %d", ds.steps);
+            }
+        }
+    }
+    else{
+        motorPosCmdData[id].append(ds);
+    }
+
     if(dt > 0){
         ds.steps = 0;
         ds.msecsFor = dt;
