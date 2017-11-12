@@ -11,7 +11,8 @@ FpgaControl::FpgaControl(QObject *parent) :
     fpgaFreq(FPGA_FREQ_25),
     bDirInvers(false),
     recvInterval(-1),
-    bTermState(MOTOR_CNT)
+    bTermState(MOTOR_CNT),
+    maxDiv_debug(0), maxSteps_debug(0)
 {
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
@@ -367,7 +368,7 @@ void FpgaControl::sendDivPos(int mi, DivPosDataStr &ds)
     quint32 temp = 0;
     temp = mi&0xf;
     temp |= ((div&DIV_MASK)<<4);
-    temp |= (((quint64)steps&STEPS_MASK)<<20);
+    temp |= (((quint64)steps&STEPS_MASK)<<19);
     temp |= (((quint64)dir&0x1)<<31);
     QByteArray ba = QByteArray::fromRawData((char*)&temp, sizeof(quint32));
 
@@ -728,6 +729,13 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
 
     ds.steps =  abs(delta);
     ds.msecsFor = msecsForMove;
+
+
+    if(ds.steps > maxSteps_debug){
+        maxSteps_debug = ds.steps;
+        qDebug() << "new max steps == "<< maxSteps_debug ;
+    }
+
     int dt = 0;
     if(delta == 0){
         ds.finishAbsTimeMsec = curmSecs + 100;
@@ -736,6 +744,10 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
         //float secsOnStep = msecsForMove / (ds.steps*1000.);
         //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
         ds.div = (quint32)(freqOnMove/ds.steps);
+        if(ds.div > maxDiv_debug){
+            maxDiv_debug = ds.div;
+            qDebug("new max div == 0x%x", maxDiv_debug) ;
+        }
         if(ds.div > MAX_DIV){
             ds.div = MAX_DIV;
             int nt = (ds.div*ds.steps*1000)/fpgaFreq;
@@ -743,7 +755,7 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
             if(id==0){
                 qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
             }
-        }
+        }        
     }
     if(id == 0){
         qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));

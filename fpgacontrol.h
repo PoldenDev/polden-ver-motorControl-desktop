@@ -70,6 +70,7 @@ private:
 //    bool isBufferFree(qint32, int);
 //    void setBufferNotFree(qint32&, int);
 //    bool isTermEna(qint32, int);
+    int maxDiv_debug, maxSteps_debug;
 
 signals:
     void termStateChanged(int, bool);
