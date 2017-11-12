@@ -25,7 +25,6 @@
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -79,48 +78,6 @@ public:
     QLabel *label_6;
     QLineEdit *lineEditDataGramCnt;
     QCheckBox *checkBoxSliderPosCtrl;
-    QWidget *tabTimeStat;
-    QHBoxLayout *horizontalLayout_8;
-    QWidget *widget_10;
-    QVBoxLayout *verticalLayout_5;
-    QSlider *timeShift_0;
-    QLineEdit *lineEditTimeShift_0;
-    QWidget *widget_11;
-    QVBoxLayout *verticalLayout_6;
-    QSlider *timeShift_1;
-    QLineEdit *lineEditTimeShift_1;
-    QWidget *widget_12;
-    QVBoxLayout *verticalLayout_7;
-    QSlider *timeShift_2;
-    QLineEdit *lineEditTimeShift_2;
-    QWidget *widget_13;
-    QVBoxLayout *verticalLayout_8;
-    QSlider *timeShift_3;
-    QLineEdit *lineEditTimeShift_3;
-    QWidget *widget_14;
-    QVBoxLayout *verticalLayout_9;
-    QSlider *timeShift_4;
-    QLineEdit *lineEditTimeShift_4;
-    QWidget *widget_15;
-    QVBoxLayout *verticalLayout_10;
-    QSlider *timeShift_5;
-    QLineEdit *lineEditTimeShift_5;
-    QWidget *widget_16;
-    QVBoxLayout *verticalLayout_11;
-    QSlider *timeShift_6;
-    QLineEdit *lineEditTimeShift_6;
-    QWidget *widget_18;
-    QVBoxLayout *verticalLayout_13;
-    QSlider *timeShift_8;
-    QLineEdit *lineEditTimeShift_8;
-    QWidget *widget_17;
-    QVBoxLayout *verticalLayout_12;
-    QSlider *timeShift_7;
-    QLineEdit *lineEditTimeShift_7;
-    QWidget *widget_19;
-    QVBoxLayout *verticalLayout_14;
-    QSlider *timeShift_9;
-    QLineEdit *lineEditTimeShift_9;
     QWidget *tabSettings;
     QGroupBox *groupBox_5;
     QLabel *label_8;
@@ -406,313 +363,6 @@ public:
         checkBoxSliderPosCtrl->setObjectName(QStringLiteral("checkBoxSliderPosCtrl"));
         checkBoxSliderPosCtrl->setGeometry(QRect(600, 280, 70, 17));
         tabWidget->addTab(tabMainStat, QString());
-        tabTimeStat = new QWidget();
-        tabTimeStat->setObjectName(QStringLiteral("tabTimeStat"));
-        horizontalLayout_8 = new QHBoxLayout(tabTimeStat);
-        horizontalLayout_8->setSpacing(6);
-        horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
-        widget_10 = new QWidget(tabTimeStat);
-        widget_10->setObjectName(QStringLiteral("widget_10"));
-        verticalLayout_5 = new QVBoxLayout(widget_10);
-        verticalLayout_5->setSpacing(6);
-        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
-        timeShift_0 = new QSlider(widget_10);
-        timeShift_0->setObjectName(QStringLiteral("timeShift_0"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Expanding);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(timeShift_0->sizePolicy().hasHeightForWidth());
-        timeShift_0->setSizePolicy(sizePolicy1);
-        timeShift_0->setMinimum(-1999);
-        timeShift_0->setMaximum(1999);
-        timeShift_0->setTracking(true);
-        timeShift_0->setOrientation(Qt::Vertical);
-        timeShift_0->setTickPosition(QSlider::TicksBothSides);
-        timeShift_0->setTickInterval(500);
-
-        verticalLayout_5->addWidget(timeShift_0);
-
-        lineEditTimeShift_0 = new QLineEdit(widget_10);
-        lineEditTimeShift_0->setObjectName(QStringLiteral("lineEditTimeShift_0"));
-        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_0->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_0->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_0->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_5->addWidget(lineEditTimeShift_0);
-
-
-        horizontalLayout_8->addWidget(widget_10, 0, Qt::AlignHCenter);
-
-        widget_11 = new QWidget(tabTimeStat);
-        widget_11->setObjectName(QStringLiteral("widget_11"));
-        verticalLayout_6 = new QVBoxLayout(widget_11);
-        verticalLayout_6->setSpacing(6);
-        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
-        timeShift_1 = new QSlider(widget_11);
-        timeShift_1->setObjectName(QStringLiteral("timeShift_1"));
-        sizePolicy1.setHeightForWidth(timeShift_1->sizePolicy().hasHeightForWidth());
-        timeShift_1->setSizePolicy(sizePolicy1);
-        timeShift_1->setMinimum(-1999);
-        timeShift_1->setMaximum(1999);
-        timeShift_1->setTracking(true);
-        timeShift_1->setOrientation(Qt::Vertical);
-        timeShift_1->setTickPosition(QSlider::TicksBothSides);
-        timeShift_1->setTickInterval(500);
-
-        verticalLayout_6->addWidget(timeShift_1);
-
-        lineEditTimeShift_1 = new QLineEdit(widget_11);
-        lineEditTimeShift_1->setObjectName(QStringLiteral("lineEditTimeShift_1"));
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_1->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_1->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_1->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_6->addWidget(lineEditTimeShift_1);
-
-
-        horizontalLayout_8->addWidget(widget_11, 0, Qt::AlignHCenter);
-
-        widget_12 = new QWidget(tabTimeStat);
-        widget_12->setObjectName(QStringLiteral("widget_12"));
-        verticalLayout_7 = new QVBoxLayout(widget_12);
-        verticalLayout_7->setSpacing(6);
-        verticalLayout_7->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
-        timeShift_2 = new QSlider(widget_12);
-        timeShift_2->setObjectName(QStringLiteral("timeShift_2"));
-        sizePolicy1.setHeightForWidth(timeShift_2->sizePolicy().hasHeightForWidth());
-        timeShift_2->setSizePolicy(sizePolicy1);
-        timeShift_2->setMinimum(-1999);
-        timeShift_2->setMaximum(1999);
-        timeShift_2->setTracking(true);
-        timeShift_2->setOrientation(Qt::Vertical);
-        timeShift_2->setTickPosition(QSlider::TicksBothSides);
-        timeShift_2->setTickInterval(500);
-
-        verticalLayout_7->addWidget(timeShift_2);
-
-        lineEditTimeShift_2 = new QLineEdit(widget_12);
-        lineEditTimeShift_2->setObjectName(QStringLiteral("lineEditTimeShift_2"));
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_2->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_2->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_2->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_7->addWidget(lineEditTimeShift_2);
-
-
-        horizontalLayout_8->addWidget(widget_12);
-
-        widget_13 = new QWidget(tabTimeStat);
-        widget_13->setObjectName(QStringLiteral("widget_13"));
-        verticalLayout_8 = new QVBoxLayout(widget_13);
-        verticalLayout_8->setSpacing(6);
-        verticalLayout_8->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_8->setObjectName(QStringLiteral("verticalLayout_8"));
-        timeShift_3 = new QSlider(widget_13);
-        timeShift_3->setObjectName(QStringLiteral("timeShift_3"));
-        sizePolicy1.setHeightForWidth(timeShift_3->sizePolicy().hasHeightForWidth());
-        timeShift_3->setSizePolicy(sizePolicy1);
-        timeShift_3->setMinimum(-1999);
-        timeShift_3->setMaximum(1999);
-        timeShift_3->setTracking(true);
-        timeShift_3->setOrientation(Qt::Vertical);
-        timeShift_3->setTickPosition(QSlider::TicksBothSides);
-        timeShift_3->setTickInterval(500);
-
-        verticalLayout_8->addWidget(timeShift_3);
-
-        lineEditTimeShift_3 = new QLineEdit(widget_13);
-        lineEditTimeShift_3->setObjectName(QStringLiteral("lineEditTimeShift_3"));
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_3->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_3->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_3->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_8->addWidget(lineEditTimeShift_3);
-
-
-        horizontalLayout_8->addWidget(widget_13);
-
-        widget_14 = new QWidget(tabTimeStat);
-        widget_14->setObjectName(QStringLiteral("widget_14"));
-        verticalLayout_9 = new QVBoxLayout(widget_14);
-        verticalLayout_9->setSpacing(6);
-        verticalLayout_9->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_9->setObjectName(QStringLiteral("verticalLayout_9"));
-        timeShift_4 = new QSlider(widget_14);
-        timeShift_4->setObjectName(QStringLiteral("timeShift_4"));
-        sizePolicy1.setHeightForWidth(timeShift_4->sizePolicy().hasHeightForWidth());
-        timeShift_4->setSizePolicy(sizePolicy1);
-        timeShift_4->setMinimum(-1999);
-        timeShift_4->setMaximum(1999);
-        timeShift_4->setTracking(true);
-        timeShift_4->setOrientation(Qt::Vertical);
-        timeShift_4->setTickPosition(QSlider::TicksBothSides);
-        timeShift_4->setTickInterval(500);
-
-        verticalLayout_9->addWidget(timeShift_4);
-
-        lineEditTimeShift_4 = new QLineEdit(widget_14);
-        lineEditTimeShift_4->setObjectName(QStringLiteral("lineEditTimeShift_4"));
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_4->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_4->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_4->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_9->addWidget(lineEditTimeShift_4);
-
-
-        horizontalLayout_8->addWidget(widget_14);
-
-        widget_15 = new QWidget(tabTimeStat);
-        widget_15->setObjectName(QStringLiteral("widget_15"));
-        verticalLayout_10 = new QVBoxLayout(widget_15);
-        verticalLayout_10->setSpacing(6);
-        verticalLayout_10->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
-        timeShift_5 = new QSlider(widget_15);
-        timeShift_5->setObjectName(QStringLiteral("timeShift_5"));
-        sizePolicy1.setHeightForWidth(timeShift_5->sizePolicy().hasHeightForWidth());
-        timeShift_5->setSizePolicy(sizePolicy1);
-        timeShift_5->setMinimum(-1999);
-        timeShift_5->setMaximum(1999);
-        timeShift_5->setTracking(true);
-        timeShift_5->setOrientation(Qt::Vertical);
-        timeShift_5->setTickPosition(QSlider::TicksBothSides);
-        timeShift_5->setTickInterval(500);
-
-        verticalLayout_10->addWidget(timeShift_5);
-
-        lineEditTimeShift_5 = new QLineEdit(widget_15);
-        lineEditTimeShift_5->setObjectName(QStringLiteral("lineEditTimeShift_5"));
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_5->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_5->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_5->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_10->addWidget(lineEditTimeShift_5);
-
-
-        horizontalLayout_8->addWidget(widget_15);
-
-        widget_16 = new QWidget(tabTimeStat);
-        widget_16->setObjectName(QStringLiteral("widget_16"));
-        verticalLayout_11 = new QVBoxLayout(widget_16);
-        verticalLayout_11->setSpacing(6);
-        verticalLayout_11->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
-        timeShift_6 = new QSlider(widget_16);
-        timeShift_6->setObjectName(QStringLiteral("timeShift_6"));
-        sizePolicy1.setHeightForWidth(timeShift_6->sizePolicy().hasHeightForWidth());
-        timeShift_6->setSizePolicy(sizePolicy1);
-        timeShift_6->setMinimum(-1999);
-        timeShift_6->setMaximum(1999);
-        timeShift_6->setTracking(true);
-        timeShift_6->setOrientation(Qt::Vertical);
-        timeShift_6->setTickPosition(QSlider::TicksBothSides);
-        timeShift_6->setTickInterval(500);
-
-        verticalLayout_11->addWidget(timeShift_6);
-
-        lineEditTimeShift_6 = new QLineEdit(widget_16);
-        lineEditTimeShift_6->setObjectName(QStringLiteral("lineEditTimeShift_6"));
-        sizePolicy2.setHeightForWidth(lineEditTimeShift_6->sizePolicy().hasHeightForWidth());
-        lineEditTimeShift_6->setSizePolicy(sizePolicy2);
-        lineEditTimeShift_6->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_11->addWidget(lineEditTimeShift_6);
-
-
-        horizontalLayout_8->addWidget(widget_16);
-
-        widget_18 = new QWidget(tabTimeStat);
-        widget_18->setObjectName(QStringLiteral("widget_18"));
-        verticalLayout_13 = new QVBoxLayout(widget_18);
-        verticalLayout_13->setSpacing(6);
-        verticalLayout_13->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_13->setObjectName(QStringLiteral("verticalLayout_13"));
-        timeShift_8 = new QSlider(widget_18);
-        timeShift_8->setObjectName(QStringLiteral("timeShift_8"));
-        sizePolicy1.setHeightForWidth(timeShift_8->sizePolicy().hasHeightForWidth());
-        timeShift_8->setSizePolicy(sizePolicy1);
-        timeShift_8->setMinimum(-1999);
-        timeShift_8->setMaximum(1999);
-        timeShift_8->setTracking(true);
-        timeShift_8->setOrientation(Qt::Vertical);
-        timeShift_8->setTickPosition(QSlider::TicksBothSides);
-        timeShift_8->setTickInterval(500);
-
-        verticalLayout_13->addWidget(timeShift_8);
-
-        lineEditTimeShift_8 = new QLineEdit(widget_18);
-        lineEditTimeShift_8->setObjectName(QStringLiteral("lineEditTimeShift_8"));
-        lineEditTimeShift_8->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_13->addWidget(lineEditTimeShift_8);
-
-
-        horizontalLayout_8->addWidget(widget_18);
-
-        widget_17 = new QWidget(tabTimeStat);
-        widget_17->setObjectName(QStringLiteral("widget_17"));
-        verticalLayout_12 = new QVBoxLayout(widget_17);
-        verticalLayout_12->setSpacing(6);
-        verticalLayout_12->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_12->setObjectName(QStringLiteral("verticalLayout_12"));
-        timeShift_7 = new QSlider(widget_17);
-        timeShift_7->setObjectName(QStringLiteral("timeShift_7"));
-        sizePolicy1.setHeightForWidth(timeShift_7->sizePolicy().hasHeightForWidth());
-        timeShift_7->setSizePolicy(sizePolicy1);
-        timeShift_7->setMinimum(-1999);
-        timeShift_7->setMaximum(1999);
-        timeShift_7->setTracking(true);
-        timeShift_7->setOrientation(Qt::Vertical);
-        timeShift_7->setTickPosition(QSlider::TicksBothSides);
-        timeShift_7->setTickInterval(500);
-
-        verticalLayout_12->addWidget(timeShift_7);
-
-        lineEditTimeShift_7 = new QLineEdit(widget_17);
-        lineEditTimeShift_7->setObjectName(QStringLiteral("lineEditTimeShift_7"));
-        lineEditTimeShift_7->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_12->addWidget(lineEditTimeShift_7);
-
-
-        horizontalLayout_8->addWidget(widget_17);
-
-        widget_19 = new QWidget(tabTimeStat);
-        widget_19->setObjectName(QStringLiteral("widget_19"));
-        verticalLayout_14 = new QVBoxLayout(widget_19);
-        verticalLayout_14->setSpacing(6);
-        verticalLayout_14->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_14->setObjectName(QStringLiteral("verticalLayout_14"));
-        timeShift_9 = new QSlider(widget_19);
-        timeShift_9->setObjectName(QStringLiteral("timeShift_9"));
-        sizePolicy1.setHeightForWidth(timeShift_9->sizePolicy().hasHeightForWidth());
-        timeShift_9->setSizePolicy(sizePolicy1);
-        timeShift_9->setMinimum(-1999);
-        timeShift_9->setMaximum(1999);
-        timeShift_9->setTracking(true);
-        timeShift_9->setOrientation(Qt::Vertical);
-        timeShift_9->setTickPosition(QSlider::TicksBothSides);
-        timeShift_9->setTickInterval(500);
-
-        verticalLayout_14->addWidget(timeShift_9);
-
-        lineEditTimeShift_9 = new QLineEdit(widget_19);
-        lineEditTimeShift_9->setObjectName(QStringLiteral("lineEditTimeShift_9"));
-        lineEditTimeShift_9->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_14->addWidget(lineEditTimeShift_9);
-
-
-        horizontalLayout_8->addWidget(widget_19);
-
-        tabWidget->addTab(tabTimeStat, QString());
         tabSettings = new QWidget();
         tabSettings->setObjectName(QStringLiteral("tabSettings"));
         groupBox_5 = new QGroupBox(tabSettings);
@@ -1017,11 +667,11 @@ public:
 
         plainTextUDP = new QPlainTextEdit(widget);
         plainTextUDP->setObjectName(QStringLiteral("plainTextUDP"));
-        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(plainTextUDP->sizePolicy().hasHeightForWidth());
-        plainTextUDP->setSizePolicy(sizePolicy3);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(plainTextUDP->sizePolicy().hasHeightForWidth());
+        plainTextUDP->setSizePolicy(sizePolicy1);
         plainTextUDP->setMinimumSize(QSize(0, 0));
         plainTextUDP->setMaximumSize(QSize(16777215, 16777215));
         plainTextUDP->setReadOnly(true);
@@ -1067,7 +717,6 @@ public:
         label_6->setText(QApplication::translate("MainWindow", "\320\224\320\263\321\200\320\274", Q_NULLPTR));
         checkBoxSliderPosCtrl->setText(QApplication::translate("MainWindow", "sliderPosCtrl", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabMainStat), QApplication::translate("MainWindow", "mainStat", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tabTimeStat), QApplication::translate("MainWindow", "timeStat", Q_NULLPTR));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "\320\234\320\265\321\205\320\260\320\275\320\270\320\272\320\260", Q_NULLPTR));
         label_8->setText(QApplication::translate("MainWindow", "\320\270\320\274\320\277/\320\276\320\261", Q_NULLPTR));
         lineEdit_ImpPerRot->setInputMask(QString());

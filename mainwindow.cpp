@@ -87,33 +87,33 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-    ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
-    ui->widget_11->layout()->setAlignment(Qt::AlignHCenter);
+//    ui->widget_10->layout()->setAlignment(Qt::AlignHCenter);
+//    ui->widget_11->layout()->setAlignment(Qt::AlignHCenter);
 
     createDebugSerialPortInterface();
     createMainInterface();
 
-    timeStatSlider.append(ui->timeShift_0);
-    timeStatSlider.append(ui->timeShift_1);
-    timeStatSlider.append(ui->timeShift_2);
-    timeStatSlider.append(ui->timeShift_3);
-    timeStatSlider.append(ui->timeShift_4);
-    timeStatSlider.append(ui->timeShift_5);
-    timeStatSlider.append(ui->timeShift_6);
-    timeStatSlider.append(ui->timeShift_7);
-    timeStatSlider.append(ui->timeShift_8);
-    timeStatSlider.append(ui->timeShift_9);
+//    timeStatSlider.append(ui->timeShift_0);
+//    timeStatSlider.append(ui->timeShift_1);
+//    timeStatSlider.append(ui->timeShift_2);
+//    timeStatSlider.append(ui->timeShift_3);
+//    timeStatSlider.append(ui->timeShift_4);
+//    timeStatSlider.append(ui->timeShift_5);
+//    timeStatSlider.append(ui->timeShift_6);
+//    timeStatSlider.append(ui->timeShift_7);
+//    timeStatSlider.append(ui->timeShift_8);
+//    timeStatSlider.append(ui->timeShift_9);
 
-    timeStatLE.append(ui->lineEditTimeShift_0);
-    timeStatLE.append(ui->lineEditTimeShift_1);
-    timeStatLE.append(ui->lineEditTimeShift_2);
-    timeStatLE.append(ui->lineEditTimeShift_3);
-    timeStatLE.append(ui->lineEditTimeShift_4);
-    timeStatLE.append(ui->lineEditTimeShift_5);
-    timeStatLE.append(ui->lineEditTimeShift_6);
-    timeStatLE.append(ui->lineEditTimeShift_7);
-    timeStatLE.append(ui->lineEditTimeShift_8);
-    timeStatLE.append(ui->lineEditTimeShift_9);
+//    timeStatLE.append(ui->lineEditTimeShift_0);
+//    timeStatLE.append(ui->lineEditTimeShift_1);
+//    timeStatLE.append(ui->lineEditTimeShift_2);
+//    timeStatLE.append(ui->lineEditTimeShift_3);
+//    timeStatLE.append(ui->lineEditTimeShift_4);
+//    timeStatLE.append(ui->lineEditTimeShift_5);
+//    timeStatLE.append(ui->lineEditTimeShift_6);
+//    timeStatLE.append(ui->lineEditTimeShift_7);
+//    timeStatLE.append(ui->lineEditTimeShift_8);
+//    timeStatLE.append(ui->lineEditTimeShift_9);
 
 //    absPosSlider.append(ui->SliderPos0);
 //    absPosSlider.append(ui->SliderPos1);
@@ -1326,17 +1326,21 @@ void MainWindow::createDebugSerialPortInterface()
     for(int i=0; i<motorCount; i++){
         QGroupBox *gb = new QGroupBox(QString("Port %1").arg(i));
         //gb->setAlignment(Qt::AlignHCenter);
+
         QVBoxLayout *vblo = new QVBoxLayout(gb);
         QComboBox *cb = new QComboBox(gb);
+        cb->setMinimumWidth(10);
         vblo->addWidget(cb);
         QPushButton *pb = new QPushButton("open", gb);
+        pb->setMinimumWidth(10);
         vblo->addWidget(pb);
-        QLineEdit *le = new QLineEdit(this);
+        QLineEdit *le = new QLineEdit(gb);
         le->setReadOnly(true);
         le->setAttribute(Qt::WA_TransparentForMouseEvents);
         le->setAlignment(Qt::AlignHCenter);
         le->setText("N/A");
         le->setPalette(*paletteGrey);
+        le->setMinimumWidth(10);
         vblo->addWidget(le);
 
         vblo->setAlignment(Qt::AlignTop);
