@@ -539,7 +539,7 @@ void MainWindow::handleReadPendingDatagrams()
                 ui->plainTextUDP->appendPlainText("start cmd");
         }
         else if(dataStr.compare("init\r\n") == 0){
-            on_pushButtonInitiate_clicked();
+            //on_pushButtonInitiate_clicked();
             //if(ui->checkBoxPrintUDPData->isChecked())
                 ui->plainTextUDP->appendPlainText("init cmd");
         }

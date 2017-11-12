@@ -734,6 +734,7 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
     if(ds.steps > maxSteps_debug){
         maxSteps_debug = ds.steps;
         qDebug() << "new max steps == "<< maxSteps_debug ;
+
     }
 
     int dt = 0;
