@@ -725,8 +725,107 @@ void FpgaControl::addRawCmd(int id, quint32 d, quint32 st, int dir)
 
 }
 
-void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id)
+//void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id)
+//{
+//    float secsOnMove = msecsForMove/1000.;
+//    quint32 freqOnMove = fpgaFreq*secsOnMove;
+//    ds.startTime = 0;
+//    ds.dir = delta > 0? 1: 0;
+//    if(bDirInvers)
+//        ds.dir = delta > 0? 0: 1;
+
+//    ds.steps =  abs(delta);
+//    ds.msecsFor = msecsForMove;
+
+
+//    if(ds.steps > maxSteps_debug){
+//        maxSteps_debug = ds.steps;
+//        qDebug() << "new max steps == "<< maxSteps_debug ;
+
+//    }
+
+//    int dt = 0;
+//    if(delta == 0){
+//        ds.finishAbsTimeMsec = curmSecs + 100;
+//    }
+//    else{
+//        //float secsOnStep = msecsForMove / (ds.steps*1000.);
+//        //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
+//        ds.div = (quint32)(freqOnMove/ds.steps);
+//        if(ds.div > maxDiv_debug){
+//            maxDiv_debug = ds.div;
+//            qDebug("new max div == 0x%x", maxDiv_debug) ;
+//        }
+//        if(ds.div > MAX_DIV){
+//            ds.div = MAX_DIV;
+//            int nt = (ds.div*ds.steps*1000)/fpgaFreq;
+//            dt = msecsForMove - nt;
+//            if(id==0){
+//                QString msg;
+//                msg.sprintf("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
+//                emit errorOccured(msg);
+//                qDebug() << qPrintable(msg);
+//            }
+//        }
+//    }
+//    if(id == 0){
+//        qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
+//    }
+
+//    if(ds.steps > MAX_STEPS){
+//        int steps = ds.steps;
+//        int pts = 1;
+//        if(id==0){
+//            QString msg;
+//            msg.sprintf("maxSteps err st: %d, msecsForMove %d", steps, msecsForMove);
+//            emit errorOccured(msg);
+//            qDebug() << qPrintable(msg);
+//        }
+//        while(steps>MAX_STEPS){
+//            steps /= 2;
+//            pts *= 2;
+//        }
+//        for(int i=0; i<pts; i++){
+//            ds.steps = steps;
+//            motorPosCmdData[id].append(ds);
+//            if(id==0){
+//                qDebug("maxSteps err addPt st %d", ds.steps);
+//            }
+//        }
+//    }
+//    else{
+//        motorPosCmdData[id].append(ds);
+//    }
+
+//    if(dt > 0){
+//        ds.steps = 0;
+//        ds.msecsFor = dt;
+//        motorPosCmdData[id].append(ds);
+//        if(id==0) qDebug("added Pt");
+//    }
+//}
+
+void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
 {
+    DivPosDataStr ds;
+    ds.finishPos = newPosImp;
+    quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
+
+    int delta = 0;
+    if(motorPosCmdData[id].isEmpty() == true){
+        if(id == 0){
+            qDebug() << "ql epmty"<< "np" << newPosImp << "cp" << getMotorAbsPosImp(id);
+        }
+        delta = newPosImp - getMotorAbsPosImp(id);
+    }
+    else{        
+        if(id == 0){
+            qDebug() << "ql" << motorPosCmdData[id].length() << "np" << newPosImp << "cp" << getMotorAbsPosImp(id)<< "fp" << motorPosCmdData[id].last().finishPos;
+        }
+        delta = newPosImp - motorPosCmdData[id].last().finishPos;
+    }
+
+
     float secsOnMove = msecsForMove/1000.;
     quint32 freqOnMove = fpgaFreq*secsOnMove;
     ds.startTime = 0;
@@ -760,13 +859,13 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
             ds.div = MAX_DIV;
             int nt = (ds.div*ds.steps*1000)/fpgaFreq;
             dt = msecsForMove - nt;
-            if(id==0){                
+            if(id==0){
                 QString msg;
                 msg.sprintf("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
                 emit errorOccured(msg);
                 qDebug() << qPrintable(msg);
             }
-        }        
+        }
     }
     if(id == 0){
         qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
@@ -802,62 +901,6 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
         ds.msecsFor = dt;
         motorPosCmdData[id].append(ds);
         if(id==0) qDebug("added Pt");
-    }
-}
-
-void FpgaControl::addMotorCmd(int mn, int newPosImp, int msecsForMove)
-{
-    DivPosDataStr ds;
-    ds.finishPos = newPosImp;
-    quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
-
-//    if(mn == 0){
-//        qDebug() << "ql" << motorPosCmdData[mn].length() << "fp" << motorPosCmdData[mn].last().finishPos << "np" << newPosImp << "cp" << getMotorAbsPosImp(mn);
-//    }
-
-
-    if(motorPosCmdData[mn].isEmpty() == true){
-        if(mn == 0){
-            qDebug() << "ql epmty"<< "np" << newPosImp << "cp" << getMotorAbsPosImp(mn);
-        }
-
-        quint32 curPos = getMotorAbsPosImp(mn);
-        int delta = newPosImp - curPos;
-        //int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
-        //int maxImpPerDelta = mmToImp(vmaxMmsec)/10;
-        //qDebug("%d", maxImpPerDelta);
-
-        int maxImpPerDelta = 10000;
-
-        int n=1;
-        for(; abs(delta)>maxImpPerDelta; n*=2){
-            delta/=2;
-        }
-        if(n>1){
-            //qDebug("%d add %d Pts %d", mn, n, delta);
-//            ui->plainTextUDP->appendPlainText(QString("%1 add %2 Pts,delta=%3")
-//                                              .arg(mn)
-//                                              .arg(n)
-//                                              .arg(delta));
-        }
-
-        for(int i=0; i<n; i++){
-            ds.finishPos = curPos + delta;
-            curPos += delta;
-            calcCmd(ds, delta, curmSecs, msecsForMove, mn);
-            //motorPosCmdData[mn].append(ds);
-        }
-    }
-    else{        
-        if(mn == 0){
-            //qDebug() << "np" << newPosImp << "ql" << motorPosCmdData[mn].length() << "fp" <<motorPosCmdData[mn].last().finishPos;
-            qDebug() << "ql" << motorPosCmdData[mn].length() << "np" << newPosImp << "cp" << getMotorAbsPosImp(mn)<< "fp" << motorPosCmdData[mn].last().finishPos;
-        }
-        int delta = newPosImp - motorPosCmdData[mn].last().finishPos;
-        //if(delta != 0)
-        //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));
-        calcCmd(ds, delta, curmSecs, msecsForMove, mn);
-        //motorPosCmdData[mn].append(ds);
     }
 }
 
