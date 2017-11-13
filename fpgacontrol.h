@@ -64,8 +64,6 @@ private:
     void terminatorState(int i, bool bEna);
     void allFreeToWrite();
     void sendDivPos(int mi, DivPosDataStr &ds);
-//    void calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint32 msecsForMove, int id);
-
 
 //    bool isBufferFree(qint32, int);
 //    void setBufferNotFree(qint32&, int);

@@ -733,15 +733,15 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
 
     int delta = 0;
     if(motorPosCmdData[id].isEmpty() == true){
-        if(id == 0){
-            qDebug() << "ql epmty"<< "np" << newPosImp << "cp" << getMotorAbsPosImp(id);
-        }
+//        if(id == 0){
+//            qDebug() << "ql epmty"<< "np" << newPosImp << "cp" << getMotorAbsPosImp(id);
+//        }
         delta = newPosImp - getMotorAbsPosImp(id);
     }
     else{        
-        if(id == 0){
-            qDebug() << "ql" << motorPosCmdData[id].length() << "np" << newPosImp << "cp" << getMotorAbsPosImp(id)<< "fp" << motorPosCmdData[id].last().finishPos;
-        }
+//        if(id == 0){
+//            qDebug() << "ql" << motorPosCmdData[id].length() << "np" << newPosImp << "cp" << getMotorAbsPosImp(id)<< "fp" << motorPosCmdData[id].last().finishPos;
+//        }
         delta = newPosImp - motorPosCmdData[id].last().finishPos;
     }
 
@@ -759,8 +759,10 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
 
     if(ds.steps > maxSteps_debug){
         maxSteps_debug = ds.steps;
-        qDebug() << "new max steps == "<< maxSteps_debug ;
-
+        QString msg;
+        msg.sprintf("new max steps == %d", maxSteps_debug);
+        //qDebug() << qPrintable(msg);
+        emit errorOccured(msg);
     }
 
     int dt = 0;
@@ -773,7 +775,9 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
         ds.div = (quint32)(freqOnMove/ds.steps);
         if(ds.div > maxDiv_debug){
             maxDiv_debug = ds.div;
-            qDebug("new max div == 0x%x", maxDiv_debug) ;
+            QString msg;
+            msg.sprintf("new max div == 0x%x", maxDiv_debug);
+            //qDebug() << qPrintable(msg);
         }
         if(ds.div > MAX_DIV){
             ds.div = MAX_DIV;
@@ -783,12 +787,12 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
                 QString msg;
                 msg.sprintf("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
                 emit errorOccured(msg);
-                qDebug() << qPrintable(msg);
+                //qDebug() << qPrintable(msg);
             }
         }
     }
     if(id == 0){
-        qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
+        //qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
     }
 
     if(ds.steps > MAX_STEPS){
@@ -808,7 +812,10 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
             ds.steps = steps;
             motorPosCmdData[id].append(ds);
             if(id==0){
-                qDebug("maxSteps err addPt st %d", ds.steps);
+                QString msg;
+                msg.sprintf("maxSteps err addPt st %d", ds.steps);
+                emit errorOccured(msg);
+                qDebug() << qPrintable(msg);
             }
         }
     }
@@ -820,7 +827,11 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
         ds.steps = 0;
         ds.msecsFor = dt;
         motorPosCmdData[id].append(ds);
-        if(id==0) qDebug("added Pt");
+        if(id==0){
+            QString msg("added Pt");
+            emit errorOccured(msg);
+            //qDebug("added Pt");
+        }
     }
 }
 
