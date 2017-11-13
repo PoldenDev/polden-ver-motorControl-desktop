@@ -578,7 +578,7 @@ void MainWindow::handleReadPendingDatagrams()
                 ui->plainTextUDP->appendPlainText(showStr);
             }
 
-            if(udpDgRecvInterval > 400) udpDgRecvInterval=400;
+            if(udpDgRecvInterval > 1000) udpDgRecvInterval=100;
 
             foreach (QString multiMotorStr, list1) {
                 QStringList motorList = multiMotorStr.split("S", QString::SkipEmptyParts);
@@ -652,8 +652,8 @@ void MainWindow::on_pushButton_refreshCom_clicked()
 
 void MainWindow::on_pushButtonClear_clicked()
 {    
-    ui->plainTextEdit->clear();
-    ui->plainTextUDP->clear();
+    //ui->plainTextEdit->clear();
+    //ui->plainTextUDP->clear();
 
     fpgaCtrl.clearCmdList();
 }
@@ -792,12 +792,11 @@ void MainWindow::on_pushMoveUp_clicked()
 {
     for(int i=0; i<MOTOR_CNT; i++){
         if(fpgaCtrl.getCmdListLength(i) == 0){
-            int pos = fpgaCtrl.getMotorAbsPosImp(i);
-
+            int pos = fpgaCtrl.getMotorAbsPosImp(i);  
             pos +=400;
             for(int k=0; k<5; k++){
                 fpgaCtrl.addMotorCmd(i, pos, 100);
-                pos +=400;
+                pos +=2000;
             }
         }
         else{

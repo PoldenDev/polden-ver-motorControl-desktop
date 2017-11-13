@@ -777,6 +777,7 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
             maxDiv_debug = ds.div;
             QString msg;
             msg.sprintf("new max div == 0x%x", maxDiv_debug);
+            emit errorOccured(msg);
             //qDebug() << qPrintable(msg);
         }
         if(ds.div > MAX_DIV){
