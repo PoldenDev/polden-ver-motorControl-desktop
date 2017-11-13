@@ -74,7 +74,7 @@ private:
 
 signals:
     void termStateChanged(int, bool);
-    void errorOccured(QString);
+    void errorOccured(const QString&);
 
 private slots:
     void handleReadyRead();

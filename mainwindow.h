@@ -81,7 +81,7 @@ private slots:
     void on_lineEditMotorCount_editingFinished();    
 
     void fpgaCtrlTermState(int, bool);
-    void fpgaCtrlErrorOccured(QString);
+    void handleFpgaCtrlErrorOccured(const QString&);
 
 
     void on_checkBoxDirInverse_clicked();

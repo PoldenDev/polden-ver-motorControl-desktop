@@ -357,11 +357,17 @@ void FpgaControl::sendDivPos(int mi, DivPosDataStr &ds)
     quint32 div = ds.div; //calc speed
     //qDebug() << div <<ds.div;
     if(div > MAX_DIV){
-        qDebug("mi %d div exceed 0x%x!", mi, MAX_DIV);
+        QString msg;
+        msg.sprintf("mi %d div exceed 0x%x!", mi, MAX_DIV);
+        qDebug() << qPrintable(msg);
+        emit errorOccured(msg);
         div = MAX_DIV;
     }
     if(steps > MAX_STEPS){
-        qDebug("mi %d steps exceed 0x%x!", mi, MAX_STEPS);
+        QString msg;
+        msg.sprintf("mi %d steps exceed 0x%x!", mi, MAX_STEPS);
+        qDebug() << qPrintable(msg);
+        emit errorOccured(msg);
         steps = MAX_STEPS;
     }
 
@@ -637,7 +643,8 @@ void FpgaControl::handleReadyRead()
 void FpgaControl::handleExchTimeout()
 {
     recvInterval = -1;
-    emit errorOccured(QString("fpga exch timeout, no data"));
+    QString msg("fpga exch timeout, no data");
+    emit errorOccured(msg);
     char c = 0xff;
     serial.write(&c, 1);
 }
@@ -753,8 +760,11 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
             ds.div = MAX_DIV;
             int nt = (ds.div*ds.steps*1000)/fpgaFreq;
             dt = msecsForMove - nt;
-            if(id==0){
-                qDebug("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
+            if(id==0){                
+                QString msg;
+                msg.sprintf("maxSpeed err %x, msecsForMove %d, newTime %d, delta %d", ds.div, msecsForMove, nt, dt);
+                emit errorOccured(msg);
+                qDebug() << qPrintable(msg);
             }
         }        
     }
@@ -766,7 +776,10 @@ void FpgaControl::calcCmd(DivPosDataStr &ds, int delta, quint32 curmSecs, quint3
         int steps = ds.steps;
         int pts = 1;
         if(id==0){
-            qDebug("maxSteps err st: %d, msecsForMove %d", steps, msecsForMove);
+            QString msg;
+            msg.sprintf("maxSteps err st: %d, msecsForMove %d", steps, msecsForMove);
+            emit errorOccured(msg);
+            qDebug() << qPrintable(msg);
         }
         while(steps>MAX_STEPS){
             steps /= 2;
@@ -798,7 +811,16 @@ void FpgaControl::addMotorCmd(int mn, int newPosImp, int msecsForMove)
     ds.finishPos = newPosImp;
     quint32 curmSecs = QTime::currentTime().msecsSinceStartOfDay();
 
-    if(motorPosCmdData[mn].length() == 0){
+//    if(mn == 0){
+//        qDebug() << "ql" << motorPosCmdData[mn].length() << "fp" << motorPosCmdData[mn].last().finishPos << "np" << newPosImp << "cp" << getMotorAbsPosImp(mn);
+//    }
+
+
+    if(motorPosCmdData[mn].isEmpty() == true){
+        if(mn == 0){
+            qDebug() << "ql epmty"<< "np" << newPosImp << "cp" << getMotorAbsPosImp(mn);
+        }
+
         quint32 curPos = getMotorAbsPosImp(mn);
         int delta = newPosImp - curPos;
         //int vmaxMmsec = ui->lineEdit_vmax_mmsec->text().toInt();
@@ -820,13 +842,17 @@ void FpgaControl::addMotorCmd(int mn, int newPosImp, int msecsForMove)
         }
 
         for(int i=0; i<n; i++){
-            ds.finishPos = curPos;
+            ds.finishPos = curPos + delta;
             curPos += delta;
             calcCmd(ds, delta, curmSecs, msecsForMove, mn);
             //motorPosCmdData[mn].append(ds);
         }
     }
-    else{
+    else{        
+        if(mn == 0){
+            //qDebug() << "np" << newPosImp << "ql" << motorPosCmdData[mn].length() << "fp" <<motorPosCmdData[mn].last().finishPos;
+            qDebug() << "ql" << motorPosCmdData[mn].length() << "np" << newPosImp << "cp" << getMotorAbsPosImp(mn)<< "fp" << motorPosCmdData[mn].last().finishPos;
+        }
         int delta = newPosImp - motorPosCmdData[mn].last().finishPos;
         //if(delta != 0)
         //    qDebug("%d st=%d div=%d, dir=%d", mn, delta, (qint32)FPGA_FREQ/(delta*10), delta/abs(delta));

@@ -155,8 +155,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&fpgaCtrl, SIGNAL(termStateChanged(int,bool)),
             this, SLOT(fpgaCtrlTermState(int, bool)));
-    connect(&fpgaCtrl, SIGNAL(errorOccured(QString)),
-            this, SLOT(fpgaCtrlErrorOccured(QString)));
+    connect(&fpgaCtrl, SIGNAL(errorOccured(const QString&)),
+            this, SLOT(handleFpgaCtrlErrorOccured(const QString&)));
 
 }
 
@@ -264,7 +264,7 @@ void MainWindow::fpgaCtrlTermState(int id, bool bEna)
         termCheckBoxList[id]->setChecked(bEna);
     }
 }
-void MainWindow::fpgaCtrlErrorOccured(QString errStr)
+void MainWindow::handleFpgaCtrlErrorOccured(const QString &errStr)
 {
     ui->plainTextEdit->appendPlainText(errStr);
 }
