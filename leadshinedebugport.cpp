@@ -23,7 +23,7 @@ void LeadshineDebugPort::setPortCount(int pCnt)
         debSerialPortList.append(sp);
         motorRespRecvdList.append(new bool(false));
     }
-
+    checkDebugComTimer.start();
 }
 
 void LeadshineDebugPort::handleComPortErrorOccured(int id, QSerialPort::SerialPortError error)
@@ -61,7 +61,9 @@ void LeadshineDebugPort::handleComPortErrorOccured(int id, QSerialPort::SerialPo
 
 void LeadshineDebugPort::handleReadyRead(int id)
 {
-
+    QByteArray ba = debSerialPortList[id]->readAll();
+    //qDebug() << id << ba;
+    parseLeadShineMsg(id, ba);
 }
 
 void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
