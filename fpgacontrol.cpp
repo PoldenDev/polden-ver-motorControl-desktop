@@ -766,10 +766,7 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
     }
 
     int dt = 0;
-    if(delta == 0){
-        ds.finishAbsTimeMsec = curmSecs + 100;
-    }
-    else{
+    if(delta != 0){
         //float secsOnStep = msecsForMove / (ds.steps*1000.);
         //if(mn==0) qDebug() << "secsOnStep" << secsOnStep;
         ds.div = (quint32)(freqOnMove/ds.steps);
@@ -792,9 +789,18 @@ void FpgaControl::addMotorCmd(int id, int newPosImp, int msecsForMove)
             }
         }
     }
-    if(id == 0){
-        //qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
+    else{
+
+        if(id == 0){
+            QString msg;
+            msg.sprintf("delta 0, msecsForMove %d", msecsForMove );
+            emit errorOccured(msg);
+            //qDebug()<< "ms:" <<msecsForMove << "s:" <<delta << "d:" << qPrintable(QString("0x")+QString::number(ds.div, 16));
+        }
+        return;
     }
+
+
 
     if(ds.steps > MAX_STEPS){
         int steps = ds.steps;

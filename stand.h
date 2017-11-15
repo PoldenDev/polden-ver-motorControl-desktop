@@ -34,5 +34,4 @@ typedef struct{
     qint32 finishPos; //pos after cmd
     quint32 msecsFor;
     quint32 startTime;
-    quint32 finishAbsTimeMsec;
 } DivPosDataStr;

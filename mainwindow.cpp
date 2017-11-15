@@ -276,7 +276,8 @@ void MainWindow::fpgaCtrlTermState(int id, bool bEna)
 }
 void MainWindow::handleFpgaCtrlErrorOccured(const QString &errStr)
 {
-    ui->plainTextEdit->appendPlainText(errStr);
+    QString showStr = QString("%1> %2").arg(QTime::currentTime().toString("mm:ss:zzz")).arg(errStr);
+    ui->plainTextEdit->appendPlainText(showStr);
 }
 
 void MainWindow::dataProcess100msTimeOut()
