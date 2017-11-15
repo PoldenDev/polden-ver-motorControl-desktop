@@ -49,10 +49,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     quint32 motorCount = settings.value("motorCount", 0).toInt();
+
+    ui->plainTextEdit->appendPlainText(QString("motorCount %1").arg(motorCount));
     fpgaCtrl.setMotorCount(motorCount);
     lsDebugPort.setPortCount(motorCount);
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
+
     ui->checkBoxPrintUDPData->setChecked(settings.value("printUdpData", false).toBool());
 
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
@@ -60,7 +63,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     fpgaCtrl.setDirInverse(ui->checkBoxDirInverse->isChecked());
     ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
-    ui->lineEdit_MaxHeightImp->setText(settings.value("maxHeightImp", 200000).toString());
+    QString maxHeightImp = settings.value("maxHeightImp", 200000).toString();
+    ui->lineEdit_MaxHeightImp->setText(maxHeightImp);
+
+    ui->plainTextEdit->appendPlainText(QString("maxHeightImp %1").arg(maxHeightImp));
+
     ui->lineEdit_vmax_mmsec->setText(settings.value("vmax_mmsec", 50).toString());
 
     on_pushButtonUdpOpenClose_clicked();
@@ -243,6 +250,9 @@ MainWindow::~MainWindow()
 
     settings.setValue("printUdpData", ui->checkBoxPrintUDPData->isChecked());
 
+    quint32 maxHeightImp = ui->lineEdit_MaxHeightImp->text().toInt();
+    settings.setValue("maxHeightImp", maxHeightImp);
+    settings.setValue("mmPerRot", ui->lineEdit_mmPerRot->text().toInt());
     delete ui;
 }
 
@@ -1139,9 +1149,6 @@ void MainWindow::on_lineEdit_maxHeightMM_editingFinished()
     int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
     quint32 maxHeightImp = (maxHeightMm/mmPerRot)*impPerRot;
     ui->lineEdit_MaxHeightImp->setText(QString::number(maxHeightImp));
-    QSettings settings("Murinets", "MotorControl");
-    settings.setValue("maxHeightImp", maxHeightImp);
-
 }
 
 void MainWindow::on_lineEdit_MaxHeightImp_editingFinished()
@@ -1151,35 +1158,30 @@ void MainWindow::on_lineEdit_MaxHeightImp_editingFinished()
     int impPerRot = ui->lineEdit_ImpPerRot->text().toInt();
     int maxHeigtMM = (maxHeightImp/impPerRot)*mmPerRot;
     ui->lineEdit_maxHeightMM->setText(QString::number(maxHeigtMM));
-    QSettings settings("Murinets", "MotorControl");
-    settings.setValue("maxHeightImp", maxHeightImp);
+
 
 }
 
 void MainWindow::on_radioButtonFpgaFreq25_clicked()
 {
     fpgaCtrl.setFpgaFreq(FPGA_FREQ_25);
-    QSettings settings("Murinets", "MotorControl");
     settings.setValue("FPGA_FREQ", FPGA_FREQ_25);
 }
 
 void MainWindow::on_radioButtonFpgaFreq24_clicked()
 {
     fpgaCtrl.setFpgaFreq(FPGA_FREQ_24);
-    QSettings settings("Murinets", "MotorControl");
     settings.setValue("FPGA_FREQ", FPGA_FREQ_24);
 }
 
 void MainWindow::on_lineEdit_mmPerRot_editingFinished()
 {
-    QSettings settings("Murinets", "MotorControl");
-    settings.setValue("mmPerRot", ui->lineEdit_mmPerRot->text().toInt());
+
     on_lineEdit_maxHeightMM_editingFinished();
 }
 
 void MainWindow::on_lineEdit_vmax_mmsec_editingFinished()
 {
-    QSettings settings("Murinets", "MotorControl");
     settings.setValue("vmax_mmsec", ui->lineEdit_vmax_mmsec->text().toInt());
 }
 
