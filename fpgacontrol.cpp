@@ -282,17 +282,9 @@ void FpgaControl::freeToWrite(int i)
 
     case MT_GoDOWN:
     case MT_INIT_GoDOWN:
-//        DivPosDataStr ds;
-//        if(speedTrig[i]){
-//            ds.pos = getMotorAbsPosImp(i)-500;
-//            speedTrig[i] = false;
-//        }
-//        else{
-//            ds.pos = getMotorAbsPosImp(i)-10;
-//            speedTrig[i] = true;
-//        }
-//        ds.pos = getMotorAbsPosImp(i)-500;
-//        sendDivPos(i, ds);
+        DivPosDataStr ds;
+        ds.steps
+        sendDivPos(i, ds);
 
         break;
 
