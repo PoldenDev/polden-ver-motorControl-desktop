@@ -28,6 +28,7 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -123,6 +124,15 @@ public:
     QCheckBox *term10;
     QWidget *tabDebugPort;
     QWidget *widgetComPorts;
+    QWidget *tabSonoff;
+    QTableWidget *tableWidgetSonOffDevices;
+    QLineEdit *lineEditSSID;
+    QLabel *label_15;
+    QLineEdit *lineEditKey;
+    QLineEdit *lineEditServerIp;
+    QLabel *label_17;
+    QLabel *label_16;
+    QPushButton *pushButtonSonoffAPSet;
     QWidget *widget_27;
     QHBoxLayout *horizontalLayout_18;
     QPushButton *pushButtonInitiate;
@@ -547,6 +557,33 @@ public:
         widgetComPorts->setObjectName(QStringLiteral("widgetComPorts"));
         widgetComPorts->setGeometry(QRect(80, 70, 671, 201));
         tabWidget->addTab(tabDebugPort, QString());
+        tabSonoff = new QWidget();
+        tabSonoff->setObjectName(QStringLiteral("tabSonoff"));
+        tableWidgetSonOffDevices = new QTableWidget(tabSonoff);
+        tableWidgetSonOffDevices->setObjectName(QStringLiteral("tableWidgetSonOffDevices"));
+        tableWidgetSonOffDevices->setGeometry(QRect(10, 10, 481, 191));
+        lineEditSSID = new QLineEdit(tabSonoff);
+        lineEditSSID->setObjectName(QStringLiteral("lineEditSSID"));
+        lineEditSSID->setGeometry(QRect(580, 30, 121, 20));
+        label_15 = new QLabel(tabSonoff);
+        label_15->setObjectName(QStringLiteral("label_15"));
+        label_15->setGeometry(QRect(540, 30, 27, 23));
+        lineEditKey = new QLineEdit(tabSonoff);
+        lineEditKey->setObjectName(QStringLiteral("lineEditKey"));
+        lineEditKey->setGeometry(QRect(580, 60, 121, 20));
+        lineEditServerIp = new QLineEdit(tabSonoff);
+        lineEditServerIp->setObjectName(QStringLiteral("lineEditServerIp"));
+        lineEditServerIp->setGeometry(QRect(580, 90, 121, 20));
+        label_17 = new QLabel(tabSonoff);
+        label_17->setObjectName(QStringLiteral("label_17"));
+        label_17->setGeometry(QRect(540, 90, 41, 23));
+        label_16 = new QLabel(tabSonoff);
+        label_16->setObjectName(QStringLiteral("label_16"));
+        label_16->setGeometry(QRect(540, 60, 23, 23));
+        pushButtonSonoffAPSet = new QPushButton(tabSonoff);
+        pushButtonSonoffAPSet->setObjectName(QStringLiteral("pushButtonSonoffAPSet"));
+        pushButtonSonoffAPSet->setGeometry(QRect(600, 120, 75, 23));
+        tabWidget->addTab(tabSonoff, QString());
 
         verticalLayout_2->addWidget(tabWidget);
 
@@ -695,7 +732,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -761,6 +798,11 @@ public:
         term10->setText(QApplication::translate("MainWindow", "10", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabDebugPort), QApplication::translate("MainWindow", "debugPort", Q_NULLPTR));
+        label_15->setText(QApplication::translate("MainWindow", "SSID:", Q_NULLPTR));
+        label_17->setText(QApplication::translate("MainWindow", "servIp:", Q_NULLPTR));
+        label_16->setText(QApplication::translate("MainWindow", "key:", Q_NULLPTR));
+        pushButtonSonoffAPSet->setText(QApplication::translate("MainWindow", "set", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tabSonoff), QApplication::translate("MainWindow", "power control", Q_NULLPTR));
         pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
         pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));

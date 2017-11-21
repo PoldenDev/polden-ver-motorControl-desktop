@@ -20,6 +20,7 @@
 #include <QGroupBox>
 #include "fpgacontrol.h"
 #include "leadshinedebugport.h"
+#include "sonoffmanager.h"
 
 //#include <qwt_plot_curve.h>
 
@@ -89,6 +90,8 @@ private slots:
     void on_pushButtonTest1_clicked();
 
     void on_pushButtonTest2_clicked();
+
+    void on_pushButtonSonoffAPSet_clicked();
 
 private:
     //quint32 motorCount;
@@ -175,6 +178,7 @@ private:
 
     FpgaControl fpgaCtrl;
     LeadshineDebugPort lsDebugPort;
+    SonoffManager *sonoffManager;
 };
 
 

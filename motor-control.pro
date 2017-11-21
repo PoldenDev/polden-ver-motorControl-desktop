@@ -34,7 +34,9 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     uartthread.cpp \
     fpgacontrol.cpp \
-    leadshinedebugport.cpp
+    leadshinedebugport.cpp \
+    sonoffmanager.cpp \
+    sslserver.cpp
 
 HEADERS  += mainwindow.h \
     UartThread \
@@ -42,10 +44,12 @@ HEADERS  += mainwindow.h \
     uartthread.h \
     stand.h \
     fpgacontrol.h \
-    leadshinedebugport.h
+    leadshinedebugport.h \
+    sonoffmanager.h \
+    sslserver.h
 
 FORMS    += mainwindow.ui
 
-include ( C:\Qwt-6.1.3\features\qwt.prf )
+# include ( C:\Qwt-6.1.3\features\qwt.prf )
 
 

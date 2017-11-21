@@ -44,7 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
     lastUdpDatagrammRecvd(0),
     lastDebugShowTime(0),
     fpgaCtrl(this),
-    lsDebugPort(this)
+    lsDebugPort(this),
+    sonoffManager(NULL)
 {
     ui->setupUi(this);
 
@@ -164,6 +165,18 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(fpgaCtrlTermState(int, bool)));
     connect(&fpgaCtrl, SIGNAL(errorOccured(const QString&)),
             this, SLOT(handleFpgaCtrlErrorOccured(const QString&)));
+
+
+    QString sonoffApSSID = settings.value("sonOffApSSID", "").toString();
+    QString sonoffApKey = settings.value("sonOffApKey", "").toString();
+    QString sonoffServIp = settings.value("sonOffServIp", "").toString();
+
+    ui->lineEditSSID->setText(sonoffApSSID);
+    ui->lineEditKey->setText(sonoffApKey);
+    ui->lineEditServerIp->setText(sonoffServIp);
+
+    sonoffManager = new SonoffManager(this, ui->tableWidgetSonOffDevices);
+    sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
 
 }
 
@@ -1490,4 +1503,21 @@ void MainWindow::on_lineEditMotorCount_editingFinished()
 void MainWindow::on_checkBoxDirInverse_clicked()
 {
     fpgaCtrl.setDirInverse(ui->checkBoxDirInverse->isChecked());
+}
+
+void MainWindow::on_pushButtonSonoffAPSet_clicked()
+{
+    QString sonoffApSSID = ui->lineEditSSID->text();
+    QString sonoffApKey = ui->lineEditKey->text();
+    QString sonoffServIp = ui->lineEditServerIp->text();
+
+    if(sonoffManager != NULL){
+        sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
+    }
+
+
+    settings.setValue("sonOffApSSID", sonoffApSSID);
+    settings.setValue("sonOffApKey", sonoffApKey);
+    settings.setValue("sonOffServIp", sonoffServIp);
+
 }

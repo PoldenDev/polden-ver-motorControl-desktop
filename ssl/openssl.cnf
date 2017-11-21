@@ -1,0 +1,17 @@
+[req]
+default_bits = 1024       # Длинна ключа в битах.
+default_keyfile = host.key    # Имя файла, в который будет записан закрытый ключ.
+encrypt_key = no                    # Нам не нужно шифровать закрытый ключ паролем.
+default_md = sha256              # Алгоритм хеша.
+prompt = no                            # Не нужно запрашивать данные у пользователя, мы всё пропишем здесь.
+distinguished_name = req_distinguished_name         # Имя секции с данными (может быть любым).
+
+[req_distinguished_name]
+C = RU     # Country - Двухбуквенный код страны.
+L = Murmansk # Locality - Город.
+CN = my.semenushkin.ru      # Common Name - Имя домена.
+emailAddress = all@semenushkin.ru      # Адрес электронной почты.
+# Можно ещё указать следующие поля:
+# ST (State - штат, название провинции и т.п.)
+# O (Organization - название организации)
+# OU (Organizational Unit - название подразделения)
