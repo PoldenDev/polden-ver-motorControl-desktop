@@ -808,7 +808,7 @@ void MainWindow::on_pushButtonInitiate_clicked()
 {
     fpgaCtrl.setMotorStateInitiate();
     //udpServerClose();
-    on_pushButtonClear_clicked();
+    fpgaCtrl.clearCmdList();
 }
 
 
