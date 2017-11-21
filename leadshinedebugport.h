@@ -21,6 +21,9 @@ public:
     bool open(int);
     void close(int);
 signals:
+    void driverOk(int);
+    void driverErr(int, QString&);
+    void driverTimeOut(int);
 
 public slots:
 private slots:

@@ -178,6 +178,10 @@ MainWindow::MainWindow(QWidget *parent) :
     sonoffManager = new SonoffManager(this, ui->tableWidgetSonOffDevices);
     sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
 
+    connect(&lsDebugPort, SIGNAL(driverOk(int)), this, SLOT(handleDriverOk(int)));
+    connect(&lsDebugPort, SIGNAL(driverErr(int, QString&)), this, SLOT(handleDriverErr(int, QString&)));
+    connect(&lsDebugPort, SIGNAL(driverTimeOut(int)), this, SLOT(handleDriverTimeout(int)));
+
 }
 
 void MainWindow::createPlot(QString name)
@@ -1520,4 +1524,28 @@ void MainWindow::on_pushButtonSonoffAPSet_clicked()
     settings.setValue("sonOffApKey", sonoffApKey);
     settings.setValue("sonOffServIp", sonoffServIp);
 
+}
+
+
+void MainWindow::handleDriverOk(int id)
+{
+    debPortStatusLeList[id]->setPalette(*paletteGreen);
+    debPortStatusMainLeList[id]->setPalette(*paletteGreen);
+    //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
+    debPortStatusLeList[id]->setText("OK");
+    debPortStatusMainLeList[id]->setText("OK");
+}
+
+void MainWindow::handleDriverErr(int id, QString &msg)
+{
+    debPortStatusLeList[id]->setPalette(*paletteRed);
+    debPortStatusMainLeList[id]->setPalette(*paletteRed);
+    debPortStatusLeList[id]->setText(msg);
+    debPortStatusMainLeList[id]->setText(msg);
+}
+
+void MainWindow::handleDriverTimeout(int id)
+{
+    debPortStatusMainLeList[id]->setPalette(*paletteGrey);
+    debPortStatusLeList[id]->setPalette(*paletteGrey);
 }

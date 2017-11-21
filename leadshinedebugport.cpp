@@ -76,6 +76,7 @@ void LeadshineDebugPort::handleReadyRead(int id)
                 (msgDataArrList[id][1] == 0x03))
             break;
         msgDataArrList[id].remove(0, 1);
+        //qDebug() <<"d";
     }
     if(msgDataArrList[id].length()>=3){
         int msgSize = msgDataArrList[id][2];
@@ -93,7 +94,6 @@ void LeadshineDebugPort::handleReadyRead(int id)
 
 void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
 {
-
     quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-2);
     QByteArray crc16ba;
     crc16ba.append(crc16&0xff);
@@ -113,6 +113,7 @@ void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
 
         //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
         if((ba[4]&0x50) == 0){
+            emit driverOk(id);
 //            debPortStatusLeList[id]->setPalette(*paletteGreen);
 //            debPortStatusMainLeList[id]->setPalette(*paletteGreen);
 //            //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
@@ -121,16 +122,21 @@ void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
 
         }
         else{
+            QString msg("");
+
 //            debPortStatusLeList[id]->setPalette(*paletteRed);
 //            debPortStatusMainLeList[id]->setPalette(*paletteRed);
             if(ba[4]&0x10){ //encErr
+                msg += "encErr";
 //                debPortStatusLeList[id]->setText("enc err");
 //                debPortStatusMainLeList[id]->setText("enc err");
             }
             if(ba[4]&0x40){ //posErr
+                msg += "posErr";
 //                debPortStatusLeList[id]->setText("pos err");
 //                debPortStatusMainLeList[id]->setText("pos err");
             }
+            emit driverErr(id, msg);
         }
     }
     else{
@@ -198,8 +204,7 @@ void LeadshineDebugPort::checkDebugComTimerHandle()
     for(int i=0; i<portCount; i++){
         bool &bRespRecv = *(motorRespRecvdList[i]);
         if(bRespRecv == false){
-//            debPortStatusMainLeList[i]->setPalette(*paletteGrey);
-//            debPortStatusLeList[i]->setPalette(*paletteGrey);
+            emit driverTimeOut(i);
         }
         QSerialPort *sp = debSerialPortList[i];
         if(sp->isOpen()){

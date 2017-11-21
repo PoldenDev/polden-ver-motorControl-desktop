@@ -93,6 +93,10 @@ private slots:
 
     void on_pushButtonSonoffAPSet_clicked();
 
+    void handleDriverOk(int id);
+    void handleDriverErr(int id, QString &msg);
+    void handleDriverTimeout(int id);
+
 private:
     //quint32 motorCount;
 
