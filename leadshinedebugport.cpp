@@ -1,4 +1,5 @@
 #include "leadshinedebugport.h"
+#include <QDebug>
 
 LeadshineDebugPort::LeadshineDebugPort(QObject *parent) :
     QObject(parent),
@@ -16,13 +17,17 @@ void LeadshineDebugPort::setPortCount(int pCnt)
     checkDebugComTimer.stop();
     debSerialPortList.clear();
     motorRespRecvdList.clear();
+    msgDataArrList.clear();
     for(int i=0; i<pCnt; i++){
         QSerialPort *sp = new QSerialPort(this);
         connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
         connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
         debSerialPortList.append(sp);
         motorRespRecvdList.append(new bool(false));
+
+        msgDataArrList.append(QByteArray());
     }
+
     checkDebugComTimer.start();
 }
 
@@ -62,12 +67,33 @@ void LeadshineDebugPort::handleComPortErrorOccured(int id, QSerialPort::SerialPo
 void LeadshineDebugPort::handleReadyRead(int id)
 {
     QByteArray ba = debSerialPortList[id]->readAll();
-    //qDebug() << id << ba;
-    parseLeadShineMsg(id, ba);
+    msgDataArrList[id].append(ba);
+    for(int i=0;
+        (i<msgDataArrList[id].length()) && (msgDataArrList[id].length()>=2);
+        i++)
+    {
+        if((msgDataArrList[id][0] == 0x01) &&
+                (msgDataArrList[id][1] == 0x03))
+            break;
+        msgDataArrList[id].remove(0, 1);
+    }
+    if(msgDataArrList[id].length()>=3){
+        int msgSize = msgDataArrList[id][2];
+        msgSize += (3 + 2); //3 header, 2 crc
+        if( msgDataArrList[id].length() >= msgSize ){
+            //qDebug("msg!!");
+            QByteArray msgBa = msgDataArrList[id].left(msgSize);
+            msgDataArrList[id].remove(0, msgSize);
+            //qDebug() << id << msgBa;
+            parseLeadShineMsg(id, msgBa);
+        }
+    }
+
 }
 
 void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
 {
+
     quint16 crc16 = CRC16_ModBusRTU(ba, ba.length()-2);
     QByteArray crc16ba;
     crc16ba.append(crc16&0xff);
@@ -144,9 +170,9 @@ void LeadshineDebugPort::setPortName(int id, QString &name)
     debSerialPortList[id]->setPortName(name);
 }
 
-QString& LeadshineDebugPort::portName(int id)
+QString LeadshineDebugPort::portName(int id)
 {
-    debSerialPortList[id]->portName();
+    return debSerialPortList[id]->portName();
 }
 
 bool LeadshineDebugPort::open(int id)

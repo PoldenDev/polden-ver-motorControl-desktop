@@ -17,7 +17,7 @@ public:
 
     bool isPortOpen(int);
     void setPortName(int, QString&);
-    QString& portName(int);
+    QString portName(int);
     bool open(int);
     void close(int);
 signals:
@@ -34,6 +34,8 @@ private:
 
     void handleReadyRead(int id);
     void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
+
+    QList<QByteArray> msgDataArrList;
 };
 
 #endif // LEADSHINEDEBUGPORT_H
