@@ -283,7 +283,7 @@ void FpgaControl::freeToWrite(int i)
     case MT_GoDOWN:
     case MT_INIT_GoDOWN:
         DivPosDataStr ds;
-        ds.steps
+        ds.steps;
         sendDivPos(i, ds);
 
         break;
