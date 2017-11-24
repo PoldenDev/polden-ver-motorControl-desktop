@@ -562,6 +562,7 @@ public:
         tableWidgetSonOffDevices = new QTableWidget(tabSonoff);
         tableWidgetSonOffDevices->setObjectName(QStringLiteral("tableWidgetSonOffDevices"));
         tableWidgetSonOffDevices->setGeometry(QRect(10, 10, 481, 191));
+        tableWidgetSonOffDevices->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         lineEditSSID = new QLineEdit(tabSonoff);
         lineEditSSID->setObjectName(QStringLiteral("lineEditSSID"));
         lineEditSSID->setGeometry(QRect(580, 30, 121, 20));

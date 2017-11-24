@@ -908,6 +908,9 @@
           <height>191</height>
          </rect>
         </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustToContents</enum>
+        </property>
        </widget>
        <widget class="QLineEdit" name="lineEditSSID">
         <property name="geometry">
