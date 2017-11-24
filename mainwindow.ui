@@ -86,7 +86,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabMainStat">
        <attribute name="title">
@@ -1075,6 +1075,61 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget_2" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="pushButtonU1">
+         <property name="text">
+          <string>u1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonD1">
+         <property name="text">
+          <string>d1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonU2">
+         <property name="text">
+          <string>u2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonD2">
+         <property name="text">
+          <string>d2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonU3">
+         <property name="text">
+          <string>u3</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonD3">
+         <property name="text">
+          <string>d3</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+      <zorder>pushButtonU1</zorder>
+      <zorder>pushButtonGoZero</zorder>
+      <zorder>pushButtonD1</zorder>
+      <zorder>pushButtonU2</zorder>
+      <zorder>pushButtonD2</zorder>
+      <zorder>pushButtonU3</zorder>
+      <zorder>pushButtonD3</zorder>
      </widget>
     </item>
     <item>

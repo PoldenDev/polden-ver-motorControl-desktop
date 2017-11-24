@@ -97,6 +97,20 @@ private slots:
     void handleDriverErr(int id, QString &msg);
     void handleDriverTimeout(int id);
 
+    void moveUp(int);
+    void moveDown(int);
+    void on_pushButtonU1_clicked();
+
+    void on_pushButtonD1_clicked();
+
+    void on_pushButtonU2_clicked();
+
+    void on_pushButtonD2_clicked();
+
+    void on_pushButtonU3_clicked();
+
+    void on_pushButtonD3_clicked();
+
 private:
     //quint32 motorCount;
 

@@ -242,25 +242,16 @@ void FpgaControl::terminatorState(int i, bool bEna)
         }
 
     }
-    else if((mtState[i] == MT_INIT_GoDOWN) && (bEna == true)){
-//         motorAbsolutePosCur[i] = 0;
-
-//        //mtState[i] = MT_IDLE;
-//        mtState[i] = MT_INIT_GoUp;
-//        DivPosDataStr ds;
-//        int startPos =0;
-
-//        if(motorPosCmdData[i].length() == 0)
-//            startPos = getMotorAbsPosImp(i);
-//        else
-//            startPos = motorPosCmdData[i].last().pos;
-
-//        ds.pos = startPos+400;
-//        for(int k=0; k<40; k++){
-//            motorPosCmdData[i] << ds;
-//             ds.pos += 400;
-//        }
-
+    else if(mtState[i] == MT_INIT_GoDOWN){
+        if(bEna == true){
+        }
+        else{
+            if(getCmdListLength(i) == 0){
+                int pos = getMotorAbsPosImp(i);
+                pos -=400;
+                addMotorCmd(i, pos, 100);
+            }
+        }
     }
 
 }
@@ -282,11 +273,12 @@ void FpgaControl::freeToWrite(int i)
 
     case MT_GoDOWN:
     case MT_INIT_GoDOWN:
-        DivPosDataStr ds;
-        ds.steps;
-        sendDivPos(i, ds);
+        //DivPosDataStr ds;
+        //ds.steps=200;
+        //ds.dir
+        //sendDivPos(i, ds);
 
-        break;
+        //break;
 
     case MT_IDLE:
     case MT_INIT_GoUp:
@@ -588,6 +580,22 @@ void FpgaControl::handleReadyRead()
                 terminatorState(5+i, b&(1<<i));
             }
             break;
+        }
+    }
+
+    bool bAllDown = true;
+    for(int id=0; id<motorCount; id++){
+        bAllDown = (bAllDown&&bTermState[id]&&(getCmdListLength(id) == 0));
+    }
+    if(bAllDown == true){
+        for(int id=0; id<motorCount; id++){
+            mtState[id] = MT_IDLE;
+            int pos = getMotorAbsPosImp(id);
+            pos +=400;
+            for(int k=0; k<20; k++){
+                addMotorCmd(id, pos, 100);
+                pos +=400;
+            }
         }
     }
 

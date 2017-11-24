@@ -824,7 +824,7 @@ void MainWindow::on_pushMoveUp_clicked()
             pos +=400;
             for(int k=0; k<5; k++){
                 fpgaCtrl.addMotorCmd(i, pos, 100);
-                pos +=2000;
+                pos +=400;
             }
         }
         else{
@@ -1549,3 +1549,72 @@ void MainWindow::handleDriverTimeout(int id)
     debPortStatusMainLeList[id]->setPalette(*paletteGrey);
     debPortStatusLeList[id]->setPalette(*paletteGrey);
 }
+
+
+void MainWindow::moveUp(int id)
+{
+    if(fpgaCtrl.getCmdListLength(id) == 0){
+        int pos = fpgaCtrl.getMotorAbsPosImp(id);
+        pos +=400;
+        for(int k=0; k<5; k++){
+            fpgaCtrl.addMotorCmd(id, pos, 100);
+            pos +=400;
+        }
+    }
+    else{
+        QString msg = QString("m %1 queue not empty").arg(id);
+        ui->plainTextEdit->appendPlainText(msg);
+    }
+}
+
+void MainWindow::moveDown(int id)
+{
+    if(fpgaCtrl.getCmdListLength(id) == 0){
+        int pos = fpgaCtrl.getMotorAbsPosImp(id);
+
+        pos -=400;
+        for(int k=0; k<5; k++){
+            fpgaCtrl.addMotorCmd(id, pos, 100);
+            pos -=400;
+//                if(pos <=0){
+//           ui->plainTextEdit->appendPlainText(msg);
+//            pos = 0;
+//                    break;
+//                }
+        }
+    }
+    else{
+        QString msg = QString("m %1 queue not empty").arg(id);
+    }
+}
+
+void MainWindow::on_pushButtonU1_clicked()
+{
+    moveUp(0);
+}
+
+void MainWindow::on_pushButtonD1_clicked()
+{
+    moveDown(0);
+}
+
+void MainWindow::on_pushButtonU2_clicked()
+{
+    moveUp(1);
+}
+
+void MainWindow::on_pushButtonD2_clicked()
+{
+    moveDown(1);
+}
+
+void MainWindow::on_pushButtonU3_clicked()
+{
+    moveUp(2);
+}
+
+void MainWindow::on_pushButtonD3_clicked()
+{
+    moveDown(2);
+}
+

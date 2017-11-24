@@ -145,6 +145,14 @@ public:
     QPushButton *pushButtonTest;
     QPushButton *pushButtonTest1;
     QPushButton *pushButtonTest2;
+    QWidget *widget_2;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *pushButtonU1;
+    QPushButton *pushButtonD1;
+    QPushButton *pushButtonU2;
+    QPushButton *pushButtonD2;
+    QPushButton *pushButtonU3;
+    QPushButton *pushButtonD3;
     QWidget *widget_29;
     QHBoxLayout *horizontalLayout_20;
     QPushButton *pushButtonPosReset;
@@ -648,6 +656,52 @@ public:
 
         verticalLayout_2->addWidget(widget_6);
 
+        widget_2 = new QWidget(centralWidget);
+        widget_2->setObjectName(QStringLiteral("widget_2"));
+        horizontalLayout_2 = new QHBoxLayout(widget_2);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        pushButtonU1 = new QPushButton(widget_2);
+        pushButtonU1->setObjectName(QStringLiteral("pushButtonU1"));
+
+        horizontalLayout_2->addWidget(pushButtonU1);
+
+        pushButtonD1 = new QPushButton(widget_2);
+        pushButtonD1->setObjectName(QStringLiteral("pushButtonD1"));
+
+        horizontalLayout_2->addWidget(pushButtonD1);
+
+        pushButtonU2 = new QPushButton(widget_2);
+        pushButtonU2->setObjectName(QStringLiteral("pushButtonU2"));
+
+        horizontalLayout_2->addWidget(pushButtonU2);
+
+        pushButtonD2 = new QPushButton(widget_2);
+        pushButtonD2->setObjectName(QStringLiteral("pushButtonD2"));
+
+        horizontalLayout_2->addWidget(pushButtonD2);
+
+        pushButtonU3 = new QPushButton(widget_2);
+        pushButtonU3->setObjectName(QStringLiteral("pushButtonU3"));
+
+        horizontalLayout_2->addWidget(pushButtonU3);
+
+        pushButtonD3 = new QPushButton(widget_2);
+        pushButtonD3->setObjectName(QStringLiteral("pushButtonD3"));
+
+        horizontalLayout_2->addWidget(pushButtonD3);
+
+        pushButtonU1->raise();
+        pushButtonGoZero->raise();
+        pushButtonD1->raise();
+        pushButtonU2->raise();
+        pushButtonD2->raise();
+        pushButtonU3->raise();
+        pushButtonD3->raise();
+
+        verticalLayout_2->addWidget(widget_2);
+
         widget_29 = new QWidget(centralWidget);
         widget_29->setObjectName(QStringLiteral("widget_29"));
         horizontalLayout_20 = new QHBoxLayout(widget_29);
@@ -733,7 +787,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -812,6 +866,12 @@ public:
         pushButtonTest->setText(QApplication::translate("MainWindow", "test", Q_NULLPTR));
         pushButtonTest1->setText(QApplication::translate("MainWindow", "test1", Q_NULLPTR));
         pushButtonTest2->setText(QApplication::translate("MainWindow", "test2", Q_NULLPTR));
+        pushButtonU1->setText(QApplication::translate("MainWindow", "u1", Q_NULLPTR));
+        pushButtonD1->setText(QApplication::translate("MainWindow", "d1", Q_NULLPTR));
+        pushButtonU2->setText(QApplication::translate("MainWindow", "u2", Q_NULLPTR));
+        pushButtonD2->setText(QApplication::translate("MainWindow", "d2", Q_NULLPTR));
+        pushButtonU3->setText(QApplication::translate("MainWindow", "u3", Q_NULLPTR));
+        pushButtonD3->setText(QApplication::translate("MainWindow", "d3", Q_NULLPTR));
         pushButtonPosReset->setText(QApplication::translate("MainWindow", "pos reset", Q_NULLPTR));
         pushBUttonToIdle->setText(QApplication::translate("MainWindow", "to idle", Q_NULLPTR));
         pushButtonClear->setText(QApplication::translate("MainWindow", "clear queue", Q_NULLPTR));
