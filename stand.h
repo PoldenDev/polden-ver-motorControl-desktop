@@ -23,7 +23,7 @@ typedef enum{
     MT_GoDOWN,
     MT_GoUP,
     MT_INIT_GoDOWN,
-    MT_INIT_GoUp,
+    MT_INIT_GoUp
 } TMotorState ;
 
 

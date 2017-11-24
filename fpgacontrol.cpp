@@ -231,19 +231,9 @@ void FpgaControl::terminatorState(int i, bool bEna)
         emit(termStateChanged(i, bEna));
     }
 
-    if(bEna == true){
-        motorAbsolutePosCur[i] = 0;
-    }
-    if(mtState[i] == MT_GoDOWN){
-        if(bEna == false){
-        }
-        else{
-            motorAbsolutePosCur[i] = 0;
-        }
-
-    }
-    else if(mtState[i] == MT_INIT_GoDOWN){
+    if(mtState[i] == MT_INIT_GoDOWN){
         if(bEna == true){
+            motorAbsolutePosCur[i] = 0;
         }
         else{
             if(getCmdListLength(i) == 0){
@@ -589,7 +579,7 @@ void FpgaControl::handleReadyRead()
     }
     if(bAllDown == true){
         for(int id=0; id<motorCount; id++){
-            mtState[id] = MT_IDLE;
+            mtState[id] = MT_INIT_GoUp;
             int pos = getMotorAbsPosImp(id);
             pos +=400;
             for(int k=0; k<20; k++){
@@ -598,6 +588,15 @@ void FpgaControl::handleReadyRead()
             }
         }
     }
+
+//    for(int id=0; id<motorCount; id++){
+//        if(mtState[id] = MT_INIT_GoUp){
+//            if(motorPosCmdData[id].isEmpty()){
+//                motorPosCmdData[id].clear();
+//                mtState[id] = MT_IDLE;
+//            }
+//        }
+//    }
 
     //тут подождём
     for(int i=0; i<motorCount; i++){

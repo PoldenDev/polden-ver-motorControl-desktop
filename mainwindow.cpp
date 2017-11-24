@@ -182,6 +182,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&lsDebugPort, SIGNAL(driverErr(int, QString&)), this, SLOT(handleDriverErr(int, QString&)));
     connect(&lsDebugPort, SIGNAL(driverTimeOut(int)), this, SLOT(handleDriverTimeout(int)));
 
+
+    qDebug() << qPrintable(settings.value("usbMain", "").toString());
+
+    //ui->comComboBoxUsbMain->set
+
+    for(int i=0; i<ui->comComboBoxUsbMain->count(); i++){
+       // ui->comComboBoxUsbMain->itemData()
+        qDebug() << ui->comComboBoxUsbMain->itemText(i);
+    }
+
+
+
 }
 
 void MainWindow::createPlot(QString name)
@@ -270,6 +282,9 @@ MainWindow::~MainWindow()
     quint32 maxHeightImp = ui->lineEdit_MaxHeightImp->text().toInt();
     settings.setValue("maxHeightImp", maxHeightImp);
     settings.setValue("mmPerRot", ui->lineEdit_mmPerRot->text().toInt());
+
+    QString comName = (ui->comComboBoxUsbMain->currentData().toString());
+    settings.setValue("usbMain", comName);
     delete ui;
 }
 
@@ -328,7 +343,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
 {   
     if(ui->pushButtonComOpen->text() == "open"){
         if(fpgaCtrl.portIsOpen() == false){
-            QString comName = (ui->comComboBox->currentData().toString());
+            QString comName = (ui->comComboBoxUsbMain->currentData().toString());
             if(comName.length() > 0){
                 if (fpgaCtrl.openPort(comName) == false) {
                     //qDebug("%s port open FAIL", qUtf8Printable(comName));
@@ -338,7 +353,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
                     return;                    
                 }
                 else{
-                    ui->comComboBox->setDisabled(true);
+                    ui->comComboBoxUsbMain->setDisabled(true);
                     //qDebug("%s port opened", qUtf8Printable(comName));
                     ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
     //                connect(&serial, SIGNAL(readyRead()),
@@ -358,7 +373,7 @@ void MainWindow::on_pushButtonComOpen_clicked()
         ui->plainTextEdit->appendPlainText(QString("%1 closed").arg(fpgaCtrl.getPortName()));
         ui->pushButtonComOpen->setText("open");        
         //contrStringQueue.clear();
-        ui->comComboBox->setDisabled(false);
+        ui->comComboBoxUsbMain->setDisabled(false);
     }
 
 }
@@ -567,7 +582,7 @@ void MainWindow::handleReadPendingDatagrams()
                 ui->plainTextUDP->appendPlainText("start cmd");
         }
         else if(dataStr.compare("init\r\n") == 0){
-            //on_pushButtonInitiate_clicked();
+            on_pushButtonInitiate_clicked();
             //if(ui->checkBoxPrintUDPData->isChecked())
                 ui->plainTextUDP->appendPlainText("init cmd");
         }
@@ -627,7 +642,7 @@ void MainWindow::handleReadPendingDatagrams()
 
 void MainWindow::on_pushButton_refreshCom_clicked()
 {
-    ui->comComboBox->clear();
+    ui->comComboBoxUsbMain->clear();
     foreach (QComboBox *cb, debPortCmbBxList) {
         cb->clear();
     }
@@ -669,8 +684,8 @@ void MainWindow::on_pushButton_refreshCom_clicked()
                    .arg(serialPortInfo.hasProductIdentifier() ? QByteArray::number(serialPortInfo.productIdentifier(), 16) : blankString)
                    .arg(serialPortInfo.isBusy() ? QObject::tr("Yes") : QObject::tr("No"));
 
-           ui->comComboBox->addItem(cbItemName, serialPortInfo.portName());
-           ui->comComboBox->setItemData(i, cbToolTipText, Qt::ToolTipRole);
+           ui->comComboBoxUsbMain->addItem(cbItemName, serialPortInfo.portName());
+           ui->comComboBoxUsbMain->setItemData(i, cbToolTipText, Qt::ToolTipRole);
            foreach (QComboBox *cb, debPortCmbBxList) {
                cb->addItem(cbItemName, serialPortInfo.portName());
                cb->setItemData(i, cbToolTipText, Qt::ToolTipRole);

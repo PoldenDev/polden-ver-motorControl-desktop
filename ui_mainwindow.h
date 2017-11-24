@@ -42,7 +42,7 @@ public:
     QVBoxLayout *verticalLayout_2;
     QWidget *widget_4;
     QHBoxLayout *horizontalLayout_3;
-    QComboBox *comComboBox;
+    QComboBox *comComboBoxUsbMain;
     QPushButton *pushButtonComOpen;
     QPushButton *pushButton_refreshCom;
     QSpacerItem *horizontalSpacer;
@@ -188,11 +188,11 @@ public:
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, -1, 0);
-        comComboBox = new QComboBox(widget_4);
-        comComboBox->setObjectName(QStringLiteral("comComboBox"));
-        comComboBox->setMinimumSize(QSize(100, 0));
+        comComboBoxUsbMain = new QComboBox(widget_4);
+        comComboBoxUsbMain->setObjectName(QStringLiteral("comComboBoxUsbMain"));
+        comComboBoxUsbMain->setMinimumSize(QSize(100, 0));
 
-        horizontalLayout_3->addWidget(comComboBox);
+        horizontalLayout_3->addWidget(comComboBoxUsbMain);
 
         pushButtonComOpen = new QPushButton(widget_4);
         pushButtonComOpen->setObjectName(QStringLiteral("pushButtonComOpen"));
