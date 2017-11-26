@@ -28,7 +28,6 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -97,6 +96,8 @@ public:
     QLabel *label_3;
     QLineEdit *lineEditMotorCount;
     QCheckBox *checkBoxDirInverse;
+    QCheckBox *checkBoxInitEnable;
+    QCheckBox *checkBoxInitOnStart;
     QGroupBox *groupBox_7;
     QLineEdit *lineEditMinVal;
     QLabel *label;
@@ -124,15 +125,6 @@ public:
     QCheckBox *term10;
     QWidget *tabDebugPort;
     QWidget *widgetComPorts;
-    QWidget *tabSonoff;
-    QTableWidget *tableWidgetSonOffDevices;
-    QLineEdit *lineEditSSID;
-    QLabel *label_15;
-    QLineEdit *lineEditKey;
-    QLineEdit *lineEditServerIp;
-    QLabel *label_17;
-    QLabel *label_16;
-    QPushButton *pushButtonSonoffAPSet;
     QWidget *widget_27;
     QHBoxLayout *horizontalLayout_18;
     QPushButton *pushButtonInitiate;
@@ -423,7 +415,7 @@ public:
         lineEdit_vmax_mmsec->setAlignment(Qt::AlignCenter);
         groupBox_6 = new QGroupBox(tabSettings);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        groupBox_6->setGeometry(QRect(260, 20, 151, 121));
+        groupBox_6->setGeometry(QRect(260, 20, 151, 161));
         radioButtonFpgaFreq24 = new QRadioButton(groupBox_6);
         radioButtonFpgaFreq24->setObjectName(QStringLiteral("radioButtonFpgaFreq24"));
         radioButtonFpgaFreq24->setGeometry(QRect(10, 70, 91, 17));
@@ -442,6 +434,12 @@ public:
         checkBoxDirInverse->setObjectName(QStringLiteral("checkBoxDirInverse"));
         checkBoxDirInverse->setGeometry(QRect(10, 50, 121, 17));
         checkBoxDirInverse->setLayoutDirection(Qt::LeftToRight);
+        checkBoxInitEnable = new QCheckBox(groupBox_6);
+        checkBoxInitEnable->setObjectName(QStringLiteral("checkBoxInitEnable"));
+        checkBoxInitEnable->setGeometry(QRect(10, 110, 131, 17));
+        checkBoxInitOnStart = new QCheckBox(groupBox_6);
+        checkBoxInitOnStart->setObjectName(QStringLiteral("checkBoxInitOnStart"));
+        checkBoxInitOnStart->setGeometry(QRect(10, 130, 70, 17));
         groupBox_7 = new QGroupBox(tabSettings);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
         groupBox_7->setGeometry(QRect(20, 200, 141, 111));
@@ -565,34 +563,6 @@ public:
         widgetComPorts->setObjectName(QStringLiteral("widgetComPorts"));
         widgetComPorts->setGeometry(QRect(80, 70, 671, 201));
         tabWidget->addTab(tabDebugPort, QString());
-        tabSonoff = new QWidget();
-        tabSonoff->setObjectName(QStringLiteral("tabSonoff"));
-        tableWidgetSonOffDevices = new QTableWidget(tabSonoff);
-        tableWidgetSonOffDevices->setObjectName(QStringLiteral("tableWidgetSonOffDevices"));
-        tableWidgetSonOffDevices->setGeometry(QRect(10, 10, 481, 191));
-        tableWidgetSonOffDevices->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        lineEditSSID = new QLineEdit(tabSonoff);
-        lineEditSSID->setObjectName(QStringLiteral("lineEditSSID"));
-        lineEditSSID->setGeometry(QRect(580, 30, 121, 20));
-        label_15 = new QLabel(tabSonoff);
-        label_15->setObjectName(QStringLiteral("label_15"));
-        label_15->setGeometry(QRect(540, 30, 27, 23));
-        lineEditKey = new QLineEdit(tabSonoff);
-        lineEditKey->setObjectName(QStringLiteral("lineEditKey"));
-        lineEditKey->setGeometry(QRect(580, 60, 121, 20));
-        lineEditServerIp = new QLineEdit(tabSonoff);
-        lineEditServerIp->setObjectName(QStringLiteral("lineEditServerIp"));
-        lineEditServerIp->setGeometry(QRect(580, 90, 121, 20));
-        label_17 = new QLabel(tabSonoff);
-        label_17->setObjectName(QStringLiteral("label_17"));
-        label_17->setGeometry(QRect(540, 90, 41, 23));
-        label_16 = new QLabel(tabSonoff);
-        label_16->setObjectName(QStringLiteral("label_16"));
-        label_16->setGeometry(QRect(540, 60, 23, 23));
-        pushButtonSonoffAPSet = new QPushButton(tabSonoff);
-        pushButtonSonoffAPSet->setObjectName(QStringLiteral("pushButtonSonoffAPSet"));
-        pushButtonSonoffAPSet->setGeometry(QRect(600, 120, 75, 23));
-        tabWidget->addTab(tabSonoff, QString());
 
         verticalLayout_2->addWidget(tabWidget);
 
@@ -692,13 +662,6 @@ public:
 
         horizontalLayout_2->addWidget(pushButtonD3);
 
-        pushButtonU1->raise();
-        pushButtonGoZero->raise();
-        pushButtonD1->raise();
-        pushButtonU2->raise();
-        pushButtonD2->raise();
-        pushButtonU3->raise();
-        pushButtonD3->raise();
 
         verticalLayout_2->addWidget(widget_2);
 
@@ -829,6 +792,8 @@ public:
         label_3->setText(QApplication::translate("MainWindow", "\320\232\320\276\320\273-\320\262\320\276 \320\274\320\276\321\202\320\276\321\200\320\276\320\262:", Q_NULLPTR));
         lineEditMotorCount->setInputMask(QApplication::translate("MainWindow", "90", Q_NULLPTR));
         checkBoxDirInverse->setText(QApplication::translate("MainWindow", "\320\270\320\275\320\262\320\265\321\200\321\201\320\270\321\217 dir", Q_NULLPTR));
+        checkBoxInitEnable->setText(QApplication::translate("MainWindow", "UDP \320\270\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\260\321\206\320\270\321\217", Q_NULLPTR));
+        checkBoxInitOnStart->setText(QApplication::translate("MainWindow", "init on start", Q_NULLPTR));
         groupBox_7->setTitle(QApplication::translate("MainWindow", "UDP", Q_NULLPTR));
         lineEditMinVal->setInputMask(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         lineEditMinVal->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
@@ -853,11 +818,6 @@ public:
         term10->setText(QApplication::translate("MainWindow", "10", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabDebugPort), QApplication::translate("MainWindow", "debugPort", Q_NULLPTR));
-        label_15->setText(QApplication::translate("MainWindow", "SSID:", Q_NULLPTR));
-        label_17->setText(QApplication::translate("MainWindow", "servIp:", Q_NULLPTR));
-        label_16->setText(QApplication::translate("MainWindow", "key:", Q_NULLPTR));
-        pushButtonSonoffAPSet->setText(QApplication::translate("MainWindow", "set", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tabSonoff), QApplication::translate("MainWindow", "power control", Q_NULLPTR));
         pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));
         pushMoveDown->setText(QApplication::translate("MainWindow", "moveDown", Q_NULLPTR));
         pushMoveUp->setText(QApplication::translate("MainWindow", "moveUp", Q_NULLPTR));

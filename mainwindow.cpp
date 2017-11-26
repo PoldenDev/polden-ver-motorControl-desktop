@@ -44,8 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     lastUdpDatagrammRecvd(0),
     lastDebugShowTime(0),
     fpgaCtrl(this),
-    lsDebugPort(this),
-    sonoffManager(NULL)
+    lsDebugPort(this)
 {
     ui->setupUi(this);
 
@@ -61,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
     ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
+
+    ui->checkBoxInitEnable->setChecked(settings.value("initEnable", false).toBool());
+
+    ui->checkBoxInitOnStart->setChecked(settings.value("initOnStart", false).toBool());
 
     fpgaCtrl.setDirInverse(ui->checkBoxDirInverse->isChecked());
     ui->lineEdit_mmPerRot->setText(settings.value("mmPerRot", 10).toString());
@@ -167,30 +170,41 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(handleFpgaCtrlErrorOccured(const QString&)));
 
 
-    QString sonoffApSSID = settings.value("sonOffApSSID", "").toString();
-    QString sonoffApKey = settings.value("sonOffApKey", "").toString();
-    QString sonoffServIp = settings.value("sonOffServIp", "").toString();
+//    QString sonoffApSSID = settings.value("sonOffApSSID", "").toString();
+//    QString sonoffApKey = settings.value("sonOffApKey", "").toString();
+//    QString sonoffServIp = settings.value("sonOffServIp", "").toString();
 
-    ui->lineEditSSID->setText(sonoffApSSID);
-    ui->lineEditKey->setText(sonoffApKey);
-    ui->lineEditServerIp->setText(sonoffServIp);
+//    ui->lineEditSSID->setText(sonoffApSSID);
+//    ui->lineEditKey->setText(sonoffApKey);
+//    ui->lineEditServerIp->setText(sonoffServIp);
 
-    sonoffManager = new SonoffManager(this, ui->tableWidgetSonOffDevices);
-    sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
+    //sonoffManager = new SonoffManager(this, ui->tableWidgetSonOffDevices);
+    //sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
 
     connect(&lsDebugPort, SIGNAL(driverOk(int)), this, SLOT(handleDriverOk(int)));
     connect(&lsDebugPort, SIGNAL(driverErr(int, QString&)), this, SLOT(handleDriverErr(int, QString&)));
     connect(&lsDebugPort, SIGNAL(driverTimeOut(int)), this, SLOT(handleDriverTimeout(int)));
 
 
-    qDebug() << qPrintable(settings.value("usbMain", "").toString());
 
+
+    QString mainCom = settings.value("usbMain", "").toString();
+    qDebug() << qPrintable(mainCom);
     //ui->comComboBoxUsbMain->set
 
     for(int i=0; i<ui->comComboBoxUsbMain->count(); i++){
        // ui->comComboBoxUsbMain->itemData()
-        qDebug() << ui->comComboBoxUsbMain->itemText(i);
+        if(ui->comComboBoxUsbMain->itemData(i).toString() == mainCom){
+            ui->comComboBoxUsbMain->setCurrentIndex(i);
+            on_pushButtonComOpen_clicked();
+            if(ui->checkBoxInitOnStart->isChecked()){
+                on_pushButtonInitiate_clicked();
+            }
+            break;
+        }
     }
+
+
 
 
 
@@ -272,6 +286,7 @@ void MainWindow::createPlot(QString name)
 
 MainWindow::~MainWindow()
 {
+    fpgaCtrl.closePort();
     settings.setValue("maxPosValue", ui->lineEditUDPMaxVal->text().toInt());
     settings.setValue("minPosValue", ui->lineEditMinVal->text().toInt());
     settings.setValue("dirInverse", ui->checkBoxDirInverse->isChecked());
@@ -285,6 +300,11 @@ MainWindow::~MainWindow()
 
     QString comName = (ui->comComboBoxUsbMain->currentData().toString());
     settings.setValue("usbMain", comName);
+
+
+    settings.setValue("initEnable", ui->checkBoxInitEnable->isChecked());
+
+    settings.setValue("initOnStart", ui->checkBoxInitOnStart->isChecked());
     delete ui;
 }
 
@@ -582,9 +602,15 @@ void MainWindow::handleReadPendingDatagrams()
                 ui->plainTextUDP->appendPlainText("start cmd");
         }
         else if(dataStr.compare("init\r\n") == 0){
-            on_pushButtonInitiate_clicked();
             //if(ui->checkBoxPrintUDPData->isChecked())
                 ui->plainTextUDP->appendPlainText("init cmd");
+
+            if(ui->checkBoxInitEnable->isChecked()){
+                on_pushButtonInitiate_clicked();
+            }
+            else{
+                ui->plainTextUDP->appendPlainText("init from UDP off");
+            }
         }
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
@@ -824,7 +850,7 @@ void MainWindow::on_goToTerm_clicked()
 }
 
 void MainWindow::on_pushButtonInitiate_clicked()
-{
+{       
     fpgaCtrl.setMotorStateInitiate();
     //udpServerClose();
     fpgaCtrl.clearCmdList();
@@ -1524,22 +1550,22 @@ void MainWindow::on_checkBoxDirInverse_clicked()
     fpgaCtrl.setDirInverse(ui->checkBoxDirInverse->isChecked());
 }
 
-void MainWindow::on_pushButtonSonoffAPSet_clicked()
-{
-    QString sonoffApSSID = ui->lineEditSSID->text();
-    QString sonoffApKey = ui->lineEditKey->text();
-    QString sonoffServIp = ui->lineEditServerIp->text();
+//void MainWindow::on_pushButtonSonoffAPSet_clicked()
+//{
+//    QString sonoffApSSID = ui->lineEditSSID->text();
+//    QString sonoffApKey = ui->lineEditKey->text();
+//    QString sonoffServIp = ui->lineEditServerIp->text();
 
-    if(sonoffManager != NULL){
-        sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
-    }
+//    if(sonoffManager != NULL){
+//        sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
+//    }
 
 
-    settings.setValue("sonOffApSSID", sonoffApSSID);
-    settings.setValue("sonOffApKey", sonoffApKey);
-    settings.setValue("sonOffServIp", sonoffServIp);
+//    settings.setValue("sonOffApSSID", sonoffApSSID);
+//    settings.setValue("sonOffApKey", sonoffApKey);
+//    settings.setValue("sonOffServIp", sonoffServIp);
 
-}
+//}
 
 
 void MainWindow::handleDriverOk(int id)
@@ -1578,7 +1604,7 @@ void MainWindow::moveUp(int id)
     }
     else{
         QString msg = QString("m %1 queue not empty").arg(id);
-        ui->plainTextEdit->appendPlainText(msg);
+        //ui->plainTextEdit->appendPlainText(msg);
     }
 }
 

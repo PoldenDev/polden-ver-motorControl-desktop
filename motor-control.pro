@@ -34,9 +34,7 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     uartthread.cpp \
     fpgacontrol.cpp \
-    leadshinedebugport.cpp \
-    sonoffmanager.cpp \
-    sslserver.cpp
+    leadshinedebugport.cpp
 
 HEADERS  += mainwindow.h \
     UartThread \
@@ -44,9 +42,7 @@ HEADERS  += mainwindow.h \
     uartthread.h \
     stand.h \
     fpgacontrol.h \
-    leadshinedebugport.h \
-    sonoffmanager.h \
-    sslserver.h
+    leadshinedebugport.h
 
 FORMS    += mainwindow.ui
 
