@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //motorCount(0),
     udpSocket(NULL),    
     curMotorSendIdx(0),
-    settings("murinets", "vertolet"),
+    settings("murinets", "motorControl"),
     xUdpRecv(0),
     markerXPos(0),
     dataGramCnt(0),
@@ -52,7 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->plainTextEdit->appendPlainText(QString("motorCount %1").arg(motorCount));
     fpgaCtrl.setMotorCount(motorCount);
-    lsDebugPort.setPortCount(motorCount);
+
+
     ui->lineEditMotorCount->setText(QString("%1").arg(motorCount));
     ui->lineEditUDPMaxVal->setText(QString::number(settings.value("maxPosValue", 1000).toInt()));
 
@@ -77,6 +78,8 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButtonUdpOpenClose_clicked();
 
     on_lineEdit_MaxHeightImp_editingFinished();
+
+    ui->checkBoxDriversStateControl->setChecked(settings.value("driversStateControl", false).toBool());
 
 
 
@@ -145,7 +148,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //    }
 
 
-
     //connectionTime = 0;
     uiUpdateTimer.setInterval(100);
     connect(&uiUpdateTimer, SIGNAL(timeout()), this, SLOT(uiUpdateTimerSlot()));
@@ -168,7 +170,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(fpgaCtrlTermState(int, bool)));
     connect(&fpgaCtrl, SIGNAL(errorOccured(const QString&)),
             this, SLOT(handleFpgaCtrlErrorOccured(const QString&)));
-
+    connect(&fpgaCtrl, SIGNAL(standStateChanged(TStandState)),
+            this, SLOT(handleStandStateChanged(TStandState)));
 
 //    QString sonoffApSSID = settings.value("sonOffApSSID", "").toString();
 //    QString sonoffApKey = settings.value("sonOffApKey", "").toString();
@@ -181,15 +184,38 @@ MainWindow::MainWindow(QWidget *parent) :
     //sonoffManager = new SonoffManager(this, ui->tableWidgetSonOffDevices);
     //sonoffManager->setAPserverParams(sonoffApSSID, sonoffApKey, sonoffServIp);
 
+
+
+
+
+
+
     connect(&lsDebugPort, SIGNAL(driverOk(int)), this, SLOT(handleDriverOk(int)));
     connect(&lsDebugPort, SIGNAL(driverErr(int, QString&)), this, SLOT(handleDriverErr(int, QString&)));
     connect(&lsDebugPort, SIGNAL(driverTimeOut(int)), this, SLOT(handleDriverTimeout(int)));
 
+    lsDebugPort.setPortCount(motorCount);
 
+    for(int id=0; id<motorCount; id++){
+        QString settingName = QString("debugComName%1").arg(id);
+        if(settings.contains(settingName)){
+            QString debPortName = settings.value(settingName, "").toString();
+            lsDebugPort.setPortName(id, debPortName);
 
+            QComboBox *cb = debPortCmbBxList[id];
+            for(int j=0; j<cb->count(); j++){
+                //qDebug() << qPrintable(cb->itemData(j).toString());
+                if(cb->itemData(j).toString() == debPortName){
+                    cb->setCurrentIndex(j);
+                    pushDebugComPortOpen(id);
+                    break;
+                }
+            }
+        }
+    }
 
     QString mainCom = settings.value("usbMain", "").toString();
-    qDebug() << qPrintable(mainCom);
+    //qDebug() << qPrintable(mainCom);
     //ui->comComboBoxUsbMain->set
 
     for(int i=0; i<ui->comComboBoxUsbMain->count(); i++){
@@ -203,11 +229,6 @@ MainWindow::MainWindow(QWidget *parent) :
             break;
         }
     }
-
-
-
-
-
 }
 
 void MainWindow::createPlot(QString name)
@@ -305,6 +326,12 @@ MainWindow::~MainWindow()
     settings.setValue("initEnable", ui->checkBoxInitEnable->isChecked());
 
     settings.setValue("initOnStart", ui->checkBoxInitOnStart->isChecked());
+    settings.setValue("driversStateControl", ui->checkBoxDriversStateControl->isChecked());
+
+    quint32 motorCount = ui->lineEditMotorCount->text().toInt();
+    for(int i=0; i<motorCount; i++){
+        settings.setValue(QString("debugComName%1").arg(i), lsDebugPort.portName(i));
+    }
     delete ui;
 }
 
@@ -328,7 +355,7 @@ void MainWindow::fpgaCtrlTermState(int id, bool bEna)
 }
 void MainWindow::handleFpgaCtrlErrorOccured(const QString &errStr)
 {
-    QString showStr = QString("%1> %2").arg(QTime::currentTime().toString("mm:ss:zzz")).arg(errStr);
+    QString showStr = QString("%1> %2").arg(QTime::currentTime().toString("hh:mm:ss")).arg(errStr);
     ui->plainTextEdit->appendPlainText(showStr);
 }
 
@@ -846,7 +873,7 @@ void MainWindow::on_pushBUttonToIdle_clicked()
 
 void MainWindow::on_goToTerm_clicked()
 {
-    fpgaCtrl.setMotorStateGoDown();
+    //fpgaCtrl.setMotorStateGoDown();
 }
 
 void MainWindow::on_pushButtonInitiate_clicked()
@@ -985,10 +1012,10 @@ void MainWindow::uiUpdateTimerSlot()
             }
             switch(fpgaCtrl.mtState[i]){
                 case MT_IDLE:   stateLineEdit[i]->setText("idle"); ;break;
-                case MT_GoDOWN: stateLineEdit[i]->setText("mvD");break;
-                case MT_GoUP:   stateLineEdit[i]->setText("mvU");break;
-                case MT_INIT_GoDOWN: stateLineEdit[i]->setText("initMvD");break;
-                case MT_INIT_GoUp: stateLineEdit[i]->setText("initMvU");break;
+                //case MT_GoDOWN: stateLineEdit[i]->setText("mvD");break;
+                //case MT_GoUP:   stateLineEdit[i]->setText("mvU");break;
+                case MT_INIT_GoDOWN: stateLineEdit[i]->setText("iMvD");break;
+                case MT_INIT_GoUp: stateLineEdit[i]->setText("iMvU");break;
             }
 
             int mmPerRot = ui->lineEdit_mmPerRot->text().toInt();
@@ -1017,6 +1044,21 @@ void MainWindow::uiUpdateTimerSlot()
 
         //qDebug() << connectionTime.elapsed() << connectionTime.toString("zzz");
         //connectionTime.elapsed()
+        if(ui->checkBoxDriversStateControl->isChecked()){
+            if(lsDebugPort.isDriversOk()){
+                ui->lineEditDriversState->setText("ОК");
+                ui->lineEditDriversState->setPalette(*paletteGreen);
+            }
+            else{
+                ui->lineEditDriversState->setText("Ошибка");
+                ui->lineEditDriversState->setPalette(*paletteRed);
+            }
+        }
+        else{
+            ui->lineEditDriversState->setText("Не контролируется");
+            ui->lineEditDriversState->setPalette(*paletteRed);
+        }
+
     }
     else if(tabName == "timeStat"){
         int curMsec = QTime::currentTime().msecsSinceStartOfDay();
@@ -1055,9 +1097,15 @@ void MainWindow::udpServerOpen()
 {
     if(udpSocket == NULL){
         udpSocket = new QUdpSocket(this);
+
         connect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
                 this, SLOT(stateChanged(QAbstractSocket::SocketState)));
+        connect(udpSocket, SIGNAL(readyRead()),
+                this, SLOT(handleReadPendingDatagrams()));
+    }
 
+    if(udpSocket->state() != QAbstractSocket::BoundState){
+        udpConnectionTime.restart();
         //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
         if(udpSocket->bind(QHostAddress::Any, 8051) == true){
             //qDebug("UDP bind OK");
@@ -1065,28 +1113,35 @@ void MainWindow::udpServerOpen()
         }
         else{
             ui->plainTextEdit->appendPlainText("UDP bind FAIL");
-
         }
-
-        connect(udpSocket, SIGNAL(readyRead()),
-                this, SLOT(handleReadPendingDatagrams()));
-        udpConnectionTime.start();
-        ui->pushButtonUdpOpenClose->setText("UDP Close");
     }
+
+
+    ui->pushButtonUdpOpenClose->setText("UDP Close");
+
 }
 
 void MainWindow::udpServerClose()
 {
-    udpSocket->close();
-    disconnect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-               this, SLOT(stateChanged(QAbstractSocket::SocketState)));
-    disconnect(udpSocket, SIGNAL(readyRead()),
-               this, SLOT(readPendingDatagrams()));
-    ui->pushButtonUdpOpenClose->setText("UDP Open");
-    ui->plainTextEdit->appendPlainText("UDP closed");
-
+    if(udpSocket != NULL){
+        udpSocket->close();
+        disconnect(udpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+                   this, SLOT(stateChanged(QAbstractSocket::SocketState)));
+        disconnect(udpSocket, SIGNAL(readyRead()),
+                   this, SLOT(handleReadPendingDatagrams()));
+        ui->pushButtonUdpOpenClose->setText("UDP Open");
+        ui->plainTextEdit->appendPlainText("UDP closed");
+    }
 }
 
+bool MainWindow::isUdpServerOpen()
+{
+    bool ret = false;
+    if(udpSocket != NULL){
+        ret = (udpSocket->state() == QAbstractSocket::BoundState);
+    }
+    return ret;
+}
 
 void MainWindow::on_pushButtonUdpOpenClose_clicked()
 {
@@ -1443,6 +1498,7 @@ void MainWindow::pushDebugComPortOpen(int id)
     QComboBox &cb = *debPortCmbBxList[id];
 
 
+    QString msg;
      if(pb.text() == "open"){
          if(lsDebugPort.isPortOpen(id) == false){
              QString comName = cb.currentData().toString();
@@ -1452,18 +1508,22 @@ void MainWindow::pushDebugComPortOpen(int id)
                  lsDebugPort.setPortName(id, comName);
                  if (lsDebugPort.open(id) == false) {
                      //qDebug("%s port open FAIL", qUtf8Printable(comName));
-                     ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL").arg(qUtf8Printable(comName)));
+                     //ui->plainTextEdit->appendPlainText(QString("%1 port open FAIL").arg(qUtf8Printable(comName)));
+                     msg = QString("debug port \"%1\" open fail").arg(comName);
                      return;
                  }
                  else{
                      cb.setDisabled(true);
-                     ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
+                     msg = QString("debug port \"%1\" open OK").arg(comName);
+     //                ui->plainTextEdit->appendPlainText(QString("%1 port opened").arg(qUtf8Printable(comName)));
      //                connect(&serial, SIGNAL(readyRead()),
      //                        this, SLOT(handleReadyRead()));
      //                connect(&serial, SIGNAL(bytesWritten(qint64)),
      //                        this, SLOT(handleSerialDataWritten(qint64)));
                      pb.setText("close");
                  }
+                 msg = QTime::currentTime().toString("hh:mm:ss")+"> " + msg;
+                 ui->plainTextEdit->appendPlainText(msg);
              }
          }
      }
@@ -1583,6 +1643,16 @@ void MainWindow::handleDriverErr(int id, QString &msg)
     debPortStatusMainLeList[id]->setPalette(*paletteRed);
     debPortStatusLeList[id]->setText(msg);
     debPortStatusMainLeList[id]->setText(msg);
+//    if(isUdpServerOpen())
+//        udpServerClose();
+    fpgaCtrl.clearCmdList();
+    fpgaCtrl.setMotorStateIdle();
+
+    if(fpgaCtrl.portIsOpen()){
+        fpgaCtrl.closePort();
+        ui->pushButtonComOpen->setText("open");
+        ui->comComboBoxUsbMain->setDisabled(false);
+    }
 }
 
 void MainWindow::handleDriverTimeout(int id)
@@ -1659,3 +1729,26 @@ void MainWindow::on_pushButtonD3_clicked()
     moveDown(2);
 }
 
+void MainWindow::handleStandStateChanged(TStandState ss)
+{
+    QString msg="standState:";
+    switch(ss){
+    case standStateidle:
+        ui->lineEditStandState->setText("idle");
+        ui->lineEditStandState->setPalette(*paletteGrey);
+        msg += "idle";
+        break;
+    case standStateInitiating:
+        ui->lineEditStandState->setText("initiate");
+        ui->lineEditStandState->setPalette(*paletteGrey);
+        msg += "initiate";
+        break;
+    case standStateError:
+        ui->lineEditStandState->setText("error");
+        ui->lineEditStandState->setPalette(*paletteRed);
+        msg += "error";
+        break;
+    }
+    msg = QTime::currentTime().toString("hh:mm:ss")+"> " + msg;
+    ui->plainTextEdit->appendPlainText(msg);
+}

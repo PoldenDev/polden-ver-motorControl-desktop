@@ -20,8 +20,8 @@ typedef struct{
 
 typedef enum{
     MT_IDLE,
-    MT_GoDOWN,
-    MT_GoUP,
+    //MT_GoDOWN,
+    //MT_GoUP,
     MT_INIT_GoDOWN,
     MT_INIT_GoUp
 } TMotorState ;

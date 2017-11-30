@@ -83,7 +83,7 @@ private slots:
 
     void fpgaCtrlTermState(int, bool);
     void handleFpgaCtrlErrorOccured(const QString&);
-
+    void handleStandStateChanged(TStandState);
 
     void on_checkBoxDirInverse_clicked();
 
@@ -110,6 +110,8 @@ private slots:
     void on_pushButtonU3_clicked();
 
     void on_pushButtonD3_clicked();
+
+
 
 private:
     //quint32 motorCount;
@@ -163,6 +165,7 @@ private:
 
     void udpServerOpen();
     void udpServerClose();
+    bool isUdpServerOpen();
 
     int mmToImp(int mm);
     bool speedTrig[MOTOR_CNT];

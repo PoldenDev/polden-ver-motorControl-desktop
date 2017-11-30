@@ -12,8 +12,10 @@ FpgaControl::FpgaControl(QObject *parent) :
     bDirInvers(false),
     recvInterval(-1),
     bTermState(MOTOR_CNT),
-    maxDiv_debug(0), maxSteps_debug(0)
+    maxDiv_debug(0), maxSteps_debug(0),
+    standState(standStateidle)
 {
+    emit standStateChanged(standState);
     for(int i=0; i<MOTOR_CNT; i++){
         bTermState[i] = false;
         mtState[i] = MT_IDLE;
@@ -64,24 +66,26 @@ void FpgaControl::setMotorCount(int mc)
 
 void FpgaControl::setMotorStateIdle()
 {
-    if(serial.isOpen()){
-        QString str("Si\r\n");
-     serial.write(str.toLatin1());
-    }
+//    if(serial.isOpen()){
+//        QString str("Si\r\n");
+//     serial.write(str.toLatin1());
+//    }
 
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
     }
 }
 
-void FpgaControl::setMotorStateGoDown()
-{
-    for(int i=0; i<MOTOR_CNT; i++)
-      mtState[i] = MT_GoDOWN;
-}
+//void FpgaControl::setMotorStateGoDown()
+//{
+//    for(int i=0; i<MOTOR_CNT; i++)
+//      mtState[i] = MT_GoDOWN;
+//}
 
 void FpgaControl::setMotorStateInitiate()
 {
+    standState = standStateInitiating;
+    emit standStateChanged(standState);
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_INIT_GoDOWN;
     }
@@ -250,7 +254,7 @@ void FpgaControl::terminatorState(int i, bool bEna)
 void FpgaControl::freeToWrite(int i)
 {
     switch(mtState[i]){
-    case MT_GoUP:
+//    case MT_GoUP:
 //        if(getMotorAbsPosImp(0) < 360000){
 //            DivPosDataStr ds;
 //            ds.pos = getMotorAbsPosImp(i) + 4560;
@@ -259,9 +263,9 @@ void FpgaControl::freeToWrite(int i)
 //        else{
 //            mtState[i] = MT_GoDOWN;
 //        }
-        break;
+//        break;
 
-    case MT_GoDOWN:
+    //case MT_GoDOWN:
     case MT_INIT_GoDOWN:
         //DivPosDataStr ds;
         //ds.steps=200;
@@ -306,20 +310,6 @@ void FpgaControl::freeToWrite(int i)
     }
         break;
     }
-
-    if((mtState[i] == MT_INIT_GoUp) &&
-            (motorPosCmdData[i].isEmpty() == true)){
-        mtState[i] = MT_IDLE;
-        motorAbsolutePosCur[i] = 0;
-        bool bState = true;
-        for(int k=0; k<MOTOR_CNT; k++){
-            bState = ((mtState[k]==MT_IDLE)&&bState);
-        }
-//        if(bState == true)
-//            udpServerOpen();
-    }
-
-
 }
 
 //int lastMsec = 0;
@@ -573,18 +563,49 @@ void FpgaControl::handleReadyRead()
         }
     }
 
-    bool bAllDown = true;
-    for(int id=0; id<motorCount; id++){
-        bAllDown = (bAllDown&&bTermState[id]&&(getCmdListLength(id) == 0));
-    }
-    if(bAllDown == true){
+
+    if(standState == standStateInitiating){
+        bool bAllDownPos = true;
+        bool bAllInitGoDownState = true;
+
         for(int id=0; id<motorCount; id++){
-            mtState[id] = MT_INIT_GoUp;
-            int pos = getMotorAbsPosImp(id);
-            pos +=400;
-            for(int k=0; k<20; k++){
-                addMotorCmd(id, pos, 100);
-                pos +=400;
+            bAllDownPos = (bAllDownPos&&bTermState[id] && (getCmdListLength(id) == 0));
+            bAllInitGoDownState = (bAllInitGoDownState && (mtState[id] == MT_INIT_GoDOWN));
+        }
+        if(bAllInitGoDownState){
+            if(bAllDownPos){
+                for(int id=0; id<motorCount; id++){
+                    mtState[id] = MT_INIT_GoUp;
+                    int pos = getMotorAbsPosImp(id);
+                    pos +=400;
+                    for(int k=0; k<20; k++){
+                        addMotorCmd(id, pos, 100);
+                        pos +=400;
+                    }
+                }
+            }
+        }
+        else{
+            bool bAllIdleState = true;
+            for(int id=0; id<motorCount; id++){
+                if(mtState[id] == MT_INIT_GoUp){
+                    if(motorPosCmdData[id].isEmpty() == true){
+                        if(bTermState[id]){
+                            standState = standStateError;
+                            emit errorOccured(QString("ошибка %1 привода").arg(id));
+                            emit standStateChanged(standState);
+                        }
+                        else{
+                            mtState[id] = MT_IDLE;
+                            motorAbsolutePosCur[id] = 0;
+                        }
+                    }
+                }
+                bAllIdleState = ((mtState[id]==MT_IDLE)&&bAllIdleState);
+            }
+            if(bAllIdleState){
+                standState = standStateidle;
+                emit standStateChanged(standState);
             }
         }
     }
@@ -625,9 +646,11 @@ void FpgaControl::handleReadyRead()
         }
     }
 
-    for(int i=0; i<MOTOR_CNT; i++){
-        if(isBufFree[i] == true)
-            freeToWrite(i);
+    if(standState != standStateError){
+        for(int i=0; i<MOTOR_CNT; i++){
+            if(isBufFree[i] == true)
+                freeToWrite(i);
+        }
     }
 
     //parseFPGAMsg(dArr);

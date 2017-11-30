@@ -8,6 +8,12 @@
 
 #include "stand.h"
 
+typedef enum{
+    standStateInitiating,
+    standStateError,
+    standStateidle
+} TStandState;
+
 class FpgaControl : public QObject
 {
     Q_OBJECT
@@ -23,7 +29,7 @@ public:
 
     void setMotorCount(int);
     void setMotorStateIdle();
-    void setMotorStateGoDown();
+    //void setMotorStateGoDown();
     void setMotorStateInitiate();
     void setFpgaFreq(quint32);
     void setDirInverse(bool e){bDirInvers=e;}
@@ -57,6 +63,7 @@ private:
 
     QTime exchInterval;
     QTimer timer, exchTimeoutTimer;
+    TStandState standState;
 
 
     void parseFPGAMsg(QByteArray ba);
@@ -67,13 +74,15 @@ private:
 
 //    bool isBufferFree(qint32, int);
 //    void setBufferNotFree(qint32&, int);
-//    bool isTermEna(qint32, int);
+//    bool issTermEna(qint32, int);
     int maxDiv_debug, maxSteps_debug;
 
 signals:
     void termStateChanged(int, bool);
     void errorOccured(const QString&);
     void initFinished();
+    void standStateChanged(TStandState);
+
 
 private slots:
     void handleReadyRead();

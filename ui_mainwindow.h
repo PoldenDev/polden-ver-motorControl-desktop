@@ -78,6 +78,10 @@ public:
     QLabel *label_6;
     QLineEdit *lineEditDataGramCnt;
     QCheckBox *checkBoxSliderPosCtrl;
+    QGroupBox *groupBox_3;
+    QLineEdit *lineEditDriversState;
+    QGroupBox *groupBox_9;
+    QLineEdit *lineEditStandState;
     QWidget *tabSettings;
     QGroupBox *groupBox_5;
     QLabel *label_8;
@@ -123,6 +127,7 @@ public:
     QCheckBox *term8;
     QCheckBox *term9;
     QCheckBox *term10;
+    QCheckBox *checkBoxDriversStateControl;
     QWidget *tabDebugPort;
     QWidget *widgetComPorts;
     QWidget *widget_27;
@@ -137,8 +142,6 @@ public:
     QPushButton *pushButtonTest;
     QPushButton *pushButtonTest1;
     QPushButton *pushButtonTest2;
-    QWidget *widget_2;
-    QHBoxLayout *horizontalLayout_2;
     QPushButton *pushButtonU1;
     QPushButton *pushButtonD1;
     QPushButton *pushButtonU2;
@@ -165,7 +168,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(816, 739);
+        MainWindow->resize(838, 923);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -372,6 +375,21 @@ public:
         checkBoxSliderPosCtrl = new QCheckBox(tabMainStat);
         checkBoxSliderPosCtrl->setObjectName(QStringLiteral("checkBoxSliderPosCtrl"));
         checkBoxSliderPosCtrl->setGeometry(QRect(600, 280, 70, 17));
+        groupBox_3 = new QGroupBox(tabMainStat);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setGeometry(QRect(760, 30, 151, 71));
+        lineEditDriversState = new QLineEdit(groupBox_3);
+        lineEditDriversState->setObjectName(QStringLiteral("lineEditDriversState"));
+        lineEditDriversState->setGeometry(QRect(10, 30, 121, 20));
+        lineEditDriversState->setAlignment(Qt::AlignCenter);
+        lineEditDriversState->setReadOnly(true);
+        groupBox_9 = new QGroupBox(tabMainStat);
+        groupBox_9->setObjectName(QStringLiteral("groupBox_9"));
+        groupBox_9->setGeometry(QRect(760, 140, 120, 80));
+        lineEditStandState = new QLineEdit(groupBox_9);
+        lineEditStandState->setObjectName(QStringLiteral("lineEditStandState"));
+        lineEditStandState->setGeometry(QRect(10, 30, 91, 20));
+        lineEditStandState->setAlignment(Qt::AlignCenter);
         tabWidget->addTab(tabMainStat, QString());
         tabSettings = new QWidget();
         tabSettings->setObjectName(QStringLiteral("tabSettings"));
@@ -415,7 +433,7 @@ public:
         lineEdit_vmax_mmsec->setAlignment(Qt::AlignCenter);
         groupBox_6 = new QGroupBox(tabSettings);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        groupBox_6->setGeometry(QRect(260, 20, 151, 161));
+        groupBox_6->setGeometry(QRect(260, 20, 151, 171));
         radioButtonFpgaFreq24 = new QRadioButton(groupBox_6);
         radioButtonFpgaFreq24->setObjectName(QStringLiteral("radioButtonFpgaFreq24"));
         radioButtonFpgaFreq24->setGeometry(QRect(10, 70, 91, 17));
@@ -439,7 +457,7 @@ public:
         checkBoxInitEnable->setGeometry(QRect(10, 110, 131, 17));
         checkBoxInitOnStart = new QCheckBox(groupBox_6);
         checkBoxInitOnStart->setObjectName(QStringLiteral("checkBoxInitOnStart"));
-        checkBoxInitOnStart->setGeometry(QRect(10, 130, 70, 17));
+        checkBoxInitOnStart->setGeometry(QRect(10, 130, 101, 17));
         groupBox_7 = new QGroupBox(tabSettings);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
         groupBox_7->setGeometry(QRect(20, 200, 141, 111));
@@ -462,7 +480,7 @@ public:
         checkBoxPrintUDPData->setGeometry(QRect(20, 80, 61, 20));
         groupBox_8 = new QGroupBox(tabSettings);
         groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
-        groupBox_8->setGeometry(QRect(240, 190, 151, 51));
+        groupBox_8->setGeometry(QRect(170, 210, 151, 51));
         label_13 = new QLabel(groupBox_8);
         label_13->setObjectName(QStringLiteral("label_13"));
         label_13->setGeometry(QRect(10, 20, 71, 16));
@@ -556,6 +574,9 @@ public:
 
         verticalLayout_4->addWidget(widget_9);
 
+        checkBoxDriversStateControl = new QCheckBox(tabSettings);
+        checkBoxDriversStateControl->setObjectName(QStringLiteral("checkBoxDriversStateControl"));
+        checkBoxDriversStateControl->setGeometry(QRect(440, 30, 211, 17));
         tabWidget->addTab(tabSettings, QString());
         tabDebugPort = new QWidget();
         tabDebugPort->setObjectName(QStringLiteral("tabDebugPort"));
@@ -590,6 +611,7 @@ public:
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
         pushMoveDown = new QPushButton(widget_6);
         pushMoveDown->setObjectName(QStringLiteral("pushMoveDown"));
+        pushMoveDown->setMaximumSize(QSize(16777215, 16777215));
 
         horizontalLayout_4->addWidget(pushMoveDown);
 
@@ -623,47 +645,38 @@ public:
 
         horizontalLayout_4->addWidget(pushButtonTest2);
 
-
-        verticalLayout_2->addWidget(widget_6);
-
-        widget_2 = new QWidget(centralWidget);
-        widget_2->setObjectName(QStringLiteral("widget_2"));
-        horizontalLayout_2 = new QHBoxLayout(widget_2);
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        pushButtonU1 = new QPushButton(widget_2);
+        pushButtonU1 = new QPushButton(widget_6);
         pushButtonU1->setObjectName(QStringLiteral("pushButtonU1"));
 
-        horizontalLayout_2->addWidget(pushButtonU1);
+        horizontalLayout_4->addWidget(pushButtonU1);
 
-        pushButtonD1 = new QPushButton(widget_2);
+        pushButtonD1 = new QPushButton(widget_6);
         pushButtonD1->setObjectName(QStringLiteral("pushButtonD1"));
 
-        horizontalLayout_2->addWidget(pushButtonD1);
+        horizontalLayout_4->addWidget(pushButtonD1);
 
-        pushButtonU2 = new QPushButton(widget_2);
+        pushButtonU2 = new QPushButton(widget_6);
         pushButtonU2->setObjectName(QStringLiteral("pushButtonU2"));
 
-        horizontalLayout_2->addWidget(pushButtonU2);
+        horizontalLayout_4->addWidget(pushButtonU2);
 
-        pushButtonD2 = new QPushButton(widget_2);
+        pushButtonD2 = new QPushButton(widget_6);
         pushButtonD2->setObjectName(QStringLiteral("pushButtonD2"));
 
-        horizontalLayout_2->addWidget(pushButtonD2);
+        horizontalLayout_4->addWidget(pushButtonD2);
 
-        pushButtonU3 = new QPushButton(widget_2);
+        pushButtonU3 = new QPushButton(widget_6);
         pushButtonU3->setObjectName(QStringLiteral("pushButtonU3"));
 
-        horizontalLayout_2->addWidget(pushButtonU3);
+        horizontalLayout_4->addWidget(pushButtonU3);
 
-        pushButtonD3 = new QPushButton(widget_2);
+        pushButtonD3 = new QPushButton(widget_6);
         pushButtonD3->setObjectName(QStringLiteral("pushButtonD3"));
 
-        horizontalLayout_2->addWidget(pushButtonD3);
+        horizontalLayout_4->addWidget(pushButtonD3);
 
 
-        verticalLayout_2->addWidget(widget_2);
+        verticalLayout_2->addWidget(widget_6);
 
         widget_29 = new QWidget(centralWidget);
         widget_29->setObjectName(QStringLiteral("widget_29"));
@@ -739,7 +752,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 816, 21));
+        menuBar->setGeometry(QRect(0, 0, 838, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -771,6 +784,8 @@ public:
         label_7->setText(QApplication::translate("MainWindow", "state", Q_NULLPTR));
         label_6->setText(QApplication::translate("MainWindow", "\320\224\320\263\321\200\320\274", Q_NULLPTR));
         checkBoxSliderPosCtrl->setText(QApplication::translate("MainWindow", "sliderPosCtrl", Q_NULLPTR));
+        groupBox_3->setTitle(QApplication::translate("MainWindow", "\320\241\320\276\321\201\321\202\320\276\321\217\320\275\320\270\320\265 \320\264\321\200\320\260\320\271\320\262\320\265\321\200\320\276\320\262", Q_NULLPTR));
+        groupBox_9->setTitle(QApplication::translate("MainWindow", "\320\241\320\276\321\201\321\202\320\276\321\217\320\275\320\270\320\265", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabMainStat), QApplication::translate("MainWindow", "mainStat", Q_NULLPTR));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "\320\234\320\265\321\205\320\260\320\275\320\270\320\272\320\260", Q_NULLPTR));
         label_8->setText(QApplication::translate("MainWindow", "\320\270\320\274\320\277/\320\276\320\261", Q_NULLPTR));
@@ -816,6 +831,7 @@ public:
         term8->setText(QApplication::translate("MainWindow", "8", Q_NULLPTR));
         term9->setText(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         term10->setText(QApplication::translate("MainWindow", "10", Q_NULLPTR));
+        checkBoxDriversStateControl->setText(QApplication::translate("MainWindow", "\320\272\320\276\320\275\321\202\321\200\320\276\320\273\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\276\321\210\320\270\320\261\320\272\320\270 \320\264\321\200\320\260\320\271\320\262\320\265\321\200\320\276\320\262", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabSettings), QApplication::translate("MainWindow", "settings", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabDebugPort), QApplication::translate("MainWindow", "debugPort", Q_NULLPTR));
         pushButtonInitiate->setText(QApplication::translate("MainWindow", "\320\230\320\275\320\270\321\206\320\270\320\260\320\273\320\270\320\267\320\270\321\200\320\276\320\262\320\260\321\202\321\214", Q_NULLPTR));

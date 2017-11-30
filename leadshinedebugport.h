@@ -4,6 +4,13 @@
 #include <QObject>
 #include <QSerialPort>
 #include <QTimer>
+#include <QMap>
+
+typedef enum{
+    LS_STAT_OK,
+    LS_STAT_Error,
+    LS_STAT_Unknown
+} TDriversState;
 
 class LeadshineDebugPort : public QObject
 {
@@ -20,6 +27,10 @@ public:
     QString portName(int);
     bool open(int);
     void close(int);
+
+    bool isDriversOk();
+    TDriversState driverState(int);
+    QList<QString> comNames;
 signals:
     void driverOk(int);
     void driverErr(int, QString&);
@@ -39,6 +50,8 @@ private:
     void handleComPortErrorOccured(int id, QSerialPort::SerialPortError error);
 
     QList<QByteArray> msgDataArrList;
+
+    QMap<int, TDriversState> driverStateMap;
 };
 
 #endif // LEADSHINEDEBUGPORT_H

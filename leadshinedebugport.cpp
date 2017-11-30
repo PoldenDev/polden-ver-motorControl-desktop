@@ -7,7 +7,7 @@ LeadshineDebugPort::LeadshineDebugPort(QObject *parent) :
 {
     connect(&checkDebugComTimer, SIGNAL(timeout()), this, SLOT(checkDebugComTimerHandle()));
     checkDebugComTimer.setSingleShot(false);
-    checkDebugComTimer.setInterval(500);
+    checkDebugComTimer.setInterval(250);
     checkDebugComTimer.start();
 }
 
@@ -18,14 +18,15 @@ void LeadshineDebugPort::setPortCount(int pCnt)
     debSerialPortList.clear();
     motorRespRecvdList.clear();
     msgDataArrList.clear();
+
     for(int i=0; i<pCnt; i++){
         QSerialPort *sp = new QSerialPort(this);
         connect(sp, &QSerialPort::errorOccurred, [this, i](QSerialPort::SerialPortError error){ handleComPortErrorOccured(i, error);});
         connect(sp, &QSerialPort::readyRead, [this, i](){ handleReadyRead(i);});
         debSerialPortList.append(sp);
         motorRespRecvdList.append(new bool(false));
-
         msgDataArrList.append(QByteArray());
+        driverStateMap[i] = LS_STAT_Unknown;
     }
 
     checkDebugComTimer.start();
@@ -114,6 +115,7 @@ void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
         //ui->plainTextEdit->appendPlainText(QString("debResp%1: %2 -> %3").arg(id).arg(ba.size()).arg(QString(ba.toHex().toUpper())));
         if((ba[4]&0x50) == 0){
             emit driverOk(id);
+            driverStateMap[id] = LS_STAT_OK;
 //            debPortStatusLeList[id]->setPalette(*paletteGreen);
 //            debPortStatusMainLeList[id]->setPalette(*paletteGreen);
 //            //ui->plainTextEdit->appendPlainText(QString("debResp%1: OK").arg(id));
@@ -123,6 +125,7 @@ void LeadshineDebugPort::parseLeadShineMsg(int id, QByteArray &ba)
         }
         else{
             QString msg("");
+            driverStateMap[id] = LS_STAT_Error;
 
 //            debPortStatusLeList[id]->setPalette(*paletteRed);
 //            debPortStatusMainLeList[id]->setPalette(*paletteRed);
@@ -174,6 +177,7 @@ bool LeadshineDebugPort::isPortOpen(int id)
 void LeadshineDebugPort::setPortName(int id, QString &name)
 {
     debSerialPortList[id]->setPortName(name);
+
 }
 
 QString LeadshineDebugPort::portName(int id)
@@ -204,7 +208,8 @@ void LeadshineDebugPort::checkDebugComTimerHandle()
     for(int i=0; i<portCount; i++){
         bool &bRespRecv = *(motorRespRecvdList[i]);
         if(bRespRecv == false){
-            emit driverTimeOut(i);
+            driverStateMap[i] = LS_STAT_Unknown;
+            emit driverTimeOut(i);            
         }
         QSerialPort *sp = debSerialPortList[i];
         if(sp->isOpen()){
@@ -212,4 +217,27 @@ void LeadshineDebugPort::checkDebugComTimerHandle()
         }
         bRespRecv = false;
     }
+}
+
+
+bool LeadshineDebugPort::isDriversOk()
+{
+    QList<int> keys = driverStateMap.keys();
+
+    bool bDirversStat = true;
+    foreach (int k, keys) {
+        bDirversStat &= (driverStateMap[k]==LS_STAT_OK);
+    }
+
+    return bDirversStat;
+}
+
+TDriversState LeadshineDebugPort::driverState(int id)
+{
+    if( (id <0) || (id >= portCount))
+        return LS_STAT_Unknown;
+
+
+
+    return driverStateMap[id];
 }
