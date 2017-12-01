@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
+    <width>1083</width>
     <height>923</height>
    </rect>
   </property>
@@ -588,41 +588,12 @@
           <x>260</x>
           <y>20</y>
           <width>151</width>
-          <height>171</height>
+          <height>121</height>
          </rect>
         </property>
         <property name="title">
          <string>ЭБУ</string>
         </property>
-        <widget class="QRadioButton" name="radioButtonFpgaFreq24">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>70</y>
-           <width>91</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>24 МГц (v1.0)</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="radioButtonFpgaFreq25">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>90</y>
-           <width>91</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>25 МГц (v1.1)</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="QLabel" name="label_3">
          <property name="geometry">
           <rect>
@@ -668,11 +639,11 @@
           <string>инверсия dir</string>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBoxInitEnable">
+        <widget class="QCheckBox" name="checkBoxUdpInitEnable">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>110</y>
+           <y>70</y>
            <width>131</width>
            <height>17</height>
           </rect>
@@ -685,7 +656,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>130</y>
+           <y>90</y>
            <width>101</width>
            <height>17</height>
           </rect>
@@ -1239,7 +1210,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>838</width>
+     <width>1083</width>
      <height>21</height>
     </rect>
    </property>

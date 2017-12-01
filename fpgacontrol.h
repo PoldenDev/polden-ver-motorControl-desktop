@@ -37,6 +37,8 @@ public:
 
     void posReset();
 
+    TStandState state(){return standState;};
+
     TMotorState mtState[MOTOR_CNT];
     quint32 fpgaFreq;
     quint32 comExchanges;

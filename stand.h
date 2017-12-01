@@ -3,7 +3,7 @@
 typedef enum {idle, waitForAck, waitForFifoFree} TSendState;
 
 #define MOTOR_CNT 10
-#define FPGA_FREQ_24 24000000
+//#define FPGA_FREQ_24 24000000
 #define FPGA_FREQ_25 25000000
 
 #define MAX_DIV 0x7FFF

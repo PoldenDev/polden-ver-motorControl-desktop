@@ -74,8 +74,6 @@ private slots:
 
     void on_lineEdit_maxHeightMM_editingFinished();
     void on_lineEdit_MaxHeightImp_editingFinished();
-    void on_radioButtonFpgaFreq25_clicked();
-    void on_radioButtonFpgaFreq24_clicked();
     void on_lineEdit_mmPerRot_editingFinished();
     void on_lineEdit_vmax_mmsec_editingFinished();
 
@@ -174,6 +172,9 @@ private:
 
     void createDebugSerialPortInterface();
     void createMainInterface();
+
+    void postMessage(QString str);
+    void postUDPMessage(QString str);
 
     QList<QComboBox*> debPortCmbBxList;
     QList<QPushButton*> debPortpbList;

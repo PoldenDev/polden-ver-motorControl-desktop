@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditMinVal->setText(QString::number(settings.value("minPosValue", 0).toInt()));
     ui->checkBoxDirInverse->setChecked(settings.value("dirInverse", false).toBool());
 
-    ui->checkBoxInitEnable->setChecked(settings.value("initEnable", false).toBool());
+    ui->checkBoxUdpInitEnable->setChecked(settings.value("udpInitEnable", false).toBool());
 
     ui->checkBoxInitOnStart->setChecked(settings.value("initOnStart", false).toBool());
 
@@ -81,20 +81,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->checkBoxDriversStateControl->setChecked(settings.value("driversStateControl", false).toBool());
 
+    ui->lineEditStandState->setText("unknown");
 
 
     quint32 fpgaFreq = settings.value("FPGA_FREQ", FPGA_FREQ_25).toInt();
+    fpgaFreq = FPGA_FREQ_25;
     fpgaCtrl.setFpgaFreq(fpgaFreq);
 
-    if(fpgaFreq == FPGA_FREQ_24)
-        ui->radioButtonFpgaFreq24->setChecked(true);
-    else if(fpgaFreq == FPGA_FREQ_25)
-        ui->radioButtonFpgaFreq25->setChecked(true);
-    else{
-        ui->radioButtonFpgaFreq24->setChecked(false);
-        ui->radioButtonFpgaFreq25->setChecked(false);
+//    if(fpgaFreq == FPGA_FREQ_24)
+//        ui->radioButtonFpgaFreq24->setChecked(true);
+//    else if(fpgaFreq == FPGA_FREQ_25)
+//        ui->radioButtonFpgaFreq25->setChecked(true);
+//    else{
+//        ui->radioButtonFpgaFreq24->setChecked(false);
+//        ui->radioButtonFpgaFreq25->setChecked(false);
 
-    }
+//    }
 
     dataProcess100msTimer.setInterval(90);
     connect(&dataProcess100msTimer, SIGNAL(timeout()), this, SLOT(dataProcess100msTimeOut()));
@@ -323,7 +325,7 @@ MainWindow::~MainWindow()
     settings.setValue("usbMain", comName);
 
 
-    settings.setValue("initEnable", ui->checkBoxInitEnable->isChecked());
+    settings.setValue("udpInitEnable", ui->checkBoxUdpInitEnable->isChecked());
 
     settings.setValue("initOnStart", ui->checkBoxInitOnStart->isChecked());
     settings.setValue("driversStateControl", ui->checkBoxDriversStateControl->isChecked());
@@ -628,11 +630,16 @@ void MainWindow::handleReadPendingDatagrams()
             //if(ui->checkBoxPrintUDPData->isChecked())
                 ui->plainTextUDP->appendPlainText("start cmd");
         }
-        else if(dataStr.compare("init\r\n") == 0){
-            //if(ui->checkBoxPrintUDPData->isChecked())
+        else if((dataStr == "init\r\n") || (dataStr == "init")){
+            if(lsDebugPort.isDriversOk() == false){
+                postUDPMessage("drivers error. Skip pos dgrm.");
+                continue;
+            }
+            else{
                 ui->plainTextUDP->appendPlainText("init cmd");
-
-            if(ui->checkBoxInitEnable->isChecked()){
+            }
+            //if(ui->checkBoxPrintUDPData->isChecked())
+            if(ui->checkBoxUdpInitEnable->isChecked()){
                 on_pushButtonInitiate_clicked();
             }
             else{
@@ -642,10 +649,40 @@ void MainWindow::handleReadPendingDatagrams()
         else if(dataStr.compare("stop\r\n") == 0){            
             qDebug("stop cmd");
             fpgaCtrl.clearCmdList();
-            //if(ui->checkBoxPrintUDPData->isChecked())
-                ui->plainTextUDP->appendPlainText("stop cmd");
+            //if(ui->checkBoxPrintUDPData->isChecked())   
+                postUDPMessage("stop cmd");
+        }
+        else if(dataStr == "stat?"){
+            QString replStr;
+
+            switch(fpgaCtrl.state()){
+            case standStateError:
+                replStr = "err";
+                break;
+            case standStateidle:
+                replStr = "ok";
+                break;
+            case standStateInitiating:
+                replStr = "init";
+                break;
+            default:
+                replStr = "err";
+            }
+            if(ui->checkBoxDriversStateControl->isChecked()){
+                if(lsDebugPort.isDriversOk() == false){
+                    replStr = "err";
+                }
+            }
+
+            postUDPMessage(QString("%1 - stat? ->\"").arg(datagram.senderAddress().toString()) + replStr +"\"");
+            udpSocket->writeDatagram(replStr.toLatin1(), datagram.senderAddress(), 8052);
+            //udpSocket->writeDatagram(datagram.makeReply(replStr.toLatin1()));
         }
         else{
+            if(lsDebugPort.isDriversOk() == false){
+                postUDPMessage("drivers error. Skip pos dgrm.");
+                continue;
+            }
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
             //qDebug()<<dataStr;
             quint32 curMsecs = QTime::currentTime().msecsSinceStartOfDay();
@@ -665,13 +702,12 @@ void MainWindow::handleReadPendingDatagrams()
             }
 
             if(ui->checkBoxPrintUDPData->isChecked()){
-                QString showStr = QString("%1 %2 (%3)").arg(QTime::currentTime().toString("mm:ss:zzz"))
-                                                        .arg(dataStr).arg(udpDgRecvInterval);
+                QString showStr = QString("%2 (%3)").arg(dataStr).arg(udpDgRecvInterval);
                 int indOfCrLn = showStr.lastIndexOf("\r\n");
                 if(indOfCrLn != -1){
                     showStr.remove(indOfCrLn, 2);
                 }
-                ui->plainTextUDP->appendPlainText(showStr);
+                postUDPMessage(showStr);
             }
 
             if(udpDgRecvInterval > 1000) udpDgRecvInterval=100;
@@ -1109,10 +1145,10 @@ void MainWindow::udpServerOpen()
         //if(udpSocket->bind(QHostAddress("192.168.0.104"), 8051) == true){
         if(udpSocket->bind(QHostAddress::Any, 8051) == true){
             //qDebug("UDP bind OK");
-            ui->plainTextEdit->appendPlainText("UDP bind OK");
+            ui->plainTextEdit->appendPlainText(QString("UDP bind on %1 OK").arg(udpSocket->localPort()));
         }
         else{
-            ui->plainTextEdit->appendPlainText("UDP bind FAIL");
+            ui->plainTextEdit->appendPlainText(QString("UDP bind on %1 FAIL").arg(udpSocket->localPort()));
         }
     }
 
@@ -1274,18 +1310,6 @@ void MainWindow::on_lineEdit_MaxHeightImp_editingFinished()
     ui->lineEdit_maxHeightMM->setText(QString::number(maxHeigtMM));
 
 
-}
-
-void MainWindow::on_radioButtonFpgaFreq25_clicked()
-{
-    fpgaCtrl.setFpgaFreq(FPGA_FREQ_25);
-    settings.setValue("FPGA_FREQ", FPGA_FREQ_25);
-}
-
-void MainWindow::on_radioButtonFpgaFreq24_clicked()
-{
-    fpgaCtrl.setFpgaFreq(FPGA_FREQ_24);
-    settings.setValue("FPGA_FREQ", FPGA_FREQ_24);
 }
 
 void MainWindow::on_lineEdit_mmPerRot_editingFinished()
@@ -1751,4 +1775,15 @@ void MainWindow::handleStandStateChanged(TStandState ss)
     }
     msg = QTime::currentTime().toString("hh:mm:ss")+"> " + msg;
     ui->plainTextEdit->appendPlainText(msg);
+}
+
+void MainWindow::postMessage(QString str)
+{
+
+}
+
+void MainWindow::postUDPMessage(QString str)
+{
+    QString showStr = QString("%1> %2").arg(QTime::currentTime().toString("hh:mm:ss:zzz")).arg(str);
+    ui->plainTextUDP->appendPlainText(showStr);
 }
