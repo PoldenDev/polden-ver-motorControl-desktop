@@ -631,7 +631,8 @@ void MainWindow::handleReadPendingDatagrams()
                 ui->plainTextUDP->appendPlainText("start cmd");
         }
         else if((dataStr == "init\r\n") || (dataStr == "init")){
-            if(lsDebugPort.isDriversOk() == false){
+            if(ui->checkBoxDriversStateControl->isChecked() &&
+                    (lsDebugPort.isDriversOk() == false)){
                 postUDPMessage("drivers error. Skip pos dgrm.");
                 continue;
             }
@@ -653,6 +654,7 @@ void MainWindow::handleReadPendingDatagrams()
                 postUDPMessage("stop cmd");
         }
         else if(dataStr == "stat?"){
+            static int msgInd =0 ;
             QString replStr;
 
             switch(fpgaCtrl.state()){
@@ -674,14 +676,17 @@ void MainWindow::handleReadPendingDatagrams()
                 }
             }
 
-            postUDPMessage(QString("%1 - stat? ->\"").arg(datagram.senderAddress().toString()) + replStr +"\"");
+            //replStr += QString::number(msgInd++);
+            //postUDPMessage(QString("%1 - stat? ->\"").arg(datagram.senderAddress().toString()) + replStr +"\"");
             udpSocket->writeDatagram(replStr.toLatin1(), datagram.senderAddress(), 8052);
             //udpSocket->writeDatagram(datagram.makeReply(replStr.toLatin1()));
         }
         else{
-            if(lsDebugPort.isDriversOk() == false){
-                postUDPMessage("drivers error. Skip pos dgrm.");
-                continue;
+            if(ui->checkBoxDriversStateControl->isChecked()){
+                if(lsDebugPort.isDriversOk() == false){
+                    postUDPMessage("drivers error. Skip pos dgrm.");
+                    continue;
+                }
             }
             QStringList list1 = dataStr.split("\r\n", QString::SkipEmptyParts);
             //qDebug()<<dataStr;

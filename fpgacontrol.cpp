@@ -66,6 +66,7 @@ void FpgaControl::setMotorCount(int mc)
 
 void FpgaControl::setMotorStateIdle()
 {
+
 //    if(serial.isOpen()){
 //        QString str("Si\r\n");
 //     serial.write(str.toLatin1());
@@ -74,6 +75,8 @@ void FpgaControl::setMotorStateIdle()
     for(int i=0; i<MOTOR_CNT; i++){
         mtState[i] = MT_IDLE;
     }
+
+    standState = standStateidle;
 }
 
 //void FpgaControl::setMotorStateGoDown()
